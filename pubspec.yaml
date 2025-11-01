@@ -1,0 +1,22 @@
+name: learning_fun
+description: A colourful, offline educational app for children aged 2–6 to learn Hebrew and English basic skills through fun games.
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.33.0
+  flame_audio: ^2.11.11
+  shared_preferences: ^2.2.2
+  provider: ^6.1.5
+  lottie: ^3.3.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/audio/
+    - assets/images/
+    - assets/lottie/
