@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'ui/home_screen.dart';
-import 'core/progress_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'providers/app_provider.dart';
+import 'screens/new_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize any persistent storage or services here
   runApp(const LearningFunApp());
 }
 
@@ -15,16 +16,85 @@ class LearningFunApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProgressProvider(),
-      child: MaterialApp(
-        title: 'לומדים בכיף',
-        theme: ThemeData(
-          primarySwatch: Colors.teal,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          fontFamily: 'Roboto',
-        ),
-        supportedLocales: const [Locale('he'), Locale('en')],
-        home: const HomeScreen(),
+      create: (_) => AppProvider(),
+      child: Consumer<AppProvider>(
+        builder: (context, appProvider, child) {
+          return MaterialApp(
+            title: 'לומדים בכיף - Learning Fun',
+            debugShowCheckedModeBanner: false,
+
+            // תמיכה בלוקליזציה
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // אנגלית
+              Locale('he'), // עברית
+            ],
+
+            // שפה נוכחית
+            locale: appProvider.locale,
+
+            // תמיכה ב-RTL לעברית
+            builder: (context, child) {
+              return Directionality(
+                textDirection: appProvider.locale.languageCode == 'he'
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: child!,
+              );
+            },
+
+            // ערכת נושא
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.orange,
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              fontFamily: appProvider.locale.languageCode == 'he'
+                  ? 'Rubik' // פונט ידידותי לעברית
+                  : 'Quicksand', // פונט ידידותי לאנגלית
+              textTheme: const TextTheme(
+                displayLarge: TextStyle(
+                  fontSize: 96,
+                  fontWeight: FontWeight.bold,
+                ),
+                displayMedium: TextStyle(
+                  fontSize: 60,
+                  fontWeight: FontWeight.bold,
+                ),
+                displaySmall: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                ),
+                headlineLarge: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                ),
+                headlineMedium: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                ),
+                headlineSmall: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+                titleLarge: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                ),
+                bodyLarge: TextStyle(fontSize: 18),
+                bodyMedium: TextStyle(fontSize: 16),
+              ),
+            ),
+
+            home: const NewHomeScreen(),
+          );
+        },
       ),
     );
   }
