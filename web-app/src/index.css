@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Alef:wght@400;700&display=swap');
+
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Alef', sans-serif;
+  background: linear-gradient(to bottom right, #eff6ff, #faf5ff, #fce7f3);
+  color: #1f2937;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Custom button styles for kids */
+.btn-kid {
+  min-height: 80px;
+  min-width: 80px;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.btn-kid:active {
+  transform: scale(0.95);
+}
+
+.btn-kid:hover {
+  transform: scale(1.05);
+}
+
+.btn-kid-primary {
+  background: linear-gradient(to bottom right, #f7a028, #dd7800);
+  color: white;
+}
+
+.btn-kid-primary:hover {
+  background: linear-gradient(to bottom right, #f58800, #b86200);
+}
+
+.btn-kid-secondary {
+  background: linear-gradient(to bottom right, #34b9ff, #0095e6);
+  color: white;
+}
+
+.btn-kid-secondary:hover {
+  background: linear-gradient(to bottom right, #00a8ff, #007bbf);
+}
+
+/* Module card styles */
+.module-card {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  min-height: 200px;
+}
+
+.module-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+}
+
+/* Reward animations container */
+.reward-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* RTL support for Hebrew */
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+/* Animation utilities */
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s infinite;
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "Learning Fun",
+    "welcome": "Welcome!",
+    "start": "Start",
+    "next": "Next",
+    "back": "Back",
+    "correct": "Correct!",
+    "tryAgain": "Try Again!",
+    "wellDone": "Well Done!",
+    "awesome": "Awesome!",
+    "great": "Great Job!"
+  },
+  "modules": {
+    "numbers": "Numbers",
+    "letters": "Letters",
+    "colors": "Colors",
+    "shapes": "Shapes"
+  },
+  "numbers": {
+    "title": "Learn Numbers",
+    "description": "Let's count together!",
+    "learnMode": "Learning Mode",
+    "quizMode": "Quiz Time",
+    "one": "One",
+    "two": "Two",
+    "three": "Three",
+    "four": "Four",
+    "five": "Five",
+    "six": "Six",
+    "seven": "Seven",
+    "eight": "Eight",
+    "nine": "Nine",
+    "ten": "Ten"
+  },
+  "colors": {
+    "title": "Learn Colors",
+    "description": "Explore the rainbow!",
+    "red": "Red",
+    "blue": "Blue",
+    "yellow": "Yellow",
+    "green": "Green",
+    "orange": "Orange",
+    "purple": "Purple",
+    "pink": "Pink",
+    "brown": "Brown",
+    "black": "Black",
+    "white": "White"
+  },
+  "shapes": {
+    "title": "Learn Shapes",
+    "description": "Discover shapes around us!",
+    "circle": "Circle",
+    "square": "Square",
+    "triangle": "Triangle",
+    "rectangle": "Rectangle",
+    "star": "Star",
+    "heart": "Heart"
+  },
+  "letters": {
+    "title": "Learn Letters",
+    "description": "Let's explore the alphabet!"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "english": "English",
+    "hebrew": "עברית",
+    "sound": "Sound",
+    "soundOn": "Sound On",
+    "soundOff": "Sound Off",
+    "music": "Music",
+    "musicOn": "Music On",
+    "musicOff": "Music Off"
+  },
+  "dashboard": {
+    "title": "Progress",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "stars": "Stars Earned"
+  }
+}

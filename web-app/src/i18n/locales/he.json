@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "לומדים בכיף",
+    "welcome": "ברוכים הבאים!",
+    "start": "התחל",
+    "next": "הבא",
+    "back": "חזור",
+    "correct": "נכון!",
+    "tryAgain": "נסה שוב!",
+    "wellDone": "כל הכבוד!",
+    "awesome": "מעולה!",
+    "great": "יפה מאוד!"
+  },
+  "modules": {
+    "numbers": "מספרים",
+    "letters": "אותיות",
+    "colors": "צבעים",
+    "shapes": "צורות"
+  },
+  "numbers": {
+    "title": "למד מספרים",
+    "description": "בואו נספור ביחד!",
+    "learnMode": "מצב למידה",
+    "quizMode": "זמן חידון",
+    "one": "אחד",
+    "two": "שניים",
+    "three": "שלוש",
+    "four": "ארבע",
+    "five": "חמש",
+    "six": "שש",
+    "seven": "שבע",
+    "eight": "שמונה",
+    "nine": "תשע",
+    "ten": "עשר"
+  },
+  "colors": {
+    "title": "למד צבעים",
+    "description": "גלו את הקשת!",
+    "red": "אדום",
+    "blue": "כחול",
+    "yellow": "צהוב",
+    "green": "ירוק",
+    "orange": "כתום",
+    "purple": "סגול",
+    "pink": "ורוד",
+    "brown": "חום",
+    "black": "שחור",
+    "white": "לבן"
+  },
+  "shapes": {
+    "title": "למד צורות",
+    "description": "גלו צורות סביבנו!",
+    "circle": "עיגול",
+    "square": "ריבוע",
+    "triangle": "משולש",
+    "rectangle": "מלבן",
+    "star": "כוכב",
+    "heart": "לב"
+  },
+  "letters": {
+    "title": "למד אותיות",
+    "description": "בואו נגלה את האלף-בית!"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "language": "שפה",
+    "english": "English",
+    "hebrew": "עברית",
+    "sound": "קול",
+    "soundOn": "קול מופעל",
+    "soundOff": "קול כבוי",
+    "music": "מוזיקה",
+    "musicOn": "מוזיקה מופעלת",
+    "musicOff": "מוזיקה כבויה"
+  },
+  "dashboard": {
+    "title": "התקדמות",
+    "completed": "הושלם",
+    "inProgress": "בתהליך",
+    "stars": "כוכבים שהושגו"
+  }
+}
