@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך למידת מספרים - מציג מספר אחד בכל פעם עם ייצוג ויזואלי
 class NumbersLearningScreen extends StatefulWidget {

@@ -3,7 +3,7 @@ import '../widgets/language_toggle.dart';
 import '../widgets/kid_button.dart';
 import '../modules/numbers/numbers_menu_screen.dart';
 import '../screens/settings_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך הבית המעודכן
 class NewHomeScreen extends StatelessWidget {

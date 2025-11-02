@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/kid_button.dart';
 import 'numbers_learning_screen.dart';
 import 'numbers_quiz_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול המספרים
 class NumbersMenuScreen extends StatelessWidget {

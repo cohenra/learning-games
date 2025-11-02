@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך חידון מספרים - שאלות אקראיות עם בחירה מרובה
 class NumbersQuizScreen extends StatefulWidget {
