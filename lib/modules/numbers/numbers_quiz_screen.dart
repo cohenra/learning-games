@@ -198,7 +198,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                   Text(
                     l10n.howMany,
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade700,
                     ),
@@ -213,13 +213,13 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     child: Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        spacing: 6,
-                        runSpacing: 6,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: List.generate(
                           _correctAnswer,
                           (index) => Container(
-                            width: 32,
-                            height: 32,
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
@@ -278,7 +278,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                               child: Text(
                                 '$option',
                                 style: const TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 56,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
