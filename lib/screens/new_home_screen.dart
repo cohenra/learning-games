@@ -31,7 +31,7 @@ class NewHomeScreen extends StatelessWidget {
             children: [
               // כותרת עליונה עם החלפת שפה
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -39,7 +39,7 @@ class NewHomeScreen extends StatelessWidget {
                     Text(
                       l10n.appName,
                       style: TextStyle(
-                        fontSize: 40,
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.orange.shade700,
                       ),
@@ -49,27 +49,27 @@ class NewHomeScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               // ברוכים הבאים
               Text(
                 l10n.welcome,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   color: Colors.grey.shade700,
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
 
               // כרטיסי מודולים
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
-                  padding: const EdgeInsets.all(15),
-                  mainAxisSpacing: 15,
-                  crossAxisSpacing: 15,
-                  childAspectRatio: 1.5,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 2.5,
                   children: [
                     _buildModuleCard(
                       context: context,
@@ -116,7 +116,7 @@ class NewHomeScreen extends StatelessWidget {
 
               // כפתור הגדרות
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: KidButton(
                   text: l10n.settings,
                   icon: Icons.settings,
@@ -129,7 +129,8 @@ class NewHomeScreen extends StatelessWidget {
                     );
                   },
                   color: Colors.grey.shade600,
-                  width: 200,
+                  width: 160,
+                  height: 50,
                 ),
               ),
             ],
@@ -180,13 +181,13 @@ class NewHomeScreen extends StatelessWidget {
               children: [
                 Text(
                   icon,
-                  style: const TextStyle(fontSize: 48),
+                  style: const TextStyle(fontSize: 44),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),

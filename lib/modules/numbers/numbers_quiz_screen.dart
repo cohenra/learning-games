@@ -168,14 +168,14 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                   children: [
                     // התקדמות
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
                           style: const TextStyle(
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -184,7 +184,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                             _score,
                             (index) => const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: Text('⭐', style: TextStyle(fontSize: 28)),
+                              child: Text('⭐', style: TextStyle(fontSize: 22)),
                             ),
                           ),
                         ),
@@ -192,34 +192,34 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // שאלה
                   Text(
                     l10n.howMany,
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade700,
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   // נקודות המייצגות את המספר
                   Container(
-                    constraints: const BoxConstraints(maxHeight: 200),
+                    constraints: const BoxConstraints(maxHeight: 140),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 6,
+                        runSpacing: 6,
                         children: List.generate(
                           _correctAnswer,
                           (index) => Container(
-                            width: 40,
-                            height: 40,
+                            width: 32,
+                            height: 32,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
@@ -244,14 +244,14 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
 
                   // אפשרויות תשובה
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 2.0,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 3.0,
                       children: _options.map((option) {
                         return GestureDetector(
                           onTap: () => _handleAnswer(option),
@@ -278,7 +278,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                               child: Text(
                                 '$option',
                                 style: const TextStyle(
-                                  fontSize: 40,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -293,25 +293,25 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                   // כפתור הבא (רק אם ענו נכון)
                   if (_isCorrect == true) ...[
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: Column(
                         children: [
                           Text(
                             l10n.correct,
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.green.shade700,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           if (!isQuizCompleted)
                             KidButton(
                               text: l10n.next,
                               onPressed: _nextQuestion,
                               color: Colors.blue.shade500,
-                              width: 180,
-                              height: 60,
+                              width: 150,
+                              height: 50,
                             ),
                           if (isQuizCompleted)
                             KidButton(
@@ -322,8 +322,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                                 });
                               },
                               color: Colors.green.shade500,
-                              width: 180,
-                              height: 60,
+                              width: 150,
+                              height: 50,
                             ),
                         ],
                       ),
