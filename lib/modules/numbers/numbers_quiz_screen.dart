@@ -56,7 +56,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
   }
 
   void _handleAnswer(int answer) {
-    if (_selectedAnswer != null) return; // כבר נענה
+    // אם כבר ענו נכון, אל תאפשר לחיצות נוספות
+    if (_isCorrect == true) return;
 
     final appProvider = context.read<AppProvider>();
     final isCorrect = answer == _correctAnswer;
@@ -66,21 +67,37 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
       _isCorrect = isCorrect;
     });
 
-    // רשום תשובה
-    appProvider.recordAnswer('numbers', isCorrect);
-
     if (isCorrect) {
+      // רק תשובות נכונות נספרות
+      appProvider.recordAnswer('numbers', isCorrect);
+
       setState(() {
         _score++;
         _showReward = true;
       });
       appProvider.addStar('numbers');
 
+      // נגן סאונד תשובה נכונה
+      appProvider.speak(Localizations.localeOf(context).languageCode == 'he' ? 'כל הכבוד!' : 'Great job!');
+
       // הסתר את הפרס אחרי 2 שניות
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {
             _showReward = false;
+          });
+        }
+      });
+    } else {
+      // תשובה שגויה - נגן סאונד ואפשר ניסיון נוסף
+      appProvider.speak(Localizations.localeOf(context).languageCode == 'he' ? 'נסה שוב' : 'Try again');
+
+      // אפס את הבחירה אחרי שניה כדי שיוכל לנסות שוב
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted && _isCorrect == false) {
+          setState(() {
+            _selectedAnswer = null;
+            _isCorrect = null;
           });
         }
       });
@@ -101,15 +118,17 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
       return Colors.blue.shade400;
     }
 
-    if (option == _correctAnswer) {
-      return Colors.green.shade500;
+    // אם בחרו את האופציה הזו
+    if (option == _selectedAnswer) {
+      if (_isCorrect == true) {
+        return Colors.green.shade500; // נכון - ירוק
+      } else {
+        return Colors.red.shade500; // שגוי - אדום
+      }
     }
 
-    if (option == _selectedAnswer && !_isCorrect!) {
-      return Colors.red.shade500;
-    }
-
-    return Colors.grey.shade400;
+    // כפתורים שלא נבחרו נשארים כחולים (לא מראים את התשובה הנכונה!)
+    return Colors.blue.shade400;
   }
 
   @override
@@ -230,9 +249,9 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 1.8,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 2.0,
                       children: _options.map((option) {
                         return GestureDetector(
                           onTap: () => _handleAnswer(option),
@@ -259,7 +278,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                               child: Text(
                                 '$option',
                                 style: const TextStyle(
-                                  fontSize: 48,
+                                  fontSize: 40,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -271,20 +290,18 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     ),
                   ),
 
-                  // משוב וכפתור הבא
-                  if (_selectedAnswer != null) ...[
+                  // כפתור הבא (רק אם ענו נכון)
+                  if (_isCorrect == true) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
                         children: [
                           Text(
-                            _isCorrect! ? l10n.correct : l10n.tryAgain,
+                            l10n.correct,
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: _isCorrect!
-                                  ? Colors.green.shade700
-                                  : Colors.red.shade700,
+                              color: Colors.green.shade700,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -293,7 +310,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                               text: l10n.next,
                               onPressed: _nextQuestion,
                               color: Colors.blue.shade500,
-                              width: 200,
+                              width: 180,
+                              height: 60,
                             ),
                           if (isQuizCompleted)
                             KidButton(
@@ -304,7 +322,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                                 });
                               },
                               color: Colors.green.shade500,
-                              width: 200,
+                              width: 180,
+                              height: 60,
                             ),
                         ],
                       ),

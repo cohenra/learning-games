@@ -55,21 +55,21 @@ class NewHomeScreen extends StatelessWidget {
               Text(
                 l10n.welcome,
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 24,
                   color: Colors.grey.shade700,
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // כרטיסי מודולים
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
-                  padding: const EdgeInsets.all(20),
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                  childAspectRatio: 1.3,
+                  padding: const EdgeInsets.all(15),
+                  mainAxisSpacing: 15,
+                  crossAxisSpacing: 15,
+                  childAspectRatio: 1.5,
                   children: [
                     _buildModuleCard(
                       context: context,
@@ -180,13 +180,13 @@ class NewHomeScreen extends StatelessWidget {
               children: [
                 Text(
                   icon,
-                  style: const TextStyle(fontSize: 56),
+                  style: const TextStyle(fontSize: 48),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
