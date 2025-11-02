@@ -69,6 +69,7 @@ class NewHomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   mainAxisSpacing: 20,
                   crossAxisSpacing: 20,
+                  childAspectRatio: 1.3,
                   children: [
                     _buildModuleCard(
                       context: context,
@@ -179,13 +180,13 @@ class NewHomeScreen extends StatelessWidget {
               children: [
                 Text(
                   icon,
-                  style: const TextStyle(fontSize: 72),
+                  style: const TextStyle(fontSize: 56),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),

@@ -130,7 +130,7 @@ class _KidButtonState extends State<KidButton>
                   widget.text,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,

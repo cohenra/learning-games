@@ -144,9 +144,10 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // התקדמות
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // התקדמות
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Row(
@@ -172,32 +173,34 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
                   // שאלה
                   Text(
                     l10n.howMany,
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade700,
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
                   // נקודות המייצגות את המספר
-                  Expanded(
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        spacing: 12,
-                        runSpacing: 12,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: List.generate(
                           _correctAnswer,
                           (index) => Container(
-                            width: 50,
-                            height: 50,
+                            width: 40,
+                            height: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
@@ -222,13 +225,14 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
 
                   // אפשרויות תשובה
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 1.5,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.8,
                       children: _options.map((option) {
                         return GestureDetector(
                           onTap: () => _handleAnswer(option),
@@ -255,7 +259,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                               child: Text(
                                 '$option',
                                 style: const TextStyle(
-                                  fontSize: 64,
+                                  fontSize: 48,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -270,20 +274,20 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                   // משוב וכפתור הבא
                   if (_selectedAnswer != null) ...[
                     Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
                         children: [
                           Text(
                             _isCorrect! ? l10n.correct : l10n.tryAgain,
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: _isCorrect!
                                   ? Colors.green.shade700
                                   : Colors.red.shade700,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           if (!isQuizCompleted)
                             KidButton(
                               text: l10n.next,
@@ -307,6 +311,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     ),
                   ],
                 ],
+                ),
               ),
             ),
           ),
