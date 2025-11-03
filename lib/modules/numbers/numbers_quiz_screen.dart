@@ -80,12 +80,24 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
       // נגן סאונד תשובה נכונה
       appProvider.speak(Localizations.localeOf(context).languageCode == 'he' ? 'כל הכבוד!' : 'Great job!');
 
-      // הסתר את הפרס אחרי 2 שניות
-      Future.delayed(const Duration(seconds: 2), () {
+      // הסתר את הפרס ועבור לשאלה הבאה אחרי 2.5 שניות
+      Future.delayed(const Duration(milliseconds: 2500), () {
         if (mounted) {
           setState(() {
             _showReward = false;
           });
+          // עבור לשאלה הבאה אוטומטית
+          if (_currentQuestionIndex < _totalQuestions - 1) {
+            setState(() {
+              _currentQuestionIndex++;
+            });
+            _generateQuestion();
+          } else {
+            // סיימנו את כל השאלות
+            setState(() {
+              _currentQuestionIndex++;
+            });
+          }
         }
       });
     } else {
@@ -208,18 +220,18 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
 
                   // נקודות המייצגות את המספר
                   Container(
-                    constraints: const BoxConstraints(maxHeight: 140),
+                    constraints: const BoxConstraints(maxHeight: 160),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 10,
+                        runSpacing: 10,
                         children: List.generate(
                           _correctAnswer,
                           (index) => Container(
-                            width: 38,
-                            height: 38,
+                            width: 50,
+                            height: 50,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
@@ -251,7 +263,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
-                      childAspectRatio: 3.0,
+                      childAspectRatio: 6.0,
                       children: _options.map((option) {
                         return GestureDetector(
                           onTap: () => _handleAnswer(option),
@@ -290,42 +302,17 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                     ),
                   ),
 
-                  // כפתור הבא (רק אם ענו נכון)
+                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
                   if (_isCorrect == true) ...[
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: Column(
-                        children: [
-                          Text(
-                            l10n.correct,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green.shade700,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          if (!isQuizCompleted)
-                            KidButton(
-                              text: l10n.next,
-                              onPressed: _nextQuestion,
-                              color: Colors.blue.shade500,
-                              width: 150,
-                              height: 50,
-                            ),
-                          if (isQuizCompleted)
-                            KidButton(
-                              text: isHebrew ? 'סיום' : 'Finish',
-                              onPressed: () {
-                                setState(() {
-                                  _currentQuestionIndex++;
-                                });
-                              },
-                              color: Colors.green.shade500,
-                              width: 150,
-                              height: 50,
-                            ),
-                        ],
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      child: Text(
+                        l10n.correct,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
                       ),
                     ),
                   ],

@@ -69,7 +69,7 @@ class NewHomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
-                  childAspectRatio: 2.5,
+                  childAspectRatio: 5.0,
                   children: [
                     _buildModuleCard(
                       context: context,
@@ -178,10 +178,12 @@ class NewHomeScreen extends StatelessWidget {
               ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   icon,
                   style: const TextStyle(fontSize: 64),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -191,6 +193,7 @@ class NewHomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 if (!isAvailable) ...[
                   const SizedBox(height: 6),
