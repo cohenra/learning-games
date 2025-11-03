@@ -28,7 +28,6 @@ class AppProvider with ChangeNotifier {
 
   AppProvider() {
     _loadPreferences();
-    _configureTts();
   }
 
   /// טען הגדרות מ-SharedPreferences
@@ -53,6 +52,9 @@ class AppProvider with ChangeNotifier {
       value.totalAttempts = prefs.getInt('${key}_attempts') ?? 0;
     });
 
+    // קבע TTS אחרי שטענו את השפה
+    await _configureTts();
+
     notifyListeners();
   }
 
@@ -61,6 +63,11 @@ class AppProvider with ChangeNotifier {
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setSpeechRate(0.4); // קצב איטי יותר לילדים
     await _flutterTts.setPitch(1.1); // טון מעט גבוה יותר - ידידותי יותר
+
+    // קבע שפה התחלתית
+    await _flutterTts.setLanguage(
+      _locale.languageCode == 'he' ? 'he-IL' : 'en-US'
+    );
   }
 
   /// שנה שפה

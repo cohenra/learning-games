@@ -182,34 +182,34 @@ class NewHomeScreen extends StatelessWidget {
               children: [
                 Text(
                   icon,
-                  style: const TextStyle(fontSize: 64),
+                  style: const TextStyle(fontSize: 46),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 26,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 if (!isAvailable) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade400,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
                       l10n.comingSoon,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 12,
                       ),
                     ),
                   ),
