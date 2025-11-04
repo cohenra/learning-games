@@ -107,6 +107,21 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
       _isCorrect = null;
       _showReward = false;
     });
+
+    // דבר את השאלה אחרי שהמסך נבנה
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _speakQuestion();
+    });
+  }
+
+  void _speakQuestion() {
+    final appProvider = context.read<AppProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final letterName = _getLetterName(l10n, _correctAnswer['key']);
+
+    // דבר "בחרו את האות אלף" או "Select the letter Alef"
+    final question = l10n.selectTheLetter(letterName);
+    appProvider.speak(question);
   }
 
   void _handleAnswer(String answer) {
@@ -193,6 +208,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final correctLetterName = _getLetterName(l10n, _correctAnswer['key']);
 
     if (_currentQuestionIndex >= _totalQuestions && _selectedAnswer != null) {
       return _buildCompletionScreen(l10n, isHebrew);
@@ -219,96 +235,68 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // התקדמות
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            children: List.generate(
-                              _score,
-                              (index) => const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 2),
-                                child: Text('⭐', style: TextStyle(fontSize: 22)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // שאלה
-                    Text(
-                      isHebrew ? 'איזו אות זו?' : 'Which letter is this?',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    // האות הגדולה
-                    Container(
-                      width: 180,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            (_correctAnswer['color'] as Color).withOpacity(0.3),
-                            (_correctAnswer['color'] as Color).withOpacity(0.6),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (_correctAnswer['color'] as Color).withOpacity(0.4),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          _correctAnswer['letter'] as String,
+              child: Column(
+                children: [
+                  // התקדמות
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
                           style: const TextStyle(
-                            fontSize: 100,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
+                        ),
+                        Row(
+                          children: List.generate(
+                            _score,
+                            (index) => const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2),
+                              child: Text('⭐', style: TextStyle(fontSize: 20)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // שאלה - "בחרו את האות אלף"
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: GestureDetector(
+                      onTap: _speakQuestion,
+                      child: Text(
+                        l10n.selectTheLetter(correctLetterName),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
-                    // אפשרויות תשובה
-                    Padding(
+                  // אפשרויות תשובה - 4 אותיות בלבד (רק התווים, לא השמות)
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: GridView.count(
                         crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
                         childAspectRatio: 6.0,
+                        physics: const NeverScrollableScrollPhysics(),
                         children: _options.map((option) {
                           final letter = option['letter'] as String;
-                          final letterName = _getLetterName(l10n, option['key'] as String);
 
                           return GestureDetector(
                             onTap: () => _handleAnswer(letter),
@@ -332,9 +320,9 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  letterName,
+                                  letter,
                                   style: const TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 52,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -345,23 +333,36 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
                         }).toList(),
                       ),
                     ),
+                  ),
 
-                    // הודעת נכון
-                    if (_isCorrect == true) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: Text(
-                          l10n.correct,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade700,
-                          ),
+                  // כפתור להאזנה לשאלה שוב
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: KidButton(
+                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                      onPressed: _speakQuestion,
+                      color: Colors.purple.shade400,
+                      width: 200,
+                      height: 50,
+                    ),
+                  ),
+
+                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                  if (_isCorrect == true)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        l10n.correct,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
                         ),
                       ),
-                    ],
-                  ],
-                ),
+                    )
+                  else
+                    const SizedBox(height: 16),
+                ],
               ),
             ),
           ),

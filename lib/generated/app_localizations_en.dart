@@ -69,6 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get colorWhite => 'White';
   @override String selectTheColor(String color) => 'Select the color $color';
   @override String get whichColor => 'Which color?';
+  @override String selectTheLetter(String letter) => 'Select the letter $letter';
  // Hebrew Letters
   @override String get letterAlef => 'Alef';
   @override String get letterBet => 'Bet';

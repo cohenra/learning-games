@@ -282,16 +282,15 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
 
                   const SizedBox(height: 12),
 
-                  // אפשרויות תשובה - 4 ריבועים צבעוניים
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                  // אפשרויות תשובה - 4 ריבועים צבעוניים קטנים
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
                       child: GridView.count(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 1.0,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
                         physics: const NeverScrollableScrollPhysics(),
                         children: List.generate(_options.length, (index) {
                           final colorData = _options[index];
@@ -333,6 +332,8 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 16),
 
                   // כפתור להאזנה לשאלה שוב
                   Padding(

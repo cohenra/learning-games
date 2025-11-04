@@ -97,6 +97,7 @@ abstract class AppLocalizations {
   String get colorWhite;
   String selectTheColor(String color);
   String get whichColor;
+  String selectTheLetter(String letter);
  // Hebrew Letters
   String get letterAlef;
   String get letterBet;

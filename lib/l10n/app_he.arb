@@ -79,5 +79,13 @@
       }
     }
   },
-  "whichColor": "איזה צבע?"
+  "whichColor": "איזה צבע?",
+  "selectTheLetter": "בחרו את האות {letter}",
+  "@selectTheLetter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  }
 }

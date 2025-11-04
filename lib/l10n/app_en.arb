@@ -79,5 +79,13 @@
       }
     }
   },
-  "whichColor": "Which color?"
+  "whichColor": "Which color?",
+  "selectTheLetter": "Select the letter {letter}",
+  "@selectTheLetter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  }
 }
