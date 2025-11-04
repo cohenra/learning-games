@@ -1,10 +1,10 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../games/tap_colors_game.dart';
+import '../core/base_quiz_game.dart';
 
 class GameScreen extends StatefulWidget {
-  final TapColorsGame game;
+  final BaseQuizGame game;
   const GameScreen({super.key, required this.game});
 
   @override

@@ -18,5 +18,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/audio/
+    - assets/audio/ui/
+    - assets/audio/letters/
     - assets/images/
     - assets/lottie/
