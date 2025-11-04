@@ -1,0 +1,210 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Hebrew (`he`).
+class AppLocalizationsHe extends AppLocalizations {
+  AppLocalizationsHe([String locale = 'he']) : super(locale);
+
+  @override
+  String get appName => 'לומדים בכיף';
+
+  @override
+  String get welcome => 'ברוכים הבאים!';
+
+  @override
+  String get start => 'התחל';
+
+  @override
+  String get next => 'הבא';
+
+  @override
+  String get back => 'חזור';
+
+  @override
+  String get correct => 'נכון!';
+
+  @override
+  String get tryAgain => 'נסה שוב!';
+
+  @override
+  String get wellDone => 'כל הכבוד!';
+
+  @override
+  String get awesome => 'מעולה!';
+
+  @override
+  String get great => 'יפה מאוד!';
+
+  @override
+  String get modules => 'מודולים';
+
+  @override
+  String get numbers => 'מספרים';
+
+  @override
+  String get letters => 'אותיות';
+
+  @override
+  String get colors => 'צבעים';
+
+  @override
+  String get shapes => 'צורות';
+
+  @override
+  String get numbersTitle => 'למד מספרים';
+
+  @override
+  String get numbersDescription => 'בואו נספור ביחד!';
+
+  @override
+  String get learnMode => 'מצב למידה';
+
+  @override
+  String get quizMode => 'זמן חידון';
+
+  @override
+  String get numberOne => 'אחד';
+
+  @override
+  String get numberTwo => 'שניים';
+
+  @override
+  String get numberThree => 'שלוש';
+
+  @override
+  String get numberFour => 'ארבע';
+
+  @override
+  String get numberFive => 'חמש';
+
+  @override
+  String get numberSix => 'שש';
+
+  @override
+  String get numberSeven => 'שבע';
+
+  @override
+  String get numberEight => 'שמונה';
+
+  @override
+  String get numberNine => 'תשע';
+
+  @override
+  String get numberTen => 'עשר';
+
+  @override
+  String get colorsTitle => 'למד צבעים';
+
+  @override
+  String get colorsDescription => 'גלו את הקשת!';
+
+  @override
+  String get shapesTitle => 'למד צורות';
+
+  @override
+  String get shapesDescription => 'גלו צורות סביבנו!';
+
+  @override
+  String get lettersTitle => 'למד אותיות';
+
+  @override
+  String get lettersDescription => 'בואו נגלה את האלף-בית!';
+
+  @override
+  String get settings => 'הגדרות';
+
+  @override
+  String get language => 'שפה';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get hebrew => 'עברית';
+
+  @override
+  String get sound => 'קול';
+
+  @override
+  String get soundOn => 'קול מופעל';
+
+  @override
+  String get soundOff => 'קול כבוי';
+
+  @override
+  String get music => 'מוזיקה';
+
+  @override
+  String get musicOn => 'מוזיקה מופעלת';
+
+  @override
+  String get musicOff => 'מוזיקה כבויה';
+
+  @override
+  String get progress => 'התקדמות';
+
+  @override
+  String get completed => 'הושלם';
+
+  @override
+  String get inProgress => 'בתהליך';
+
+  @override
+  String get stars => 'כוכבים שהושגו';
+
+  @override
+  String get score => 'ניקוד';
+
+  @override
+  String get question => 'שאלה';
+
+  @override
+  String get howMany => 'כמה?';
+
+  @override
+  String get playAgain => 'שחק שוב';
+
+  @override
+  String get comingSoon => 'בקרוב';
+
+  @override
+  String get colorRed => 'אדום';
+
+  @override
+  String get colorBlue => 'כחול';
+
+  @override
+  String get colorYellow => 'צהוב';
+
+  @override
+  String get colorGreen => 'ירוק';
+
+  @override
+  String get colorOrange => 'כתום';
+
+  @override
+  String get colorPurple => 'סגול';
+
+  @override
+  String get colorPink => 'ורוד';
+
+  @override
+  String get colorBrown => 'חום';
+
+  @override
+  String get colorBlack => 'שחור';
+
+  @override
+  String get colorWhite => 'לבן';
+
+  @override
+  String selectTheColor(String color) {
+    return 'בחרו את הצבע $color';
+  }
+
+  @override
+  String get whichColor => 'איזה צבע?';
+}

@@ -97,6 +97,29 @@ abstract class AppLocalizations {
   String get colorWhite;
   String selectTheColor(String color);
   String get whichColor;
+ // Hebrew Letters
+  String get letterAlef;
+  String get letterBet;
+  String get letterGimel;
+  String get letterDalet;
+  String get letterHey;
+  String get letterVav;
+  String get letterZayin;
+  String get letterChet;
+  String get letterTet;
+  String get letterYod;
+  String get letterKaf;
+  String get letterLamed;
+  String get letterMem;
+  String get letterNun;
+  String get letterSamech;
+  String get letterAyin;
+  String get letterPey;
+  String get letterTzadi;
+  String get letterKof;
+  String get letterResh;
+  String get letterShin;
+  String get letterTav;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

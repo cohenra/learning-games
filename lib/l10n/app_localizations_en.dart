@@ -1,0 +1,210 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appName => 'Learning Fun';
+
+  @override
+  String get welcome => 'Welcome!';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get correct => 'Correct!';
+
+  @override
+  String get tryAgain => 'Try Again!';
+
+  @override
+  String get wellDone => 'Well Done!';
+
+  @override
+  String get awesome => 'Awesome!';
+
+  @override
+  String get great => 'Great Job!';
+
+  @override
+  String get modules => 'Modules';
+
+  @override
+  String get numbers => 'Numbers';
+
+  @override
+  String get letters => 'Letters';
+
+  @override
+  String get colors => 'Colors';
+
+  @override
+  String get shapes => 'Shapes';
+
+  @override
+  String get numbersTitle => 'Learn Numbers';
+
+  @override
+  String get numbersDescription => 'Let\'s count together!';
+
+  @override
+  String get learnMode => 'Learning Mode';
+
+  @override
+  String get quizMode => 'Quiz Time';
+
+  @override
+  String get numberOne => 'One';
+
+  @override
+  String get numberTwo => 'Two';
+
+  @override
+  String get numberThree => 'Three';
+
+  @override
+  String get numberFour => 'Four';
+
+  @override
+  String get numberFive => 'Five';
+
+  @override
+  String get numberSix => 'Six';
+
+  @override
+  String get numberSeven => 'Seven';
+
+  @override
+  String get numberEight => 'Eight';
+
+  @override
+  String get numberNine => 'Nine';
+
+  @override
+  String get numberTen => 'Ten';
+
+  @override
+  String get colorsTitle => 'Learn Colors';
+
+  @override
+  String get colorsDescription => 'Explore the rainbow!';
+
+  @override
+  String get shapesTitle => 'Learn Shapes';
+
+  @override
+  String get shapesDescription => 'Discover shapes around us!';
+
+  @override
+  String get lettersTitle => 'Learn Letters';
+
+  @override
+  String get lettersDescription => 'Let\'s explore the alphabet!';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get hebrew => 'עברית';
+
+  @override
+  String get sound => 'Sound';
+
+  @override
+  String get soundOn => 'Sound On';
+
+  @override
+  String get soundOff => 'Sound Off';
+
+  @override
+  String get music => 'Music';
+
+  @override
+  String get musicOn => 'Music On';
+
+  @override
+  String get musicOff => 'Music Off';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get inProgress => 'In Progress';
+
+  @override
+  String get stars => 'Stars Earned';
+
+  @override
+  String get score => 'Score';
+
+  @override
+  String get question => 'Question';
+
+  @override
+  String get howMany => 'How many?';
+
+  @override
+  String get playAgain => 'Play Again';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get colorRed => 'Red';
+
+  @override
+  String get colorBlue => 'Blue';
+
+  @override
+  String get colorYellow => 'Yellow';
+
+  @override
+  String get colorGreen => 'Green';
+
+  @override
+  String get colorOrange => 'Orange';
+
+  @override
+  String get colorPurple => 'Purple';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
+  String get colorBrown => 'Brown';
+
+  @override
+  String get colorBlack => 'Black';
+
+  @override
+  String get colorWhite => 'White';
+
+  @override
+  String selectTheColor(String color) {
+    return 'Select the color $color';
+  }
+
+  @override
+  String get whichColor => 'Which color?';
+}

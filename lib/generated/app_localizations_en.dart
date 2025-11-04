@@ -69,4 +69,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get colorWhite => 'White';
   @override String selectTheColor(String color) => 'Select the color $color';
   @override String get whichColor => 'Which color?';
+ // Hebrew Letters
+  @override String get letterAlef => 'Alef';
+  @override String get letterBet => 'Bet';
+  @override String get letterGimel => 'Gimel';
+  @override String get letterDalet => 'Dalet';
+  @override String get letterHey => 'Hey';
+  @override String get letterVav => 'Vav';
+  @override String get letterZayin => 'Zayin';
+  @override String get letterChet => 'Chet';
+  @override String get letterTet => 'Tet';
+  @override String get letterYod => 'Yod';
+  @override String get letterKaf => 'Kaf';
+  @override String get letterLamed => 'Lamed';
+  @override String get letterMem => 'Mem';
+  @override String get letterNun => 'Nun';
+  @override String get letterSamech => 'Samech';
+  @override String get letterAyin => 'Ayin';
+  @override String get letterPey => 'Pey';
+  @override String get letterTzadi => 'Tzadi';
+  @override String get letterKof => 'Kof';
+  @override String get letterResh => 'Resh';
+  @override String get letterShin => 'Shin';
+  @override String get letterTav => 'Tav';
 }
