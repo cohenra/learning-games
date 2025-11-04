@@ -284,12 +284,13 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
 
                   // אפשרויות תשובה - 4 ריבועים צבעוניים
                   Expanded(
+                    flex: 3,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: GridView.count(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
                         childAspectRatio: 1.0,
                         physics: const NeverScrollableScrollPhysics(),
                         children: List.generate(_options.length, (index) {
@@ -333,31 +334,35 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                     ),
                   ),
 
-                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                  if (_isCorrect == true)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text(
-                        l10n.correct,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
-                        ),
-                      ),
-                    )
-                  else
-                    const SizedBox(height: 8),
+                  // הודעת נכון וכפתור האזנה
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                        if (_isCorrect == true)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              l10n.correct,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
+                          ),
 
-                  // כפתור להאזנה לשאלה שוב
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: KidButton(
-                      text: isHebrew ? 'הקשב לשאלה 🔊' : 'Listen 🔊',
-                      onPressed: _speakQuestion,
-                      color: Colors.purple.shade400,
-                      width: 200,
-                      height: 50,
+                        // כפתור להאזנה לשאלה שוב
+                        KidButton(
+                          text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                          onPressed: _speakQuestion,
+                          color: Colors.purple.shade400,
+                          width: 180,
+                          height: 45,
+                        ),
+                      ],
                     ),
                   ),
                 ],
