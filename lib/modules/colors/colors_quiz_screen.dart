@@ -233,66 +233,65 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // התקדמות
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            children: List.generate(
-                              _score,
-                              (index) => const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 2),
-                                child: Text('⭐', style: TextStyle(fontSize: 22)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // שאלה - "בחרו את הצבע אדום"
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GestureDetector(
-                        onTap: _speakQuestion,
-                        child: Text(
-                          l10n.selectTheColor(correctColorName),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 32,
+              child: Column(
+                children: [
+                  // התקדמות
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
+                          style: const TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
                           ),
+                        ),
+                        Row(
+                          children: List.generate(
+                            _score,
+                            (index) => const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2),
+                              child: Text('⭐', style: TextStyle(fontSize: 20)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // שאלה - "בחרו את הצבע אדום"
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: GestureDetector(
+                      onTap: _speakQuestion,
+                      child: Text(
+                        l10n.selectTheColor(correctColorName),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 30),
+                  const SizedBox(height: 16),
 
-                    // אפשרויות תשובה - 4 ריבועים צבעוניים
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  // אפשרויות תשובה - 4 ריבועים צבעוניים
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: GridView.count(
                         crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
                         childAspectRatio: 1.0,
+                        physics: const NeverScrollableScrollPhysics(),
                         children: List.generate(_options.length, (index) {
                           final colorData = _options[index];
                           final color = colorData['color'] as Color;
@@ -332,38 +331,36 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                         }),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 20),
-
-                    // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                    if (_isCorrect == true) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: Text(
-                          l10n.correct,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade700,
-                          ),
+                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                  if (_isCorrect == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        l10n.correct,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
                         ),
                       ),
-                    ],
+                    )
+                  else
+                    const SizedBox(height: 8),
 
-                    const SizedBox(height: 20),
-
-                    // כפתור להאזנה לשאלה שוב
-                    KidButton(
-                      text: isHebrew ? 'הקשב לשאלה 🔊' : 'Listen to Question 🔊',
+                  // כפתור להאזנה לשאלה שוב
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: KidButton(
+                      text: isHebrew ? 'הקשב לשאלה 🔊' : 'Listen 🔊',
                       onPressed: _speakQuestion,
                       color: Colors.purple.shade400,
-                      width: 280,
-                      height: 60,
+                      width: 200,
+                      height: 50,
                     ),
-
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
