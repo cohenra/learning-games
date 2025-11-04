@@ -93,7 +93,14 @@ class NewHomeScreen extends StatelessWidget {
                       title: l10n.letters,
                       icon: '🔤',
                       color: Colors.blue,
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LettersMenuScreen(),
+                          ),
+                        );
+                      },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
