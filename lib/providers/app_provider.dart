@@ -63,6 +63,7 @@ class AppProvider with ChangeNotifier {
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setSpeechRate(0.4); // קצב איטי יותר לילדים
     await _flutterTts.setPitch(1.1); // טון מעט גבוה יותר - ידידותי יותר
+    await _flutterTts.awaitSpeakCompletion(true); // חכה עד שהדיבור מסתיים
 
     // קבע שפה התחלתית
     await _flutterTts.setLanguage(
@@ -110,6 +111,12 @@ class AppProvider with ChangeNotifier {
   /// דבר טקסט
   Future<void> speak(String text) async {
     if (!_soundEnabled) return;
+
+    // עצור את הדיבור הקודם
+    await _flutterTts.stop();
+
+    // המתן רגע קצר לפני תחילת דיבור חדש
+    await Future.delayed(const Duration(milliseconds: 100));
 
     await _flutterTts.speak(text);
   }
