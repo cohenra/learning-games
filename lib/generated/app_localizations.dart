@@ -85,6 +85,18 @@ abstract class AppLocalizations {
   String get howMany;
   String get playAgain;
   String get comingSoon;
+  String get colorRed;
+  String get colorBlue;
+  String get colorYellow;
+  String get colorGreen;
+  String get colorOrange;
+  String get colorPurple;
+  String get colorPink;
+  String get colorBrown;
+  String get colorBlack;
+  String get colorWhite;
+  String selectTheColor(String color);
+  String get whichColor;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

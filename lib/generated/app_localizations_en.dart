@@ -57,4 +57,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get howMany => 'How many?';
   @override String get playAgain => 'Play Again';
   @override String get comingSoon => 'Coming Soon';
+  @override String get colorRed => 'Red';
+  @override String get colorBlue => 'Blue';
+  @override String get colorYellow => 'Yellow';
+  @override String get colorGreen => 'Green';
+  @override String get colorOrange => 'Orange';
+  @override String get colorPurple => 'Purple';
+  @override String get colorPink => 'Pink';
+  @override String get colorBrown => 'Brown';
+  @override String get colorBlack => 'Black';
+  @override String get colorWhite => 'White';
+  @override String selectTheColor(String color) => 'Select the color $color';
+  @override String get whichColor => 'Which color?';
 }

@@ -59,5 +59,25 @@
   "question": "Question",
   "howMany": "How many?",
   "playAgain": "Play Again",
-  "comingSoon": "Coming Soon"
+  "comingSoon": "Coming Soon",
+
+  "colorRed": "Red",
+  "colorBlue": "Blue",
+  "colorYellow": "Yellow",
+  "colorGreen": "Green",
+  "colorOrange": "Orange",
+  "colorPurple": "Purple",
+  "colorPink": "Pink",
+  "colorBrown": "Brown",
+  "colorBlack": "Black",
+  "colorWhite": "White",
+  "selectTheColor": "Select the color {color}",
+  "@selectTheColor": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "whichColor": "Which color?"
 }

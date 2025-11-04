@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/language_toggle.dart';
 import '../widgets/kid_button.dart';
 import '../modules/numbers/numbers_menu_screen.dart';
+import '../modules/colors/colors_menu_screen.dart';
 import '../screens/settings_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
@@ -99,8 +100,15 @@ class NewHomeScreen extends StatelessWidget {
                       title: l10n.colors,
                       icon: '🎨',
                       color: Colors.pink,
-                      onTap: () {},
-                      isAvailable: false,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ColorsMenuScreen(),
+                          ),
+                        );
+                      },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,

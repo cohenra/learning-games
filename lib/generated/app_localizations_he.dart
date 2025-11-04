@@ -57,4 +57,16 @@ class AppLocalizationsHe extends AppLocalizations {
   @override String get howMany => 'כמה?';
   @override String get playAgain => 'שחק שוב';
   @override String get comingSoon => 'בקרוב';
+  @override String get colorRed => 'אדום';
+  @override String get colorBlue => 'כחול';
+  @override String get colorYellow => 'צהוב';
+  @override String get colorGreen => 'ירוק';
+  @override String get colorOrange => 'כתום';
+  @override String get colorPurple => 'סגול';
+  @override String get colorPink => 'ורוד';
+  @override String get colorBrown => 'חום';
+  @override String get colorBlack => 'שחור';
+  @override String get colorWhite => 'לבן';
+  @override String selectTheColor(String color) => 'בחרו את הצבע $color';
+  @override String get whichColor => 'איזה צבע?';
 }

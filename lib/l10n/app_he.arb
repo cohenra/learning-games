@@ -59,5 +59,25 @@
   "question": "שאלה",
   "howMany": "כמה?",
   "playAgain": "שחק שוב",
-  "comingSoon": "בקרוב"
+  "comingSoon": "בקרוב",
+
+  "colorRed": "אדום",
+  "colorBlue": "כחול",
+  "colorYellow": "צהוב",
+  "colorGreen": "ירוק",
+  "colorOrange": "כתום",
+  "colorPurple": "סגול",
+  "colorPink": "ורוד",
+  "colorBrown": "חום",
+  "colorBlack": "שחור",
+  "colorWhite": "לבן",
+  "selectTheColor": "בחרו את הצבע {color}",
+  "@selectTheColor": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "whichColor": "איזה צבע?"
 }
