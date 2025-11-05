@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך חידון אותיות - שאלות אקראיות עם בחירה מרובה
@@ -256,6 +257,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
     final correctLetterName = _getLetterName(l10n, _correctAnswer['key'], _correctAnswer['letter']);
@@ -285,134 +287,142 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // התקדמות
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: List.generate(
-                            _score,
-                            (index) => const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: Text('⭐', style: TextStyle(fontSize: 20)),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // התקדמות
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.horizontalSpacing,
+                        vertical: responsive.spacing(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
+                            style: TextStyle(
+                              fontSize: responsive.subtitleSize,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
+                          Row(
+                            children: List.generate(
+                              _score,
+                              (index) => Padding(
+                                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(2)),
+                                child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(20))),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 8),
+                    SizedBox(height: responsive.spacing(8)),
 
-                  // שאלה - "בחרו את האות אלף"
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GestureDetector(
-                      onTap: _speakQuestion,
-                      child: Text(
-                        l10n.selectTheLetter(correctLetterName),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
+                    // שאלה - "בחרו את האות אלף"
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: responsive.horizontalSpacing),
+                      child: GestureDetector(
+                        onTap: _speakQuestion,
+                        child: Text(
+                          l10n.selectTheLetter(correctLetterName),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: responsive.questionTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 12),
+                    SizedBox(height: responsive.spacing(12)),
 
-                  // אפשרויות תשובה - 4 אותיות בלבד (רק התווים, לא השמות)
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 6.0,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: _options.map((option) {
-                          final letter = option['letter'] as String;
+                    // אפשרויות תשובה - 4 אותיות בלבד (רק התווים, לא השמות)
+                    SizedBox(
+                      height: responsive.height(45),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: responsive.horizontalSpacing,
+                          vertical: responsive.spacing(8),
+                        ),
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: responsive.spacing(8),
+                          crossAxisSpacing: responsive.spacing(8),
+                          childAspectRatio: 6.0,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: _options.map((option) {
+                            final letter = option['letter'] as String;
 
-                          return GestureDetector(
-                            onTap: () => _handleAnswer(letter),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    _getButtonColor(letter),
-                                    _getButtonColor(letter).withOpacity(0.8),
+                            return GestureDetector(
+                              onTap: () => _handleAnswer(letter),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      _getButtonColor(letter),
+                                      _getButtonColor(letter).withOpacity(0.8),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _getButtonColor(letter).withOpacity(0.3),
+                                      blurRadius: responsive.spacing(10),
+                                      offset: Offset(0, responsive.spacing(6)),
+                                    ),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getButtonColor(letter).withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  letter,
-                                  style: const TextStyle(
-                                    fontSize: 52,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                child: Center(
+                                  child: Text(
+                                    letter,
+                                    style: TextStyle(
+                                      fontSize: responsive.fontSize(52),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-
-                  // כפתור להאזנה לשאלה שוב
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: KidButton(
-                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                      onPressed: _speakQuestion,
-                      color: Colors.purple.shade400,
-                      width: 200,
-                      height: 50,
-                    ),
-                  ),
-
-                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                  if (_isCorrect == true)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        l10n.correct,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
+                            );
+                          }).toList(),
                         ),
                       ),
-                    )
-                  else
-                    const SizedBox(height: 16),
-                ],
+                    ),
+
+                    // כפתור להאזנה לשאלה שוב
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
+                      child: KidButton(
+                        text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                        onPressed: _speakQuestion,
+                        color: Colors.purple.shade400,
+                        width: responsive.width(50),
+                        height: responsive.buttonHeight * 0.7,
+                      ),
+                    ),
+
+                    // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                    if (_isCorrect == true)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: responsive.spacing(16)),
+                        child: Text(
+                          l10n.correct,
+                          style: TextStyle(
+                            fontSize: responsive.questionTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green.shade700,
+                          ),
+                        ),
+                      )
+                    else
+                      SizedBox(height: responsive.spacing(16)),
+                  ],
+                ),
               ),
             ),
           ),
@@ -434,6 +444,8 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -448,59 +460,66 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.wellDone,
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade700,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  '${l10n.score}: $_score / $_totalQuestions',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Wrap(
-                  children: List.generate(
-                    _score,
-                    (index) => const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text('⭐', style: TextStyle(fontSize: 48)),
+          child: SingleChildScrollView(
+            child: Center(
+              child: Padding(
+                padding: responsive.safePadding,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: responsive.height(10)),
+                    Text(
+                      l10n.wellDone,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(56),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange.shade700,
+                      ),
                     ),
-                  ),
+                    SizedBox(height: responsive.spacing(40)),
+                    Text(
+                      '${l10n.score}: $_score / $_totalQuestions',
+                      style: TextStyle(
+                        fontSize: responsive.titleSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: responsive.spacing(40)),
+                    Wrap(
+                      children: List.generate(
+                        _score,
+                        (index) => Padding(
+                          padding: EdgeInsets.all(responsive.spacing(8)),
+                          child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(48))),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: responsive.spacing(60)),
+                    KidButton(
+                      text: l10n.playAgain,
+                      onPressed: () {
+                        setState(() {
+                          _currentQuestionIndex = 0;
+                          _score = 0;
+                          _selectedAnswer = null;
+                          _isCorrect = null;
+                        });
+                        _generateQuestion();
+                      },
+                      color: Colors.orange.shade500,
+                      width: responsive.width(65),
+                    ),
+                    SizedBox(height: responsive.spacing(20)),
+                    KidButton(
+                      text: l10n.back,
+                      onPressed: () => Navigator.pop(context),
+                      color: Colors.blue.shade400,
+                      width: responsive.width(65),
+                    ),
+                    SizedBox(height: responsive.height(5)),
+                  ],
                 ),
-                const SizedBox(height: 60),
-                KidButton(
-                  text: l10n.playAgain,
-                  onPressed: () {
-                    setState(() {
-                      _currentQuestionIndex = 0;
-                      _score = 0;
-                      _selectedAnswer = null;
-                      _isCorrect = null;
-                    });
-                    _generateQuestion();
-                  },
-                  color: Colors.orange.shade500,
-                  width: 250,
-                ),
-                const SizedBox(height: 20),
-                KidButton(
-                  text: l10n.back,
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.blue.shade400,
-                  width: 250,
-                ),
-              ],
+              ),
             ),
           ),
         ),

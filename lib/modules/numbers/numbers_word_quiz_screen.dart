@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// חידון מספרים עם תשובות במילים - "שבע" במקום "7"
@@ -172,6 +173,7 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final responsive = ResponsiveHelper(context);
 
     if (_currentQuestionIndex >= _totalQuestions && _selectedAnswer != null) {
       return _buildCompletionScreen(l10n, isHebrew);
@@ -202,30 +204,35 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                 children: [
                   // Header עם התקדמות וניקוד
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(responsive.spacing(16)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          isHebrew
-                              ? 'שאלה ${_currentQuestionIndex + 1} מתוך $_totalQuestions'
-                              : 'Question ${_currentQuestionIndex + 1} of $_totalQuestions',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange.shade700,
+                        Flexible(
+                          child: Text(
+                            isHebrew
+                                ? 'שאלה ${_currentQuestionIndex + 1} מתוך $_totalQuestions'
+                                : 'Question ${_currentQuestionIndex + 1} of $_totalQuestions',
+                            style: TextStyle(
+                              fontSize: responsive.fontSize(22),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(20),
+                            vertical: responsive.spacing(10)
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(responsive.spacing(20)),
                           ),
                           child: Text(
                             isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: responsive.fontSize(20),
                               fontWeight: FontWeight.bold,
                               color: Colors.orange.shade700,
                             ),
@@ -235,7 +242,7 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: responsive.spacing(12)),
 
                   // כפתור החלפה בין מילים למספרים
                   GestureDetector(
@@ -245,10 +252,13 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.spacing(20),
+                        vertical: responsive.spacing(8)
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange.shade200,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(responsive.spacing(20)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -256,57 +266,60 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                           Icon(
                             _showWords ? Icons.text_fields : Icons.numbers,
                             color: Colors.orange.shade700,
-                            size: 20,
+                            size: responsive.iconSize(20),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: responsive.spacing(8)),
                           Text(
                             _showWords
                                 ? (isHebrew ? 'מילים' : 'Words')
                                 : (isHebrew ? 'ספרות' : 'Digits'),
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: responsive.bodyTextSize,
                               fontWeight: FontWeight.bold,
                               color: Colors.orange.shade700,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: responsive.spacing(8)),
                           Icon(
                             Icons.swap_horiz,
                             color: Colors.orange.shade700,
-                            size: 20,
+                            size: responsive.iconSize(20),
                           ),
                         ],
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: responsive.spacing(12)),
 
                   // השאלה - טקסט בלבד ללא מספר
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                     child: Text(
                       isHebrew ? 'בחרו את המספר:' : 'Select the number:',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.questionTextSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue.shade700,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: responsive.spacing(12)),
 
                   // אפשרויות תשובה - מלבנים דקים כמו בחידונים האחרים
                   Expanded(
                     flex: 2,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.spacing(20),
+                        vertical: responsive.spacing(8)
+                      ),
                       child: GridView.count(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
+                        mainAxisSpacing: responsive.spacing(8),
+                        crossAxisSpacing: responsive.spacing(8),
                         childAspectRatio: 6.0,
                         physics: const NeverScrollableScrollPhysics(),
                         children: _options.map<Widget>((number) {
@@ -319,12 +332,12 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: _getButtonColor(number),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(responsive.spacing(16)),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
+                                    blurRadius: responsive.spacing(8),
+                                    offset: Offset(0, responsive.spacing(4)),
                                   ),
                                 ],
                               ),
@@ -332,7 +345,9 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                                 child: Text(
                                   displayText,
                                   style: TextStyle(
-                                    fontSize: _showWords ? 24 : 32,
+                                    fontSize: _showWords
+                                        ? responsive.answerTextSize
+                                        : responsive.fontSize(32),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -348,16 +363,16 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
 
                   // כפתור להאזנה לשאלה שוב
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
                     child: KidButton(
                       text: isHebrew ? 'הקשב שוב 🔊' : 'Listen Again 🔊',
                       onPressed: _speakQuestion,
                       color: Colors.green.shade400,
-                      width: 200,
+                      width: responsive.width(50),
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: responsive.spacing(20)),
                 ],
               ),
             ),
@@ -370,6 +385,8 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -385,48 +402,50 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
         ),
         child: SafeArea(
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.wellDone,
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade700,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.wellDone,
+                    style: TextStyle(
+                      fontSize: responsive.fontSize(56),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                Text(
-                  isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
-                  style: TextStyle(
-                    fontSize: 36,
-                    color: Colors.blue.shade700,
+                  SizedBox(height: responsive.spacing(30)),
+                  Text(
+                    isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
+                    style: TextStyle(
+                      fontSize: responsive.titleSize,
+                      color: Colors.blue.shade700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                KidButton(
-                  text: l10n.playAgain,
-                  onPressed: () {
-                    setState(() {
-                      _currentQuestionIndex = 0;
-                      _score = 0;
-                    });
-                    _generateQuestion();
-                  },
-                  color: Colors.green.shade400,
-                  width: 200,
-                ),
-                const SizedBox(height: 20),
-                KidButton(
-                  text: isHebrew ? 'חזרה' : 'Back',
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  color: Colors.blue.shade400,
-                  width: 200,
-                ),
-              ],
+                  SizedBox(height: responsive.spacing(50)),
+                  KidButton(
+                    text: l10n.playAgain,
+                    onPressed: () {
+                      setState(() {
+                        _currentQuestionIndex = 0;
+                        _score = 0;
+                      });
+                      _generateQuestion();
+                    },
+                    color: Colors.green.shade400,
+                    width: responsive.width(50),
+                  ),
+                  SizedBox(height: responsive.spacing(20)),
+                  KidButton(
+                    text: isHebrew ? 'חזרה' : 'Back',
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    color: Colors.blue.shade400,
+                    width: responsive.width(50),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

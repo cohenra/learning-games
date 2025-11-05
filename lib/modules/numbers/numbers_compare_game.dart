@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// משחק השוואת מספרים - מי גדול יותר?
@@ -125,6 +126,7 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
 
@@ -157,30 +159,35 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                 children: [
                   // Header עם התקדמות
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: responsive.safePadding,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          isHebrew
-                              ? 'סיבוב ${_currentRound + 1} מתוך $_totalRounds'
-                              : 'Round ${_currentRound + 1} of $_totalRounds',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange.shade700,
+                        Flexible(
+                          child: Text(
+                            isHebrew
+                                ? 'סיבוב ${_currentRound + 1} מתוך $_totalRounds'
+                                : 'Round ${_currentRound + 1} of $_totalRounds',
+                            style: TextStyle(
+                              fontSize: responsive.fontSize(22),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(20),
+                            vertical: responsive.spacing(10),
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(responsive.spacing(20)),
                           ),
                           child: Text(
                             isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: responsive.fontSize(20),
                               fontWeight: FontWeight.bold,
                               color: Colors.orange.shade700,
                             ),
@@ -190,23 +197,23 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: responsive.verticalSpacing),
 
                   // הוראות
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                     child: Text(
                       isHebrew ? 'לחצו על המספר הגדול יותר' : 'Tap on the bigger number',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: responsive.questionTextSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue.shade700,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  SizedBox(height: responsive.verticalSpacing * 2),
 
                   // שני המספרים
                   Expanded(
@@ -218,15 +225,15 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                             onTap: () => _onSideSelected(0),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.all(12),
+                              margin: EdgeInsets.all(responsive.spacing(12)),
                               decoration: BoxDecoration(
                                 color: _getSideColor(0),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(responsive.spacing(20)),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
+                                    blurRadius: responsive.spacing(10),
+                                    offset: Offset(0, responsive.spacing(5)),
                                   ),
                                 ],
                               ),
@@ -236,25 +243,25 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                                   // המספר
                                   Text(
                                     '$_leftNumber',
-                                    style: const TextStyle(
-                                      fontSize: 80,
+                                    style: TextStyle(
+                                      fontSize: responsive.emojiSize,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  SizedBox(height: responsive.verticalSpacing),
                                   // ייצוג ויזואלי
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                                     child: Wrap(
                                       alignment: WrapAlignment.center,
-                                      spacing: 8,
-                                      runSpacing: 8,
+                                      spacing: responsive.spacing(8),
+                                      runSpacing: responsive.spacing(8),
                                       children: List.generate(
                                         _leftNumber,
                                         (index) => Container(
-                                          width: 30,
-                                          height: 30,
+                                          width: responsive.fontSize(30),
+                                          height: responsive.fontSize(30),
                                           decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: Colors.white,
@@ -275,15 +282,15 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                             onTap: () => _onSideSelected(1),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.all(12),
+                              margin: EdgeInsets.all(responsive.spacing(12)),
                               decoration: BoxDecoration(
                                 color: _getSideColor(1),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(responsive.spacing(20)),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
+                                    blurRadius: responsive.spacing(10),
+                                    offset: Offset(0, responsive.spacing(5)),
                                   ),
                                 ],
                               ),
@@ -293,25 +300,25 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                                   // המספר
                                   Text(
                                     '$_rightNumber',
-                                    style: const TextStyle(
-                                      fontSize: 80,
+                                    style: TextStyle(
+                                      fontSize: responsive.emojiSize,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  SizedBox(height: responsive.verticalSpacing),
                                   // ייצוג ויזואלי
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                                     child: Wrap(
                                       alignment: WrapAlignment.center,
-                                      spacing: 8,
-                                      runSpacing: 8,
+                                      spacing: responsive.spacing(8),
+                                      runSpacing: responsive.spacing(8),
                                       children: List.generate(
                                         _rightNumber,
                                         (index) => Container(
-                                          width: 30,
-                                          height: 30,
+                                          width: responsive.fontSize(30),
+                                          height: responsive.fontSize(30),
                                           decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: Colors.white,
@@ -331,16 +338,16 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
 
                   // כפתור הקשב
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: responsive.safePadding,
                     child: KidButton(
                       text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
                       onPressed: _speakInstructions,
                       color: Colors.green.shade400,
-                      width: 200,
+                      width: responsive.width(50),
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: responsive.verticalSpacing),
                 ],
               ),
             ),
@@ -353,6 +360,8 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -374,20 +383,20 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                 Text(
                   l10n.wellDone,
                   style: TextStyle(
-                    fontSize: 56,
+                    fontSize: responsive.titleSize * 1.5,
                     fontWeight: FontWeight.bold,
                     color: Colors.orange.shade700,
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: responsive.verticalSpacing * 2),
                 Text(
                   isHebrew ? '!נקודות $_score מתוך $_totalRounds' : 'Score: $_score out of $_totalRounds!',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: responsive.titleSize,
                     color: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: responsive.verticalSpacing * 3),
                 KidButton(
                   text: l10n.playAgain,
                   onPressed: () {
@@ -398,16 +407,16 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                     _generateRound();
                   },
                   color: Colors.green.shade400,
-                  width: 200,
+                  width: responsive.width(50),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: responsive.verticalSpacing),
                 KidButton(
                   text: isHebrew ? 'חזרה' : 'Back',
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   color: Colors.blue.shade400,
-                  width: 200,
+                  width: responsive.width(50),
                 ),
               ],
             ),

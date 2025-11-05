@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// משחק מיון מספרים - סידור מספרים מהקטן לגדול
@@ -133,6 +134,7 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
 
@@ -161,185 +163,200 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // Header עם התקדמות
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          isHebrew
-                              ? 'סיבוב ${_currentRound + 1} מתוך $_totalRounds'
-                              : 'Round ${_currentRound + 1} of $_totalRounds',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange.shade700,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: responsive.screenHeight - MediaQuery.of(context).padding.top - kToolbarHeight,
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // הוראות
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      isHebrew ? 'סדרו את המספרים מהקטן לגדול' : 'Sort from smallest to largest',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // המספרים לבחירה
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: _numbers.map((number) {
-                        final isSelected = _userOrder.contains(number);
-                        return GestureDetector(
-                          onTap: () => _onNumberTap(number),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.grey.shade300 : Colors.orange.shade400,
-                              shape: BoxShape.circle,
-                              boxShadow: isSelected
-                                  ? []
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.orange.shade300,
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                            ),
-                            child: Center(
-                              child: Text(
-                                '$number',
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected ? Colors.grey.shade500 : Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-
-                  const SizedBox(height: 60),
-
-                  // הסדר שנבחר
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: IntrinsicHeight(
                     child: Column(
                       children: [
-                        Text(
-                          isHebrew ? 'הסדר שלכם:' : 'Your order:',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
+                        // Header עם התקדמות
+                        Padding(
+                          padding: responsive.safePadding,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  isHebrew
+                                      ? 'סיבוב ${_currentRound + 1} מתוך $_totalRounds'
+                                      : 'Round ${_currentRound + 1} of $_totalRounds',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(22),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: responsive.spacing(20),
+                                  vertical: responsive.spacing(10),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade100,
+                                  borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                ),
+                                child: Text(
+                                  isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(20),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Container(
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.orange.shade300,
-                              width: 3,
+
+                        SizedBox(height: responsive.verticalSpacing),
+
+                        // הוראות
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                          child: Text(
+                            isHebrew ? 'סדרו את המספרים מהקטן לגדול' : 'Sort from smallest to largest',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: responsive.questionTextSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade700,
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: _userOrder.isEmpty
-                                ? [
-                                    Text(
-                                      '...',
-                                      style: TextStyle(
-                                        fontSize: 36,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ),
-                                  ]
-                                : _userOrder.map((number) {
-                                    return Text(
+                        ),
+
+                        SizedBox(height: responsive.verticalSpacing * 2),
+
+                        // המספרים לבחירה
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                          child: Wrap(
+                            spacing: responsive.spacing(12),
+                            runSpacing: responsive.spacing(12),
+                            alignment: WrapAlignment.center,
+                            children: _numbers.map((number) {
+                              final isSelected = _userOrder.contains(number);
+                              final numberSize = responsive.fontSize(80);
+                              return GestureDetector(
+                                onTap: () => _onNumberTap(number),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: numberSize,
+                                  height: numberSize,
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.grey.shade300 : Colors.orange.shade400,
+                                    shape: BoxShape.circle,
+                                    boxShadow: isSelected
+                                        ? []
+                                        : [
+                                            BoxShadow(
+                                              color: Colors.orange.shade300,
+                                              blurRadius: responsive.spacing(8),
+                                              offset: Offset(0, responsive.spacing(4)),
+                                            ),
+                                          ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
                                       '$number',
                                       style: TextStyle(
-                                        fontSize: 36,
+                                        fontSize: responsive.titleSize,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.orange.shade700,
+                                        color: isSelected ? Colors.grey.shade500 : Colors.white,
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
+
+                        SizedBox(height: responsive.verticalSpacing * 3),
+
+                        // הסדר שנבחר
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                          child: Column(
+                            children: [
+                              Text(
+                                isHebrew ? 'הסדר שלכם:' : 'Your order:',
+                                style: TextStyle(
+                                  fontSize: responsive.fontSize(22),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              SizedBox(height: responsive.verticalSpacing),
+                              Container(
+                                height: responsive.fontSize(80),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                  border: Border.all(
+                                    color: Colors.orange.shade300,
+                                    width: responsive.spacing(3),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: _userOrder.isEmpty
+                                      ? [
+                                          Text(
+                                            '...',
+                                            style: TextStyle(
+                                              fontSize: responsive.titleSize,
+                                              color: Colors.grey.shade400,
+                                            ),
+                                          ),
+                                        ]
+                                      : _userOrder.map((number) {
+                                          return Text(
+                                            '$number',
+                                            style: TextStyle(
+                                              fontSize: responsive.titleSize,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.orange.shade700,
+                                            ),
+                                          );
+                                        }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                              const Spacer(),
+
+                        // כפתורים
+                        Padding(
+                          padding: responsive.safePadding,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              KidButton(
+                                text: isHebrew ? 'איפוס' : 'Reset',
+                                onPressed: _reset,
+                                color: Colors.grey.shade500,
+                                width: responsive.width(35),
+                              ),
+                              KidButton(
+                                text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                                onPressed: _speakInstructions,
+                                color: Colors.green.shade400,
+                                width: responsive.width(35),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: responsive.verticalSpacing),
                       ],
                     ),
                   ),
-
-                  const Spacer(),
-
-                  // כפתורים
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        KidButton(
-                          text: isHebrew ? 'איפוס' : 'Reset',
-                          onPressed: _reset,
-                          color: Colors.grey.shade500,
-                          width: 140,
-                        ),
-                        KidButton(
-                          text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                          onPressed: _speakInstructions,
-                          color: Colors.green.shade400,
-                          width: 140,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
           ),
@@ -351,6 +368,8 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -372,20 +391,20 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
                 Text(
                   l10n.wellDone,
                   style: TextStyle(
-                    fontSize: 56,
+                    fontSize: responsive.titleSize * 1.5,
                     fontWeight: FontWeight.bold,
                     color: Colors.orange.shade700,
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: responsive.verticalSpacing * 2),
                 Text(
                   isHebrew ? '!נקודות $_score מתוך $_totalRounds' : 'Score: $_score out of $_totalRounds!',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: responsive.titleSize,
                     color: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: responsive.verticalSpacing * 3),
                 KidButton(
                   text: l10n.playAgain,
                   onPressed: () {
@@ -397,16 +416,16 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
                     _generateRound();
                   },
                   color: Colors.green.shade400,
-                  width: 200,
+                  width: responsive.width(50),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: responsive.verticalSpacing),
                 KidButton(
                   text: isHebrew ? 'חזרה' : 'Back',
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   color: Colors.blue.shade400,
-                  width: 200,
+                  width: responsive.width(50),
                 ),
               ],
             ),

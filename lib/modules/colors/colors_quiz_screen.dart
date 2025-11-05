@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך חידון צבעים - שאלות אקראיות עם בחירה מרובה
@@ -205,6 +206,7 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final responsive = ResponsiveHelper(context);
 
     if (_currentQuestionIndex >= _totalQuestions && _selectedAnswer != null) {
       return _buildCompletionScreen(l10n, isHebrew);
@@ -233,135 +235,150 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // התקדמות
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Row(
-                          children: List.generate(
-                            _score,
-                            (index) => const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: Text('⭐', style: TextStyle(fontSize: 20)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: responsive.screenHeight -
+                        MediaQuery.of(context).padding.top -
+                        kToolbarHeight,
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // שאלה - "בחרו את הצבע אדום"
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GestureDetector(
-                      onTap: _speakQuestion,
-                      child: Text(
-                        l10n.selectTheColor(correctColorName),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
+                  child: Column(
+                    children: [
+                      // התקדמות
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: responsive.horizontalSpacing,
+                          vertical: responsive.spacing(8),
                         ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // אפשרויות תשובה - מלבנים צבעוניים דקים כמו בחידון מספרים
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 6.0,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: List.generate(_options.length, (index) {
-                          final colorData = _options[index];
-                          final color = colorData['color'] as Color;
-
-                          return GestureDetector(
-                            onTap: () => _handleAnswer(index),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: _getButtonBorderColor(index),
-                                  width: _getButtonBorderWidth(index),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.5),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
+                              style: TextStyle(
+                                fontSize: responsive.subtitleSize,
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: color == Colors.white
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(18),
-                                        border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    )
-                                  : null,
                             ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
-
-                  // כפתור להאזנה לשאלה שוב
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: KidButton(
-                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                      onPressed: _speakQuestion,
-                      color: Colors.purple.shade400,
-                      width: 200,
-                      height: 50,
-                    ),
-                  ),
-
-                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                  if (_isCorrect == true)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        l10n.correct,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
+                            Row(
+                              children: List.generate(
+                                _score,
+                                (index) => Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(2)),
+                                  child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(20))),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    )
-                  else
-                    const SizedBox(height: 16),
-                ],
+
+                      SizedBox(height: responsive.spacing(8)),
+
+                      // שאלה - "בחרו את הצבע אדום"
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: responsive.horizontalSpacing),
+                        child: GestureDetector(
+                          onTap: _speakQuestion,
+                          child: Text(
+                            l10n.selectTheColor(correctColorName),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: responsive.questionTextSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(12)),
+
+                      // אפשרויות תשובה - מלבנים צבעוניים דקים כמו בחידון מספרים
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: responsive.horizontalSpacing,
+                          vertical: responsive.spacing(8),
+                        ),
+                        child: GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          mainAxisSpacing: responsive.spacing(8),
+                          crossAxisSpacing: responsive.spacing(8),
+                          childAspectRatio: responsive.isSmallPhone ? 5.0 : 6.0,
+                          children: List.generate(_options.length, (index) {
+                            final colorData = _options[index];
+                            final color = colorData['color'] as Color;
+
+                            return GestureDetector(
+                              onTap: () => _handleAnswer(index),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                  border: Border.all(
+                                    color: _getButtonBorderColor(index),
+                                    width: _getButtonBorderWidth(index),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: color.withOpacity(0.5),
+                                      blurRadius: responsive.spacing(15),
+                                      offset: Offset(0, responsive.spacing(6)),
+                                    ),
+                                  ],
+                                ),
+                                child: color == Colors.white
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(responsive.spacing(18)),
+                                          border: Border.all(
+                                            color: Colors.grey.shade300,
+                                            width: responsive.spacing(2),
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.verticalSpacing),
+
+                      // כפתור להאזנה לשאלה שוב
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
+                        child: KidButton(
+                          text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                          onPressed: _speakQuestion,
+                          color: Colors.purple.shade400,
+                          width: responsive.width(50),
+                          height: responsive.buttonHeight * 0.7,
+                        ),
+                      ),
+
+                      // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                      if (_isCorrect == true)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: responsive.spacing(16)),
+                          child: Text(
+                            l10n.correct,
+                            style: TextStyle(
+                              fontSize: responsive.questionTextSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        )
+                      else
+                        SizedBox(height: responsive.spacing(16)),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -397,60 +414,82 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.wellDone,
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade700,
+          child: Builder(
+            builder: (context) {
+              final responsive = ResponsiveHelper(context);
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: responsive.screenHeight - MediaQuery.of(context).padding.top,
                   ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  '${l10n.score}: $_score / $_totalQuestions',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Wrap(
-                  children: List.generate(
-                    _score,
-                    (index) => const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text('⭐', style: TextStyle(fontSize: 48)),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: responsive.safePadding,
+                          child: Text(
+                            l10n.wellDone,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: responsive.titleSize * 1.3,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(40)),
+                        Text(
+                          '${l10n.score}: $_score / $_totalQuestions',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(40)),
+                        Padding(
+                          padding: responsive.safePadding,
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            children: List.generate(
+                              _score,
+                              (index) => Padding(
+                                padding: EdgeInsets.all(responsive.spacing(8)),
+                                child: Text('⭐', style: TextStyle(fontSize: responsive.emojiSize * 0.6)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(60)),
+                        KidButton(
+                          text: l10n.playAgain,
+                          onPressed: () {
+                            setState(() {
+                              _currentQuestionIndex = 0;
+                              _score = 0;
+                              _selectedAnswer = null;
+                              _isCorrect = null;
+                            });
+                            _generateQuestion();
+                          },
+                          color: Colors.orange.shade500,
+                          width: responsive.width(60),
+                          height: responsive.buttonHeight,
+                        ),
+                        SizedBox(height: responsive.spacing(20)),
+                        KidButton(
+                          text: l10n.back,
+                          onPressed: () => Navigator.pop(context),
+                          color: Colors.blue.shade400,
+                          width: responsive.width(60),
+                          height: responsive.buttonHeight,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 60),
-                KidButton(
-                  text: l10n.playAgain,
-                  onPressed: () {
-                    setState(() {
-                      _currentQuestionIndex = 0;
-                      _score = 0;
-                      _selectedAnswer = null;
-                      _isCorrect = null;
-                    });
-                    _generateQuestion();
-                  },
-                  color: Colors.orange.shade500,
-                  width: 250,
-                ),
-                const SizedBox(height: 20),
-                KidButton(
-                  text: l10n.back,
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.blue.shade400,
-                  width: 250,
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

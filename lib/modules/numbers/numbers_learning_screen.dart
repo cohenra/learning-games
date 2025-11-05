@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך למידת מספרים - מציג מספר אחד בכל פעם עם ייצוג ויזואלי
@@ -113,6 +114,7 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -147,14 +149,14 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                   child: Text(
                     '$_currentNumber',
                     style: TextStyle(
-                      fontSize: 180,
+                      fontSize: responsive.fontSize(180),
                       fontWeight: FontWeight.bold,
                       color: Colors.orange.shade700,
                       shadows: [
                         Shadow(
                           color: Colors.orange.shade200,
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
+                          blurRadius: responsive.spacing(20),
+                          offset: Offset(0, responsive.spacing(4)),
                         ),
                       ],
                     ),
@@ -168,7 +170,7 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                 child: Text(
                   _getNumberName(l10n),
                   style: TextStyle(
-                    fontSize: 48,
+                    fontSize: responsive.fontSize(48),
                     fontWeight: FontWeight.bold,
                     color: Colors.blue.shade700,
                   ),
@@ -177,11 +179,11 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
 
               // ייצוג ויזואלי - נקודות
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                 child: Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 12,
-                  runSpacing: 12,
+                  spacing: responsive.spacing(12),
+                  runSpacing: responsive.spacing(12),
                   children: List.generate(
                     _currentNumber,
                     (index) => SlideTransition(
@@ -199,8 +201,8 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                         ),
                       ),
                       child: Container(
-                        width: 60,
-                        height: 60,
+                        width: responsive.iconSize(60),
+                        height: responsive.iconSize(60),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
@@ -212,8 +214,8 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                           boxShadow: [
                             BoxShadow(
                               color: Colors.orange.shade300,
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                              blurRadius: responsive.spacing(8),
+                              offset: Offset(0, responsive.spacing(4)),
                             ),
                           ],
                         ),
@@ -225,7 +227,7 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
 
               // כפתורי ניווט
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: responsive.safePadding,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -234,20 +236,20 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                       onPressed: _goToPrevious,
                       enabled: _currentNumber > 1,
                       color: Colors.blue.shade400,
-                      width: 140,
+                      width: responsive.width(35),
                     ),
                     KidButton(
                       text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
                       onPressed: _speakCurrentNumber,
                       color: Colors.green.shade400,
-                      width: 140,
+                      width: responsive.width(35),
                     ),
                     KidButton(
                       text: l10n.next,
                       onPressed: _goToNext,
                       enabled: _currentNumber < 10,
                       color: Colors.blue.shade400,
-                      width: 140,
+                      width: responsive.width(35),
                     ),
                   ],
                 ),
@@ -259,9 +261,9 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                 children: List.generate(
                   10,
                   (index) => Container(
-                    width: 12,
-                    height: 12,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: responsive.iconSize(12),
+                    height: responsive.iconSize(12),
+                    margin: EdgeInsets.symmetric(horizontal: responsive.spacing(4)),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: index + 1 == _currentNumber
@@ -271,7 +273,7 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: responsive.verticalSpacing),
             ],
           ),
         ),
