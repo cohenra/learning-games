@@ -262,13 +262,12 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                         crossAxisSpacing: 16,
                         childAspectRatio: 2.0,
                         physics: const NeverScrollableScrollPhysics(),
-                        children: _options.map((number) {
+                        children: _options.map<Widget>((number) {
                           final numberName = _getNumberName(l10n, number);
                           return KidButton(
                             text: numberName,
                             onPressed: () => _handleAnswer(number),
                             color: _getButtonColor(number),
-                            fontSize: 28,
                             height: 80,
                           );
                         }).toList(),
