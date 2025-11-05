@@ -3,6 +3,8 @@ import '../../widgets/kid_button.dart';
 import 'numbers_learning_screen.dart';
 import 'numbers_quiz_screen.dart';
 import 'numbers_word_quiz_screen.dart';
+import 'numbers_sorting_game.dart';
+import 'numbers_compare_game.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול המספרים
@@ -64,7 +66,7 @@ class NumbersMenuScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 60),
 
-                // 3 כפתורים בשורה אחת
+                // שורה ראשונה - 3 כפתורים
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -122,6 +124,60 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.purple.shade500,
+                          height: 120,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // שורה שנייה - 2 משחקים
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // כפתור מיון מספרים
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: KidButton(
+                          text: Localizations.localeOf(context).languageCode == 'he'
+                              ? 'מיון מספרים'
+                              : 'Number Sorting',
+                          icon: Icons.sort,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NumbersSortingGame(),
+                              ),
+                            );
+                          },
+                          color: Colors.teal.shade500,
+                          height: 120,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      // כפתור השוואת מספרים
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: KidButton(
+                          text: Localizations.localeOf(context).languageCode == 'he'
+                              ? 'מי גדול יותר?'
+                              : 'Which is Bigger?',
+                          icon: Icons.compare_arrows,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NumbersCompareGame(),
+                              ),
+                            );
+                          },
+                          color: Colors.deepOrange.shade500,
                           height: 120,
                         ),
                       ),
