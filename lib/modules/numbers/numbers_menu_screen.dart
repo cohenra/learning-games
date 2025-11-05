@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
 import 'numbers_learning_screen.dart';
 import 'numbers_quiz_screen.dart';
 import 'numbers_word_quiz_screen.dart';
@@ -14,6 +15,7 @@ class NumbersMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,41 +36,48 @@ class NumbersMenuScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // אייקון
-                const Text(
-                  '🔢',
-                  style: TextStyle(fontSize: 120),
-                ),
-                const SizedBox(height: 20),
+          child: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: responsive.verticalSpacing),
 
-                // כותרת
-                Text(
-                  l10n.numbersTitle,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade700,
+                  // אייקון
+                  Text(
+                    '🔢',
+                    style: TextStyle(fontSize: responsive.emojiSize),
                   ),
-                ),
-                const SizedBox(height: 16),
+                  SizedBox(height: responsive.verticalSpacing),
 
-                // תיאור
-                Text(
-                  l10n.numbersDescription,
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.grey.shade700,
+                  // כותרת
+                  Text(
+                    l10n.numbersTitle,
+                    style: TextStyle(
+                      fontSize: responsive.titleSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 60),
+                  SizedBox(height: responsive.spacing(16)),
 
-                // שורה ראשונה - 3 כפתורים
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  // תיאור
+                  Padding(
+                    padding: responsive.safePadding,
+                    child: Text(
+                      l10n.numbersDescription,
+                      style: TextStyle(
+                        fontSize: responsive.subtitleSize,
+                        color: Colors.grey.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: responsive.spacing(40)),
+
+                  // שורה ראשונה - 3 כפתורים
+                  Padding(
+                    padding: responsive.safePadding,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -86,10 +95,10 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.blue.shade500,
-                          height: 120,
+                          height: responsive.buttonHeight,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: responsive.horizontalSpacing),
 
                       // כפתור מצב חידון
                       Expanded(
@@ -105,10 +114,10 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.green.shade500,
-                          height: 120,
+                          height: responsive.buttonHeight,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: responsive.horizontalSpacing),
 
                       // כפתור חידון מילים
                       Expanded(
@@ -124,24 +133,23 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.purple.shade500,
-                          height: 120,
+                          height: responsive.buttonHeight,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: responsive.verticalSpacing),
 
                 // שורה שנייה - 2 משחקים
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: responsive.safePadding,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // כפתור מיון מספרים
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.4,
+                      Expanded(
                         child: KidButton(
                           text: Localizations.localeOf(context).languageCode == 'he'
                               ? 'מיון מספרים'
@@ -156,14 +164,13 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.teal.shade500,
-                          height: 120,
+                          height: responsive.buttonHeight,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: responsive.horizontalSpacing),
 
                       // כפתור השוואת מספרים
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.4,
+                      Expanded(
                         child: KidButton(
                           text: Localizations.localeOf(context).languageCode == 'he'
                               ? 'מי גדול יותר?'
@@ -178,12 +185,14 @@ class NumbersMenuScreen extends StatelessWidget {
                             );
                           },
                           color: Colors.deepOrange.shade500,
-                          height: 120,
+                          height: responsive.buttonHeight,
                         ),
                       ),
                     ],
                   ),
                 ),
+
+                SizedBox(height: responsive.verticalSpacing),
               ],
             ),
           ),

@@ -6,6 +6,7 @@ import '../modules/colors/colors_menu_screen.dart';
 import '../modules/letters/letters_menu_screen.dart';
 import '../modules/shapes/shapes_menu_screen.dart';
 import '../screens/settings_screen.dart';
+import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך הבית המעודכן
@@ -15,6 +16,7 @@ class NewHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       body: Container(
@@ -34,17 +36,23 @@ class NewHomeScreen extends StatelessWidget {
             children: [
               // כותרת עליונה עם החלפת שפה
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: responsive.safePadding.copyWith(
+                  top: responsive.spacing(12),
+                  bottom: responsive.spacing(12),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 48), // למרכז את הכותרת
-                    Text(
-                      l10n.appName,
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange.shade700,
+                    SizedBox(width: responsive.spacing(48)), // למרכז את הכותרת
+                    Flexible(
+                      child: Text(
+                        l10n.appName,
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange.shade700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const LanguageToggle(),
@@ -52,27 +60,30 @@ class NewHomeScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: responsive.spacing(10)),
 
               // ברוכים הבאים
               Text(
                 l10n.welcome,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: responsive.subtitleSize,
                   color: Colors.grey.shade700,
                 ),
               ),
 
-              const SizedBox(height: 15),
+              SizedBox(height: responsive.spacing(15)),
 
               // כרטיסי מודולים
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 5.0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: responsive.spacing(12),
+                    vertical: responsive.spacing(8),
+                  ),
+                  mainAxisSpacing: responsive.spacing(10),
+                  crossAxisSpacing: responsive.spacing(10),
+                  childAspectRatio: responsive.isPhone ? 3.5 : 5.0,
                   children: [
                     _buildModuleCard(
                       context: context,
@@ -140,7 +151,10 @@ class NewHomeScreen extends StatelessWidget {
 
               // כפתור הגדרות
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: responsive.safePadding.copyWith(
+                  top: responsive.spacing(12),
+                  bottom: responsive.spacing(12),
+                ),
                 child: KidButton(
                   text: l10n.settings,
                   icon: Icons.settings,
@@ -153,8 +167,8 @@ class NewHomeScreen extends StatelessWidget {
                     );
                   },
                   color: Colors.grey.shade600,
-                  width: 160,
-                  height: 50,
+                  width: responsive.width(40),
+                  height: responsive.buttonHeight * 0.6,
                 ),
               ),
             ],
@@ -173,6 +187,7 @@ class NewHomeScreen extends StatelessWidget {
     required bool isAvailable,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final responsive = ResponsiveHelper(context);
 
     return GestureDetector(
       onTap: isAvailable ? onTap : null,
@@ -180,12 +195,12 @@ class NewHomeScreen extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(responsive.spacing(30)),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              blurRadius: responsive.spacing(15),
+              offset: Offset(0, responsive.spacing(8)),
             ),
           ],
         ),
@@ -196,7 +211,7 @@ class NewHomeScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(responsive.spacing(30)),
                   ),
                 ),
               ),
@@ -208,32 +223,37 @@ class NewHomeScreen extends StatelessWidget {
                 children: [
                   Text(
                     icon,
-                    style: const TextStyle(fontSize: 40),
+                    style: TextStyle(fontSize: responsive.iconSize(40)),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+                  SizedBox(width: responsive.spacing(8)),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: responsive.bodyTextSize,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (!isAvailable) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: responsive.spacing(8)),
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.spacing(8),
+                        vertical: responsive.spacing(4),
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange.shade400,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(responsive.spacing(12)),
                       ),
                       child: Text(
                         l10n.comingSoon,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: responsive.fontSize(10),
                         ),
                       ),
                     ),
