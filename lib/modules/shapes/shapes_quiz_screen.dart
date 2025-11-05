@@ -358,6 +358,7 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                                   width: 40,
                                   height: 40,
                                   child: CustomPaint(
+                                    key: ValueKey('${shapeData['key']}_$index'),
                                     painter: ShapePainter(
                                       shapeType: shapeData['type'],
                                       color: shapeData['color'],

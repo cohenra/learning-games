@@ -23,7 +23,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   bool _showReward = false;
 
   late Map<String, dynamic> _correctAnswer;
-  late List<Map<String, dynamic>> _options;
+  List<Map<String, dynamic>> _options = [];
 
   final Random _random = Random();
 
@@ -83,15 +83,23 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
     {'letter': 'Z', 'key': 'letterZ', 'color': Colors.orange.shade300},
   ];
 
-  List<Map<String, dynamic>> get _letters {
-    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
-    return isHebrew ? _hebrewLetters : _englishLetters;
-  }
-
   @override
   void initState() {
     super.initState();
-    _generateQuestion();
+    // _generateQuestion will be called in didChangeDependencies
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_currentQuestionIndex == 0 && _options.isEmpty) {
+      _generateQuestion();
+    }
+  }
+
+  List<Map<String, dynamic>> _getCurrentLetters() {
+    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    return isHebrew ? _hebrewLetters : _englishLetters;
   }
 
   String _getLetterName(AppLocalizations l10n, String key, [String? letter]) {
@@ -130,12 +138,13 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
 
   void _generateQuestion() {
     setState(() {
-      _correctAnswer = _letters[_random.nextInt(_letters.length)];
+      final letters = _getCurrentLetters();
+      _correctAnswer = letters[_random.nextInt(letters.length)];
       _options = [_correctAnswer];
 
       // הוסף 3 תשובות שגויות
       while (_options.length < 4) {
-        final wrongOption = _letters[_random.nextInt(_letters.length)];
+        final wrongOption = letters[_random.nextInt(letters.length)];
         if (!_options.any((opt) => opt['letter'] == wrongOption['letter'])) {
           _options.add(wrongOption);
         }
