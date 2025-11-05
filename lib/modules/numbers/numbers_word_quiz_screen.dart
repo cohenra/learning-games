@@ -21,6 +21,7 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
   int? _selectedAnswer;
   bool? _isCorrect;
   bool _showReward = false;
+  bool _showWords = true; // Toggle: true = מילים, false = ספרות
 
   late int _correctAnswer;
   late List<int> _options;
@@ -236,6 +237,51 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
 
                   const SizedBox(height: 12),
 
+                  // כפתור החלפה בין מילים למספרים
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showWords = !_showWords;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _showWords ? Icons.text_fields : Icons.numbers,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _showWords
+                                ? (isHebrew ? 'מילים' : 'Words')
+                                : (isHebrew ? 'ספרות' : 'Digits'),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.swap_horiz,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
                   // השאלה - טקסט בלבד ללא מספר
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -250,25 +296,50 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
-                  // אפשרויות תשובה - כפתורים עם שמות המספרים במילים
+                  // אפשרויות תשובה - מלבנים דקים כמו בחידונים האחרים
                   Expanded(
+                    flex: 2,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: GridView.count(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 2.0,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 6.0,
                         physics: const NeverScrollableScrollPhysics(),
                         children: _options.map<Widget>((number) {
-                          final numberName = _getNumberName(l10n, number);
-                          return KidButton(
-                            text: numberName,
-                            onPressed: () => _handleAnswer(number),
-                            color: _getButtonColor(number),
-                            height: 80,
+                          final displayText = _showWords
+                              ? _getNumberName(l10n, number)
+                              : '$number';
+                          return GestureDetector(
+                            onTap: () => _handleAnswer(number),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: _getButtonColor(number),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Text(
+                                  displayText,
+                                  style: TextStyle(
+                                    fontSize: _showWords ? 24 : 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
                           );
                         }).toList(),
                       ),

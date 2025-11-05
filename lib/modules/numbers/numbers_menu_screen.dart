@@ -64,57 +64,69 @@ class NumbersMenuScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 60),
 
-                // כפתור מצב למידה
-                KidButton(
-                  text: l10n.learnMode,
-                  icon: Icons.school,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NumbersLearningScreen(),
+                // 3 כפתורים בשורה אחת
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // כפתור מצב למידה
+                      Expanded(
+                        child: KidButton(
+                          text: l10n.learnMode,
+                          icon: Icons.school,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NumbersLearningScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.blue.shade500,
+                          height: 120,
+                        ),
                       ),
-                    );
-                  },
-                  color: Colors.blue.shade500,
-                  width: 300,
-                  height: 90,
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(width: 12),
 
-                // כפתור מצב חידון
-                KidButton(
-                  text: l10n.quizMode,
-                  icon: Icons.gamepad,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NumbersQuizScreen(),
+                      // כפתור מצב חידון
+                      Expanded(
+                        child: KidButton(
+                          text: l10n.quizMode,
+                          icon: Icons.gamepad,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NumbersQuizScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.green.shade500,
+                          height: 120,
+                        ),
                       ),
-                    );
-                  },
-                  color: Colors.green.shade500,
-                  width: 300,
-                  height: 90,
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(width: 12),
 
-                // כפתור חידון מילים
-                KidButton(
-                  text: l10n.wordQuizMode,
-                  icon: Icons.abc,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NumbersWordQuizScreen(),
+                      // כפתור חידון מילים
+                      Expanded(
+                        child: KidButton(
+                          text: l10n.wordQuizMode,
+                          icon: Icons.abc,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NumbersWordQuizScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.purple.shade500,
+                          height: 120,
+                        ),
                       ),
-                    );
-                  },
-                  color: Colors.purple.shade500,
-                  width: 300,
-                  height: 90,
+                    ],
+                  ),
                 ),
               ],
             ),
