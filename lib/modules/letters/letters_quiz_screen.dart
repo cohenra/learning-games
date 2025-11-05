@@ -28,7 +28,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   final Random _random = Random();
 
   // רשימת 22 האותיות העבריות
-  final List<Map<String, dynamic>> _letters = [
+  final List<Map<String, dynamic>> _hebrewLetters = [
     {'letter': 'א', 'key': 'letterAlef', 'color': Colors.red},
     {'letter': 'ב', 'key': 'letterBet', 'color': Colors.blue},
     {'letter': 'ג', 'key': 'letterGimel', 'color': Colors.green},
@@ -53,13 +53,54 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
     {'letter': 'ת', 'key': 'letterTav', 'color': Colors.pinkAccent},
   ];
 
+  // רשימת 26 האותיות האנגליות
+  final List<Map<String, dynamic>> _englishLetters = [
+    {'letter': 'A', 'key': 'letterA', 'color': Colors.red},
+    {'letter': 'B', 'key': 'letterB', 'color': Colors.blue},
+    {'letter': 'C', 'key': 'letterC', 'color': Colors.green},
+    {'letter': 'D', 'key': 'letterD', 'color': Colors.orange},
+    {'letter': 'E', 'key': 'letterE', 'color': Colors.purple},
+    {'letter': 'F', 'key': 'letterF', 'color': Colors.pink},
+    {'letter': 'G', 'key': 'letterG', 'color': Colors.teal},
+    {'letter': 'H', 'key': 'letterH', 'color': Colors.amber},
+    {'letter': 'I', 'key': 'letterI', 'color': Colors.cyan},
+    {'letter': 'J', 'key': 'letterJ', 'color': Colors.lime},
+    {'letter': 'K', 'key': 'letterK', 'color': Colors.indigo},
+    {'letter': 'L', 'key': 'letterL', 'color': Colors.deepOrange},
+    {'letter': 'M', 'key': 'letterM', 'color': Colors.lightGreen},
+    {'letter': 'N', 'key': 'letterN', 'color': Colors.deepPurple},
+    {'letter': 'O', 'key': 'letterO', 'color': Colors.brown},
+    {'letter': 'P', 'key': 'letterP', 'color': Colors.blueGrey},
+    {'letter': 'Q', 'key': 'letterQ', 'color': Colors.redAccent},
+    {'letter': 'R', 'key': 'letterR', 'color': Colors.lightBlue},
+    {'letter': 'S', 'key': 'letterS', 'color': Colors.greenAccent},
+    {'letter': 'T', 'key': 'letterT', 'color': Colors.orangeAccent},
+    {'letter': 'U', 'key': 'letterU', 'color': Colors.purpleAccent},
+    {'letter': 'V', 'key': 'letterV', 'color': Colors.pinkAccent},
+    {'letter': 'W', 'key': 'letterW', 'color': Colors.red.shade300},
+    {'letter': 'X', 'key': 'letterX', 'color': Colors.blue.shade300},
+    {'letter': 'Y', 'key': 'letterY', 'color': Colors.green.shade300},
+    {'letter': 'Z', 'key': 'letterZ', 'color': Colors.orange.shade300},
+  ];
+
+  List<Map<String, dynamic>> get _letters {
+    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    return isHebrew ? _hebrewLetters : _englishLetters;
+  }
+
   @override
   void initState() {
     super.initState();
     _generateQuestion();
   }
 
-  String _getLetterName(AppLocalizations l10n, String key) {
+  String _getLetterName(AppLocalizations l10n, String key, [String? letter]) {
+    // עבור אותיות אנגליות, השתמש באות עצמה כשם
+    if (key.startsWith('letter') && key.length == 7 && letter != null) {
+      return letter;
+    }
+
+    // עבור אותיות עבריות, השתמש בשמות המלאים
     switch (key) {
       case 'letterAlef': return l10n.letterAlef;
       case 'letterBet': return l10n.letterBet;
@@ -83,7 +124,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
       case 'letterResh': return l10n.letterResh;
       case 'letterShin': return l10n.letterShin;
       case 'letterTav': return l10n.letterTav;
-      default: return '';
+      default: return letter ?? '';
     }
   }
 
@@ -117,9 +158,9 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   void _speakQuestion() {
     final appProvider = context.read<AppProvider>();
     final l10n = AppLocalizations.of(context)!;
-    final letterName = _getLetterName(l10n, _correctAnswer['key']);
+    final letterName = _getLetterName(l10n, _correctAnswer['key'], _correctAnswer['letter']);
 
-    // דבר "בחרו את האות אלף" או "Select the letter Alef"
+    // דבר "בחרו את האות אלף" או "Select the letter A"
     final question = l10n.selectTheLetter(letterName);
     appProvider.speak(question);
   }
@@ -208,7 +249,7 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
-    final correctLetterName = _getLetterName(l10n, _correctAnswer['key']);
+    final correctLetterName = _getLetterName(l10n, _correctAnswer['key'], _correctAnswer['letter']);
 
     if (_currentQuestionIndex >= _totalQuestions && _selectedAnswer != null) {
       return _buildCompletionScreen(l10n, isHebrew);
