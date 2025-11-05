@@ -87,5 +87,23 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "shapeCircle": "Circle",
+  "shapeSquare": "Square",
+  "shapeTriangle": "Triangle",
+  "shapeRectangle": "Rectangle",
+  "shapeStar": "Star",
+  "shapeHeart": "Heart",
+  "shapeDiamond": "Diamond",
+  "shapeOval": "Oval",
+  "selectTheShape": "Select the {shape}",
+  "@selectTheShape": {
+    "placeholders": {
+      "shape": {
+        "type": "String"
+      }
+    }
+  },
+  "whichShape": "Which shape?"
 }

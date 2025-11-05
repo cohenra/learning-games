@@ -87,5 +87,23 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "shapeCircle": "עיגול",
+  "shapeSquare": "ריבוע",
+  "shapeTriangle": "משולש",
+  "shapeRectangle": "מלבן",
+  "shapeStar": "כוכב",
+  "shapeHeart": "לב",
+  "shapeDiamond": "מעויין",
+  "shapeOval": "אליפסה",
+  "selectTheShape": "בחרו את {shape}",
+  "@selectTheShape": {
+    "placeholders": {
+      "shape": {
+        "type": "String"
+      }
+    }
+  },
+  "whichShape": "איזו צורה?"
 }
