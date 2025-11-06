@@ -511,49 +511,45 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
   }
 
   Widget _buildGameBoard() {
-    // חישוב דינמי של מספר עמודות לפי מספר כרטיסים
-    // EASY: 8 כרטיסים = 2x4 גריד
-    // MEDIUM: 12 כרטיסים = 3x4 גריד
-    // HARD: 16 כרטיסים = 4x4 גריד
-    int crossAxisCount;
-    if (_cards.length <= 8) {
-      crossAxisCount = 4; // 2 שורות של 4
-    } else if (_cards.length <= 12) {
-      crossAxisCount = 4; // 3 שורות של 4
-    } else {
-      crossAxisCount = 4; // 4 שורות של 4
-    }
+    // חישוב דינמי של מספר עמודות ושורות
+    const int crossAxisCount = 4;
+    final rowCount = (_cards.length / crossAxisCount).ceil();
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // חישוב גובה זמין לכרטיסים
+        // חישוב גובה זמין - הגובה שה-Expanded נותן
         final availableHeight = constraints.maxHeight;
         final availableWidth = constraints.maxWidth;
 
-        // חישוב מספר שורות
-        final rowCount = (_cards.length / crossAxisCount).ceil();
+        // חישוב גובה בפועל לכרטיס
+        // גובה זמין - paddings ו-spacings
+        const padding = 12.0;
+        const spacing = 10.0;
 
-        // חישוב גובה מקסימלי לכרטיס (עם מרווחים)
-        final totalSpacing = (rowCount - 1) * 10 + 24; // spacing + padding
-        final maxCardHeight = (availableHeight - totalSpacing) / rowCount;
+        final totalVerticalSpacing = (rowCount - 1) * spacing + (padding * 2);
+        final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
 
-        // חישוב רוחב מקסימלי לכרטיס
-        final totalHorizontalSpacing = (crossAxisCount - 1) * 10 + 24; // spacing + padding
-        final maxCardWidth = (availableWidth - totalHorizontalSpacing) / crossAxisCount;
+        final totalHorizontalSpacing = (crossAxisCount - 1) * spacing + (padding * 2);
+        final cardWidth = (availableWidth - totalHorizontalSpacing) / crossAxisCount;
 
-        // חישוב aspect ratio שמתאים למסך
-        // נשתמש ביחס שמבטיח שהכרטיסים נכנסים במסך
-        final calculatedAspectRatio = maxCardWidth / maxCardHeight;
+        // חישוב aspect ratio שמבטיח שהכרטיסים נכנסים
+        final aspectRatio = cardWidth / cardHeight;
+
+        // Debug info
+        print('🎮 Memory Game Layout:');
+        print('   Cards: ${_cards.length}, Rows: $rowCount');
+        print('   Available: ${availableWidth.toStringAsFixed(1)}w × ${availableHeight.toStringAsFixed(1)}h');
+        print('   Card size: ${cardWidth.toStringAsFixed(1)}w × ${cardHeight.toStringAsFixed(1)}h');
+        print('   Aspect ratio: ${aspectRatio.toStringAsFixed(2)}');
 
         return Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(padding),
           child: GridView.count(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: calculatedAspectRatio.clamp(0.6, 1.0),
-            physics: const NeverScrollableScrollPhysics(), // ❌ אין גלילה!
-            shrinkWrap: true,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
+            childAspectRatio: aspectRatio,
+            physics: const NeverScrollableScrollPhysics(),
             children: List.generate(
               _cards.length,
               (index) => _buildMemoryCard(index),
@@ -617,10 +613,16 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
         ],
       ),
       child: Center(
-        child: Icon(
-          Icons.question_mark,
-          size: 48,
-          color: Colors.white.withOpacity(0.5),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Icon(
+              Icons.question_mark,
+              size: 60,
+              color: Colors.white.withOpacity(0.5),
+            ),
+          ),
         ),
       ),
     );
@@ -646,24 +648,31 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
       ),
       child: Stack(
         children: [
+          // השתמש ב-FittedBox כדי להתאים את האות לגודל הכרטיס
           Center(
-            child: Text(
-              card.letter,
-              style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: card.color,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Text(
+                  card.letter,
+                  style: TextStyle(
+                    fontSize: 100,
+                    fontWeight: FontWeight.bold,
+                    color: card.color,
+                  ),
+                ),
               ),
             ),
           ),
           if (isMatched)
             Positioned(
-              top: 8,
-              right: 8,
+              top: 4,
+              right: 4,
               child: Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                size: 32,
+                size: 24,
               ),
             ),
         ],
