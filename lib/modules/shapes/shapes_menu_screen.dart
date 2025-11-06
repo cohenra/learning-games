@@ -3,6 +3,7 @@ import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
 import 'shapes_learning_screen.dart';
 import 'shapes_quiz_screen.dart';
+import 'shapes_building_game_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול הצורות
@@ -119,6 +120,29 @@ class ShapesMenuScreen extends StatelessWidget {
                           height: responsive.buttonHeight,
                         ),
                       ),
+                      SizedBox(height: responsive.verticalSpacing),
+
+                      // כפתור משחק בנייה
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: KidButton(
+                          text: Localizations.localeOf(context).languageCode == 'he'
+                              ? 'משחק בנייה 🏗️'
+                              : 'Building Game 🏗️',
+                          icon: Icons.construction,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ShapesBuildingGameScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.purple.shade500,
+                          width: responsive.width(80),
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
 
                       SizedBox(height: responsive.verticalSpacing),
                     ],
@@ -203,6 +227,29 @@ class ShapesMenuScreen extends StatelessWidget {
                                 );
                               },
                               color: Colors.green.shade500,
+                              width: responsive.width(80),
+                              height: responsive.buttonHeight,
+                            ),
+                          ),
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // כפתור משחק בנייה
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: KidButton(
+                              text: Localizations.localeOf(context).languageCode == 'he'
+                                  ? 'משחק בנייה 🏗️'
+                                  : 'Building Game 🏗️',
+                              icon: Icons.construction,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ShapesBuildingGameScreen(),
+                                  ),
+                                );
+                              },
+                              color: Colors.purple.shade500,
                               width: responsive.width(80),
                               height: responsive.buttonHeight,
                             ),
