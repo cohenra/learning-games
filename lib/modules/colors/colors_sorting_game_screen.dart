@@ -303,12 +303,25 @@ class _ColorsSortingGameScreenState extends State<ColorsSortingGameScreen>
               if (!_gameStarted) _buildDifficultySelector(l10n, isHebrew),
               if (!_gameStarted) const SizedBox(height: 8),
 
-              // אזור פריטים לגרירה
-              Expanded(
-                child: _buildItemsArea(),
-              ),
+              // אזור פריטים לגרירה - בחלק העליון, גובה קבוע
+              _buildItemsArea(),
 
-              const SizedBox(height: 8),
+              // אזור גרירה ריק באמצע
+              Expanded(
+                child: Container(
+                  color: Colors.transparent,
+                  child: Center(
+                    child: Text(
+                      _items.isEmpty && !_gameCompleted
+                          ? ''
+                          : _items.isEmpty
+                              ? '🎉'
+                              : '⬇️',
+                      style: TextStyle(fontSize: 40, color: Colors.grey.shade300),
+                    ),
+                  ),
+                ),
+              ),
 
               // סלים בתחתית
               _buildBasketsArea(),
@@ -489,51 +502,49 @@ class _ColorsSortingGameScreenState extends State<ColorsSortingGameScreen>
   }
 
   Widget _buildItemsArea() {
-    if (_items.isEmpty && _gameCompleted) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('🎉', style: TextStyle(fontSize: 80)),
-            const SizedBox(height: 16),
-            Text(
-              Localizations.localeOf(context).languageCode == 'he'
-                  ? 'כל הכבוד! סיימת!'
-                  : 'Well Done! Completed!',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.pink.shade700,
+    // גובה קבוע לאזור הפריטים - בחלק העליון בלבד!
+    return Container(
+      height: 100,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.pink.shade200, width: 2),
+      ),
+      child: _items.isEmpty
+          ? Center(
+              child: Text(
+                Localizations.localeOf(context).languageCode == 'he'
+                    ? '✨ כל הכבוד! ✨'
+                    : '✨ Well Done! ✨',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.pink.shade600,
+                ),
               ),
+            )
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                // חישוב גודל קטן וקבוע לפריטים
+                final availableWidth = constraints.maxWidth;
+                final spacing = 8.0;
+                final totalSpacing = (_items.length - 1) * spacing;
+
+                // גודל מקסימלי לפריט
+                final calculatedSize = (availableWidth - totalSpacing) / _items.length;
+                // מגביל את הגודל ל-60px מקסימום, 40px מינימום
+                final itemSize = calculatedSize.clamp(40.0, 60.0);
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: _items.map((item) {
+                    return _buildDraggableItem(item, itemSize);
+                  }).toList(),
+                );
+              },
             ),
-          ],
-        ),
-      );
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // חישוב גודל פריט לפי מקום זמין
-        final itemsPerRow = _difficulty == EASY ? 3 : _difficulty == MEDIUM ? 4 : 5;
-        final spacing = 8.0;
-        final padding = 12.0;
-
-        final availableWidth = constraints.maxWidth - (padding * 2);
-        final totalSpacing = (itemsPerRow - 1) * spacing;
-        final itemSize = (availableWidth - totalSpacing) / itemsPerRow;
-
-        return Padding(
-          padding: const EdgeInsets.all(12),
-          child: Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            alignment: WrapAlignment.center,
-            children: _items.map((item) {
-              return _buildDraggableItem(item, itemSize);
-            }).toList(),
-          ),
-        );
-      },
     );
   }
 
