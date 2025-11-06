@@ -412,7 +412,6 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
                           ),
                         ),
                       ),
-                        ),
                       ),
 
                       SizedBox(height: responsive.spacing(32)),
