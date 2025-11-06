@@ -182,6 +182,8 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
         backgroundColor: Colors.blue,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

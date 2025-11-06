@@ -25,20 +25,22 @@ class ResponsiveHelper {
     safeBlockHorizontal = (screenWidth - safePaddingHorizontal) / 100;
     safeBlockVertical = (screenHeight - safePaddingVertical) / 100;
 
-    // Better text scale factor with limits
-    // Base: 360px width = 1.0, scale gradually
+    // Conservative text scale factor
     double baseWidth = 360.0;
     double rawScale = screenWidth / baseWidth;
-    // Clamp between 0.85 and 1.3 for better control
-    textScaleFactor = rawScale.clamp(0.85, 1.3);
+    // More conservative clamping
+    textScaleFactor = rawScale.clamp(0.75, 1.15);
   }
 
-  /// Get responsive font size based on screen width (with better scaling)
+  /// Get responsive font size (conservative for better fit)
   double fontSize(double size) {
-    // Use square root for more gradual scaling
     double scaleFactor = sqrt(screenWidth / 360.0);
-    // Clamp the scale factor to reasonable limits
-    scaleFactor = scaleFactor.clamp(0.9, 1.4);
+    // More conservative for tablets
+    if (isTablet) {
+      scaleFactor = scaleFactor.clamp(0.85, 1.1);
+    } else {
+      scaleFactor = scaleFactor.clamp(0.8, 1.2);
+    }
     return size * scaleFactor;
   }
 
@@ -77,140 +79,141 @@ class ResponsiveHelper {
   /// Get safe padding values
   EdgeInsets get safePadding {
     if (isSmallPhone) {
-      return EdgeInsets.symmetric(horizontal: width(4), vertical: height(1));
+      return EdgeInsets.symmetric(horizontal: width(3), vertical: height(0.8));
     } else if (isPhone) {
-      return EdgeInsets.symmetric(horizontal: width(5), vertical: height(1.5));
+      return EdgeInsets.symmetric(horizontal: width(4), vertical: height(1));
     } else {
-      return EdgeInsets.symmetric(horizontal: width(6), vertical: height(2));
+      return EdgeInsets.symmetric(horizontal: width(4), vertical: height(1.5));
     }
   }
 
-  /// Get button height based on screen size
+  /// Get button height based on screen size (MORE CONSERVATIVE)
   double get buttonHeight {
     if (isSmallPhone) {
-      return height(9); // ~9% of screen height
+      return height(8); // 8% of screen height
     } else if (isPhone) {
-      return height(10); // ~10% of screen height
+      return height(9); // 9% of screen height
     } else {
-      return min(height(12), 100.0); // Max 100px for tablets
+      // Tablets: much smaller to fit more on screen
+      return min(height(7), 70.0); // Max 70px for tablets
     }
   }
 
-  /// Get emoji/icon display size
+  /// Get emoji/icon display size (SMALLER FOR TABLETS)
   double get emojiSize {
     if (isSmallPhone) {
-      return fontSize(70);
+      return fontSize(60);
     } else if (isPhone) {
-      return fontSize(90);
+      return fontSize(70);
     } else {
-      return fontSize(100);
+      return fontSize(80); // Smaller for tablets
     }
   }
 
-  /// Get title font size
+  /// Get title font size (SMALLER FOR TABLETS)
   double get titleSize {
     if (isSmallPhone) {
-      return fontSize(32);
+      return fontSize(28);
     } else if (isPhone) {
-      return fontSize(40);
+      return fontSize(32);
     } else {
-      return fontSize(48);
+      return fontSize(36); // Smaller for tablets
     }
   }
 
   /// Get subtitle font size
   double get subtitleSize {
     if (isSmallPhone) {
-      return fontSize(16);
+      return fontSize(14);
     } else if (isPhone) {
-      return fontSize(20);
+      return fontSize(16);
     } else {
-      return fontSize(24);
+      return fontSize(18); // Smaller for tablets
     }
   }
 
   /// Get body text font size
   double get bodyTextSize {
     if (isSmallPhone) {
-      return fontSize(14);
+      return fontSize(12);
     } else if (isPhone) {
-      return fontSize(16);
+      return fontSize(14);
     } else {
-      return fontSize(18);
+      return fontSize(15); // Smaller for tablets
     }
   }
 
-  /// Get question text font size (for quizzes)
+  /// Get question text font size (for quizzes) - CONSERVATIVE
   double get questionTextSize {
     if (isSmallPhone) {
-      return fontSize(24);
+      return fontSize(20);
     } else if (isPhone) {
-      return fontSize(28);
+      return fontSize(22);
     } else {
-      return fontSize(32);
+      return fontSize(24); // Smaller for tablets
     }
   }
 
-  /// Get answer button text size
+  /// Get answer button text size - CONSERVATIVE
   double get answerTextSize {
     if (isSmallPhone) {
-      return fontSize(22);
+      return fontSize(18);
     } else if (isPhone) {
-      return fontSize(26);
+      return fontSize(20);
     } else {
-      return fontSize(30);
+      return fontSize(22); // Smaller for tablets
     }
   }
 
-  /// Get large number display size (for quiz answers)
+  /// Get large number display size (for quiz answers) - CONSERVATIVE
   double get largeNumberSize {
     if (isSmallPhone) {
-      return fontSize(48);
+      return fontSize(38);
     } else if (isPhone) {
-      return fontSize(56);
+      return fontSize(42);
     } else {
-      return fontSize(64);
+      return fontSize(44); // Much smaller for tablets
     }
   }
 
-  /// Get vertical spacing between elements
+  /// Get vertical spacing between elements (TIGHTER FOR TABLETS)
   double get verticalSpacing {
     if (isSmallPhone) {
-      return height(1.5);
+      return height(1.2);
     } else if (isPhone) {
-      return height(2);
+      return height(1.5);
     } else {
-      return height(2.5);
+      return height(1.2); // Tighter for tablets
     }
   }
 
   /// Get horizontal spacing between elements
   double get horizontalSpacing {
     if (isSmallPhone) {
-      return width(2);
+      return width(1.5);
     } else if (isPhone) {
-      return width(2.5);
+      return width(2);
     } else {
-      return width(3);
+      return width(2);
     }
   }
 
   /// Get padding for content areas
   EdgeInsets get contentPadding {
     return EdgeInsets.symmetric(
-      horizontal: width(5),
-      vertical: height(2),
+      horizontal: width(4),
+      vertical: height(1.5),
     );
   }
 
-  /// Get aspect ratio for quiz answer buttons
+  /// Get aspect ratio for quiz answer buttons (BETTER FIT)
   double get quizButtonAspectRatio {
     if (isSmallPhone) {
-      return 4.5; // Slightly taller for small phones
+      return 3.8; // Taller for small phones
     } else if (isPhone) {
-      return 5.0; // Medium height
+      return 4.2; // Medium height
     } else {
-      return 6.0; // Thinner for tablets
+      return 5.5; // Thinner for tablets but not too thin
     }
   }
 }

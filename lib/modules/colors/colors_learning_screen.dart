@@ -130,6 +130,8 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
         backgroundColor: Colors.pink,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

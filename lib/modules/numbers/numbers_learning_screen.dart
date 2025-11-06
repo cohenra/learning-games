@@ -123,6 +123,8 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
         backgroundColor: Colors.orange,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

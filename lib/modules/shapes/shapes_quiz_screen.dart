@@ -191,17 +191,16 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew, ResponsiveHelper responsive) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-            ),
-            child: Center(
-              child: Padding(
-                padding: responsive.safePadding,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+        final isTablet = MediaQuery.of(context).size.width >= 600;
+
+        if (isTablet) {
+          // Tablet: fit everything on one screen
+          return Center(
+            child: Padding(
+              padding: responsive.safePadding,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                     Text(
                       l10n.wellDone,
                       style: TextStyle(
@@ -240,12 +239,66 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                       color: Colors.blue.shade400,
                       width: responsive.width(50),
                     ),
-                  ],
+                ],
+              ),
+            ),
+          );
+        } else {
+          // Phone: allow scrolling
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Padding(
+                  padding: responsive.safePadding,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.wellDone,
+                        style: TextStyle(
+                          fontSize: responsive.titleSize * 1.3,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple.shade700,
+                        ),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing * 2),
+                      Text(
+                        isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing * 3),
+                      KidButton(
+                        text: l10n.playAgain,
+                        onPressed: () {
+                          setState(() {
+                            _currentQuestionIndex = 0;
+                            _score = 0;
+                          });
+                          _generateQuestion();
+                        },
+                        color: Colors.green.shade400,
+                        width: responsive.width(50),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing),
+                      KidButton(
+                        text: isHebrew ? 'חזרה' : 'Back',
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        color: Colors.blue.shade400,
+                        width: responsive.width(50),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+        }
       },
     );
   }
@@ -270,6 +323,8 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
       body: Stack(
         children: [
           Container(
+            width: double.infinity,
+            height: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -282,13 +337,16 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: responsive.screenHeight - kToolbarHeight - responsive.safePadding.top - responsive.safePadding.bottom,
-                  ),
-                  child: Column(
-                    children: [
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isTablet = MediaQuery.of(context).size.width >= 600;
+
+                  if (isTablet) {
+                    // Tablet: fit everything on one screen
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                       // Header עם התקדמות וניקוד
                       Padding(
                         padding: EdgeInsets.all(responsive.spacing(16)),
@@ -416,9 +474,149 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                       ),
 
                       SizedBox(height: responsive.verticalSpacing),
-                    ],
-                  ),
-                ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Phone: allow scrolling
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Column(
+                          children: [
+                            // Header עם התקדמות וניקוד
+                            Padding(
+                              padding: EdgeInsets.all(responsive.spacing(16)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      isHebrew
+                                          ? 'שאלה ${_currentQuestionIndex + 1} מתוך $_totalQuestions'
+                                          : 'Question ${_currentQuestionIndex + 1} of $_totalQuestions',
+                                      style: TextStyle(
+                                        fontSize: responsive.subtitleSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.purple.shade700,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: responsive.spacing(20),
+                                      vertical: responsive.spacing(10),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade100,
+                                      borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                    ),
+                                    child: Text(
+                                      isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
+                                      style: TextStyle(
+                                        fontSize: responsive.subtitleSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.orange.shade700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.verticalSpacing),
+
+                            // השאלה
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                              child: Text(
+                                l10n.selectTheShape(correctShapeName),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: responsive.questionTextSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.verticalSpacing * 1.5),
+
+                            // אפשרויות תשובה - מלבנים עם צורות דקים כמו בחידון מספרים
+                            Container(
+                              height: responsive.height(30),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: responsive.spacing(20),
+                                  vertical: responsive.spacing(8),
+                                ),
+                                child: GridView.count(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: responsive.spacing(8),
+                                  crossAxisSpacing: responsive.spacing(8),
+                                  childAspectRatio: responsive.quizButtonAspectRatio,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: List.generate(_options.length, (index) {
+                                    final shapeData = _options[index];
+                                    return GestureDetector(
+                                      onTap: () => _handleAnswer(index),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(responsive.spacing(16)),
+                                          border: Border.all(
+                                            color: _getButtonBorderColor(index),
+                                            width: _getButtonBorderWidth(index),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: responsive.iconSize(40),
+                                            height: responsive.iconSize(40),
+                                            child: CustomPaint(
+                                              key: ValueKey('${shapeData['key']}_$index'),
+                                              painter: ShapePainter(
+                                                shapeType: shapeData['type'],
+                                                color: shapeData['color'],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.verticalSpacing),
+
+                            // כפתור להאזנה לשאלה שוב
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
+                              child: KidButton(
+                                text: isHebrew ? 'הקשב שוב 🔊' : 'Listen Again 🔊',
+                                onPressed: _speakQuestion,
+                                color: Colors.green.shade400,
+                                width: responsive.width(50),
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.verticalSpacing),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
             ),
           ),

@@ -112,6 +112,8 @@ class _ShapesLearningScreenState extends State<ShapesLearningScreen>
         backgroundColor: Colors.purple,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
