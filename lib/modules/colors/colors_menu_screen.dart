@@ -3,6 +3,7 @@ import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
 import 'colors_learning_screen.dart';
 import 'colors_quiz_screen.dart';
+import 'colors_sorting_game_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול הצבעים
@@ -119,6 +120,29 @@ class ColorsMenuScreen extends StatelessWidget {
                           height: responsive.buttonHeight,
                         ),
                       ),
+                      SizedBox(height: responsive.verticalSpacing),
+
+                      // כפתור משחק מיון
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: KidButton(
+                          text: Localizations.localeOf(context).languageCode == 'he'
+                              ? 'משחק מיון 🎯'
+                              : 'Sorting Game 🎯',
+                          icon: Icons.sort,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ColorsSortingGameScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.orange.shade500,
+                          width: responsive.width(80),
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
 
                       SizedBox(height: responsive.verticalSpacing),
                     ],
@@ -203,6 +227,29 @@ class ColorsMenuScreen extends StatelessWidget {
                                 );
                               },
                               color: Colors.green.shade500,
+                              width: responsive.width(80),
+                              height: responsive.buttonHeight,
+                            ),
+                          ),
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // כפתור משחק מיון
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: KidButton(
+                              text: Localizations.localeOf(context).languageCode == 'he'
+                                  ? 'משחק מיון 🎯'
+                                  : 'Sorting Game 🎯',
+                              icon: Icons.sort,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ColorsSortingGameScreen(),
+                                  ),
+                                );
+                              },
+                              color: Colors.orange.shade500,
                               width: responsive.width(80),
                               height: responsive.buttonHeight,
                             ),
