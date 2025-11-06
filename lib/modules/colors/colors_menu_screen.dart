@@ -4,6 +4,7 @@ import '../../utils/responsive_helper.dart';
 import 'colors_learning_screen.dart';
 import 'colors_quiz_screen.dart';
 import 'colors_sorting_game_screen.dart';
+import 'colors_odd_one_out_game_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול הצבעים
@@ -143,6 +144,29 @@ class ColorsMenuScreen extends StatelessWidget {
                           height: responsive.buttonHeight,
                         ),
                       ),
+                      SizedBox(height: responsive.verticalSpacing),
+
+                      // כפתור משחק מצא את השונה
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: KidButton(
+                          text: Localizations.localeOf(context).languageCode == 'he'
+                              ? 'מצא את השונה 🔍'
+                              : 'Find the Odd One 🔍',
+                          icon: Icons.search,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ColorsOddOneOutGameScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.purple.shade500,
+                          width: responsive.width(80),
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
 
                       SizedBox(height: responsive.verticalSpacing),
                     ],
@@ -250,6 +274,29 @@ class ColorsMenuScreen extends StatelessWidget {
                                 );
                               },
                               color: Colors.orange.shade500,
+                              width: responsive.width(80),
+                              height: responsive.buttonHeight,
+                            ),
+                          ),
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // כפתור משחק מצא את השונה
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: KidButton(
+                              text: Localizations.localeOf(context).languageCode == 'he'
+                                  ? 'מצא את השונה 🔍'
+                                  : 'Find the Odd One 🔍',
+                              icon: Icons.search,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ColorsOddOneOutGameScreen(),
+                                  ),
+                                );
+                              },
+                              color: Colors.purple.shade500,
                               width: responsive.width(80),
                               height: responsive.buttonHeight,
                             ),
