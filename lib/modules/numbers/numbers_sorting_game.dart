@@ -262,7 +262,7 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
                                     child: Text(
                                       '$number',
                                       style: TextStyle(
-                                        fontSize: responsive.titleSize,
+                                        fontSize: responsive.largeNumberSize,
                                         fontWeight: FontWeight.bold,
                                         color: isSelected ? Colors.grey.shade500 : Colors.white,
                                       ),
@@ -316,7 +316,7 @@ class _NumbersSortingGameState extends State<NumbersSortingGame> {
                                           return Text(
                                             '$number',
                                             style: TextStyle(
-                                              fontSize: responsive.titleSize,
+                                              fontSize: responsive.largeNumberSize,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.orange.shade700,
                                             ),

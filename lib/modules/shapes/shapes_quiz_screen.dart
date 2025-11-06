@@ -189,55 +189,64 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew, ResponsiveHelper responsive) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: responsive.safePadding,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                l10n.wellDone,
-                style: TextStyle(
-                  fontSize: responsive.fontSize(56),
-                  fontWeight: FontWeight.bold,
-                  color: Colors.purple.shade700,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+            ),
+            child: Center(
+              child: Padding(
+                padding: responsive.safePadding,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.wellDone,
+                      style: TextStyle(
+                        fontSize: responsive.titleSize * 1.3,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple.shade700,
+                      ),
+                    ),
+                    SizedBox(height: responsive.verticalSpacing * 2),
+                    Text(
+                      isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
+                      style: TextStyle(
+                        fontSize: responsive.titleSize,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                    SizedBox(height: responsive.verticalSpacing * 3),
+                    KidButton(
+                      text: l10n.playAgain,
+                      onPressed: () {
+                        setState(() {
+                          _currentQuestionIndex = 0;
+                          _score = 0;
+                        });
+                        _generateQuestion();
+                      },
+                      color: Colors.green.shade400,
+                      width: responsive.width(50),
+                    ),
+                    SizedBox(height: responsive.verticalSpacing),
+                    KidButton(
+                      text: isHebrew ? 'חזרה' : 'Back',
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      color: Colors.blue.shade400,
+                      width: responsive.width(50),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: responsive.verticalSpacing * 2),
-              Text(
-                isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
-                style: TextStyle(
-                  fontSize: responsive.titleSize,
-                  color: Colors.blue.shade700,
-                ),
-              ),
-              SizedBox(height: responsive.verticalSpacing * 3),
-              KidButton(
-                text: l10n.playAgain,
-                onPressed: () {
-                  setState(() {
-                    _currentQuestionIndex = 0;
-                    _score = 0;
-                  });
-                  _generateQuestion();
-                },
-                color: Colors.green.shade400,
-                width: responsive.width(50),
-              ),
-              SizedBox(height: responsive.verticalSpacing),
-              KidButton(
-                text: isHebrew ? 'חזרה' : 'Back',
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                color: Colors.blue.shade400,
-                width: responsive.width(50),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -350,7 +359,7 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                             crossAxisCount: 2,
                             mainAxisSpacing: responsive.spacing(8),
                             crossAxisSpacing: responsive.spacing(8),
-                            childAspectRatio: responsive.isSmallPhone ? 5.0 : 6.0,
+                            childAspectRatio: responsive.quizButtonAspectRatio,
                             physics: const NeverScrollableScrollPhysics(),
                             children: List.generate(_options.length, (index) {
                               final shapeData = _options[index];

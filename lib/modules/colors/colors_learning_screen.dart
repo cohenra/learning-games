@@ -142,16 +142,17 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: responsive.screenHeight -
-                    MediaQuery.of(context).padding.top -
-                    kToolbarHeight,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
                   SizedBox(height: responsive.verticalSpacing),
 
                   // שם הצבע בחלק העליון
@@ -269,9 +270,12 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
                     ),
                   ),
                   SizedBox(height: responsive.verticalSpacing),
-                ],
-              ),
-            ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

@@ -135,9 +135,17 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
               // המספר הגדול
               ScaleTransition(
                 scale: CurvedAnimation(
@@ -274,7 +282,12 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                 ),
               ),
               SizedBox(height: responsive.verticalSpacing),
-            ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

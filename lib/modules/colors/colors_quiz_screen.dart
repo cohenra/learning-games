@@ -306,7 +306,7 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                           crossAxisCount: 2,
                           mainAxisSpacing: responsive.spacing(8),
                           crossAxisSpacing: responsive.spacing(8),
-                          childAspectRatio: responsive.isSmallPhone ? 5.0 : 6.0,
+                          childAspectRatio: responsive.quizButtonAspectRatio,
                           children: List.generate(_options.length, (index) {
                             final colorData = _options[index];
                             final color = colorData['color'] as Color;

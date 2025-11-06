@@ -124,14 +124,17 @@ class _ShapesLearningScreenState extends State<ShapesLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: responsive.screenHeight - responsive.safePadding.top - responsive.safePadding.bottom,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
                   SizedBox(height: responsive.verticalSpacing),
 
                   // הצורה הגדולה
@@ -223,9 +226,12 @@ class _ShapesLearningScreenState extends State<ShapesLearningScreen>
                     ),
                   ),
                   SizedBox(height: responsive.verticalSpacing),
-                ],
-              ),
-            ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

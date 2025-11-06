@@ -200,180 +200,191 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // Header עם התקדמות וניקוד
-                  Padding(
-                    padding: EdgeInsets.all(responsive.spacing(16)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            isHebrew
-                                ? 'שאלה ${_currentQuestionIndex + 1} מתוך $_totalQuestions'
-                                : 'Question ${_currentQuestionIndex + 1} of $_totalQuestions',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(22),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: responsive.spacing(20),
-                            vertical: responsive.spacing(10)
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(responsive.spacing(20)),
-                          ),
-                          child: Text(
-                            isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(20),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: responsive.screenHeight -
+                        MediaQuery.of(context).padding.top -
+                        kToolbarHeight,
                   ),
-
-                  SizedBox(height: responsive.spacing(12)),
-
-                  // כפתור החלפה בין מילים למספרים
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showWords = !_showWords;
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: responsive.spacing(20),
-                        vertical: responsive.spacing(8)
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade200,
-                        borderRadius: BorderRadius.circular(responsive.spacing(20)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _showWords ? Icons.text_fields : Icons.numbers,
-                            color: Colors.orange.shade700,
-                            size: responsive.iconSize(20),
-                          ),
-                          SizedBox(width: responsive.spacing(8)),
-                          Text(
-                            _showWords
-                                ? (isHebrew ? 'מילים' : 'Words')
-                                : (isHebrew ? 'ספרות' : 'Digits'),
-                            style: TextStyle(
-                              fontSize: responsive.bodyTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
-                          SizedBox(width: responsive.spacing(8)),
-                          Icon(
-                            Icons.swap_horiz,
-                            color: Colors.orange.shade700,
-                            size: responsive.iconSize(20),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: responsive.spacing(12)),
-
-                  // השאלה - טקסט בלבד ללא מספר
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-                    child: Text(
-                      isHebrew ? 'בחרו את המספר:' : 'Select the number:',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: responsive.questionTextSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: responsive.spacing(12)),
-
-                  // אפשרויות תשובה - מלבנים דקים כמו בחידונים האחרים
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: responsive.spacing(20),
-                        vertical: responsive.spacing(8)
-                      ),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: responsive.spacing(8),
-                        crossAxisSpacing: responsive.spacing(8),
-                        childAspectRatio: 6.0,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: _options.map<Widget>((number) {
-                          final displayText = _showWords
-                              ? _getNumberName(l10n, number)
-                              : '$number';
-                          return GestureDetector(
-                            onTap: () => _handleAnswer(number),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: _getButtonColor(number),
-                                borderRadius: BorderRadius.circular(responsive.spacing(16)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: responsive.spacing(8),
-                                    offset: Offset(0, responsive.spacing(4)),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  displayText,
-                                  style: TextStyle(
-                                    fontSize: _showWords
-                                        ? responsive.answerTextSize
-                                        : responsive.fontSize(32),
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.center,
+                  child: Column(
+                    children: [
+                      // Header עם התקדמות וניקוד
+                      Padding(
+                        padding: EdgeInsets.all(responsive.spacing(16)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                isHebrew
+                                    ? 'שאלה ${_currentQuestionIndex + 1} מתוך $_totalQuestions'
+                                    : 'Question ${_currentQuestionIndex + 1} of $_totalQuestions',
+                                style: TextStyle(
+                                  fontSize: responsive.subtitleSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade700,
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: responsive.spacing(20),
+                                vertical: responsive.spacing(10)
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade100,
+                                borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                              ),
+                              child: Text(
+                                isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
+                                style: TextStyle(
+                                  fontSize: responsive.subtitleSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
 
-                  // כפתור להאזנה לשאלה שוב
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
-                    child: KidButton(
-                      text: isHebrew ? 'הקשב שוב 🔊' : 'Listen Again 🔊',
-                      onPressed: _speakQuestion,
-                      color: Colors.green.shade400,
-                      width: responsive.width(50),
-                    ),
-                  ),
+                      SizedBox(height: responsive.spacing(12)),
 
-                  SizedBox(height: responsive.spacing(20)),
-                ],
+                      // כפתור החלפה בין מילים למספרים
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showWords = !_showWords;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(20),
+                            vertical: responsive.spacing(8)
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade200,
+                            borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _showWords ? Icons.text_fields : Icons.numbers,
+                                color: Colors.orange.shade700,
+                                size: responsive.iconSize(20),
+                              ),
+                              SizedBox(width: responsive.spacing(8)),
+                              Text(
+                                _showWords
+                                    ? (isHebrew ? 'מילים' : 'Words')
+                                    : (isHebrew ? 'ספרות' : 'Digits'),
+                                style: TextStyle(
+                                  fontSize: responsive.bodyTextSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade700,
+                                ),
+                              ),
+                              SizedBox(width: responsive.spacing(8)),
+                              Icon(
+                                Icons.swap_horiz,
+                                color: Colors.orange.shade700,
+                                size: responsive.iconSize(20),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(12)),
+
+                      // השאלה - טקסט בלבד ללא מספר
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                        child: Text(
+                          isHebrew ? 'בחרו את המספר:' : 'Select the number:',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: responsive.questionTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(12)),
+
+                      // אפשרויות תשובה - מלבנים דקים כמו בחידונים האחרים
+                      SizedBox(
+                        height: responsive.height(20),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(20),
+                            vertical: responsive.spacing(8)
+                          ),
+                          child: GridView.count(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: responsive.spacing(8),
+                            crossAxisSpacing: responsive.spacing(8),
+                            childAspectRatio: responsive.quizButtonAspectRatio,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: _options.map<Widget>((number) {
+                              final displayText = _showWords
+                                  ? _getNumberName(l10n, number)
+                                  : '$number';
+                              return GestureDetector(
+                                onTap: () => _handleAnswer(number),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                    color: _getButtonColor(number),
+                                    borderRadius: BorderRadius.circular(responsive.spacing(16)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: responsive.spacing(8),
+                                        offset: Offset(0, responsive.spacing(4)),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      displayText,
+                                      style: TextStyle(
+                                        fontSize: _showWords
+                                            ? responsive.answerTextSize
+                                            : responsive.largeNumberSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(16)),
+
+                      // כפתור להאזנה לשאלה שוב
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: responsive.spacing(8)),
+                        child: KidButton(
+                          text: isHebrew ? 'הקשב שוב 🔊' : 'Listen Again 🔊',
+                          onPressed: _speakQuestion,
+                          color: Colors.green.shade400,
+                          width: responsive.width(50),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(20)),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -401,52 +412,61 @@ class _NumbersWordQuizScreenState extends State<NumbersWordQuizScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.wellDone,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(56),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange.shade700,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          l10n.wellDone,
+                          style: TextStyle(
+                            fontSize: responsive.titleSize * 1.3,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(30)),
+                        Text(
+                          isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(50)),
+                        KidButton(
+                          text: l10n.playAgain,
+                          onPressed: () {
+                            setState(() {
+                              _currentQuestionIndex = 0;
+                              _score = 0;
+                            });
+                            _generateQuestion();
+                          },
+                          color: Colors.green.shade400,
+                          width: responsive.width(50),
+                        ),
+                        SizedBox(height: responsive.spacing(20)),
+                        KidButton(
+                          text: isHebrew ? 'חזרה' : 'Back',
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          color: Colors.blue.shade400,
+                          width: responsive.width(50),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: responsive.spacing(30)),
-                  Text(
-                    isHebrew ? '!נקודות $_score מתוך $_totalQuestions' : 'Score: $_score out of $_totalQuestions!',
-                    style: TextStyle(
-                      fontSize: responsive.titleSize,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                  SizedBox(height: responsive.spacing(50)),
-                  KidButton(
-                    text: l10n.playAgain,
-                    onPressed: () {
-                      setState(() {
-                        _currentQuestionIndex = 0;
-                        _score = 0;
-                      });
-                      _generateQuestion();
-                    },
-                    color: Colors.green.shade400,
-                    width: responsive.width(50),
-                  ),
-                  SizedBox(height: responsive.spacing(20)),
-                  KidButton(
-                    text: isHebrew ? 'חזרה' : 'Back',
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    color: Colors.blue.shade400,
-                    width: responsive.width(50),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

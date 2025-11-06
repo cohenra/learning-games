@@ -155,8 +155,16 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          children: [
                   // Header עם התקדמות
                   Padding(
                     padding: responsive.safePadding,
@@ -348,7 +356,12 @@ class _NumbersCompareGameState extends State<NumbersCompareGame> {
                   ),
 
                   SizedBox(height: responsive.verticalSpacing),
-                ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

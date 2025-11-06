@@ -194,10 +194,17 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
                 SizedBox(height: responsive.verticalSpacing),
                 // האות הגדולה
                 ScaleTransition(
@@ -335,8 +342,12 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
                   ),
                 ),
                 SizedBox(height: responsive.verticalSpacing),
-              ],
-            ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
