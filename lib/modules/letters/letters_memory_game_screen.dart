@@ -35,6 +35,7 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
   bool _gameStarted = false;
   bool _gameCompleted = false;
   bool _showReward = false;
+  bool _isInitialized = false;
 
   // אנימציות
   late AnimationController _flipController;
@@ -45,7 +46,15 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
   void initState() {
     super.initState();
     _initializeAnimations();
-    _initializeGame();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _initializeGame();
+      _isInitialized = true;
+    }
   }
 
   void _initializeAnimations() {
@@ -284,7 +293,11 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
           // כפתור איפוס
           IconButton(
             icon: const Icon(Icons.refresh, size: 32),
-            onPressed: _initializeGame,
+            onPressed: () {
+              setState(() {
+                _initializeGame();
+              });
+            },
             tooltip: isHebrew ? 'משחק חדש' : 'New Game',
           ),
         ],
@@ -462,8 +475,8 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
       onTap: () {
         setState(() {
           _difficulty = difficulty;
+          _initializeGame();
         });
-        _initializeGame();
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
