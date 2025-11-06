@@ -78,67 +78,67 @@ class NumbersMenuScreen extends StatelessWidget {
                   // שורה ראשונה - 3 כפתורים
                   Padding(
                     padding: responsive.safePadding,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // כפתור מצב למידה
-                      Expanded(
-                        child: KidButton(
-                          text: l10n.learnMode,
-                          icon: Icons.school,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NumbersLearningScreen(),
-                              ),
-                            );
-                          },
-                          color: Colors.blue.shade500,
-                          height: responsive.buttonHeight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // כפתור מצב למידה
+                        Expanded(
+                          child: KidButton(
+                            text: l10n.learnMode,
+                            icon: Icons.school,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NumbersLearningScreen(),
+                                ),
+                              );
+                            },
+                            color: Colors.blue.shade500,
+                            height: responsive.buttonHeight,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: responsive.horizontalSpacing),
+                        SizedBox(width: responsive.horizontalSpacing),
 
-                      // כפתור מצב חידון
-                      Expanded(
-                        child: KidButton(
-                          text: l10n.quizMode,
-                          icon: Icons.gamepad,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NumbersQuizScreen(),
-                              ),
-                            );
-                          },
-                          color: Colors.green.shade500,
-                          height: responsive.buttonHeight,
+                        // כפתור מצב חידון
+                        Expanded(
+                          child: KidButton(
+                            text: l10n.quizMode,
+                            icon: Icons.gamepad,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NumbersQuizScreen(),
+                                ),
+                              );
+                            },
+                            color: Colors.green.shade500,
+                            height: responsive.buttonHeight,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: responsive.horizontalSpacing),
+                        SizedBox(width: responsive.horizontalSpacing),
 
-                      // כפתור חידון מילים
-                      Expanded(
-                        child: KidButton(
-                          text: l10n.wordQuizMode,
-                          icon: Icons.abc,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NumbersWordQuizScreen(),
-                              ),
-                            );
-                          },
-                          color: Colors.purple.shade500,
-                          height: responsive.buttonHeight,
+                        // כפתור חידון מילים
+                        Expanded(
+                          child: KidButton(
+                            text: l10n.wordQuizMode,
+                            icon: Icons.abc,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NumbersWordQuizScreen(),
+                                ),
+                              );
+                            },
+                            color: Colors.purple.shade500,
+                            height: responsive.buttonHeight,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
                 SizedBox(height: responsive.verticalSpacing),
 
