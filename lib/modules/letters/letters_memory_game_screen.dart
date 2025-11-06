@@ -320,19 +320,19 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
               // פאנל סטטיסטיקות
               _buildStatsPanel(l10n, isHebrew),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // בחירת קושי (לפני תחילת המשחק)
               if (!_gameStarted) _buildDifficultySelector(l10n, isHebrew),
 
-              const SizedBox(height: 12),
+              if (!_gameStarted) const SizedBox(height: 8),
 
               // לוח המשחק
               Expanded(
                 child: _buildGameBoard(),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
             ],
           ),
         ),
@@ -347,16 +347,16 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
 
   Widget _buildStatsPanel(AppLocalizations l10n, bool isHebrew) {
     return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.blue.shade200,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -393,13 +393,14 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
     required Color color,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 4),
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 2),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10,
             color: Colors.grey.shade600,
             fontWeight: FontWeight.w600,
           ),
@@ -407,7 +408,7 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
         Text(
           value,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -419,22 +420,23 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
   Widget _buildDifficultySelector(AppLocalizations l10n, bool isHebrew) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             isHebrew ? 'בחר רמת קושי:' : 'Choose Difficulty:',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.blue.shade700,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -480,7 +482,7 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? color : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(12),
@@ -490,13 +492,14 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
           ),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 24)),
-            const SizedBox(height: 4),
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? Colors.white : Colors.grey.shade700,
               ),
@@ -508,19 +511,55 @@ class _LettersMemoryGameScreenState extends State<LettersMemoryGameScreen>
   }
 
   Widget _buildGameBoard() {
-    final crossAxisCount = _difficulty == EASY ? 4 : _difficulty == MEDIUM ? 4 : 4;
+    // חישוב דינמי של מספר עמודות לפי מספר כרטיסים
+    // EASY: 8 כרטיסים = 2x4 גריד
+    // MEDIUM: 12 כרטיסים = 3x4 גריד
+    // HARD: 16 כרטיסים = 4x4 גריד
+    int crossAxisCount;
+    if (_cards.length <= 8) {
+      crossAxisCount = 4; // 2 שורות של 4
+    } else if (_cards.length <= 12) {
+      crossAxisCount = 4; // 3 שורות של 4
+    } else {
+      crossAxisCount = 4; // 4 שורות של 4
+    }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: _cards.length,
-      itemBuilder: (context, index) {
-        return _buildMemoryCard(index);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // חישוב גובה זמין לכרטיסים
+        final availableHeight = constraints.maxHeight;
+        final availableWidth = constraints.maxWidth;
+
+        // חישוב מספר שורות
+        final rowCount = (_cards.length / crossAxisCount).ceil();
+
+        // חישוב גובה מקסימלי לכרטיס (עם מרווחים)
+        final totalSpacing = (rowCount - 1) * 10 + 24; // spacing + padding
+        final maxCardHeight = (availableHeight - totalSpacing) / rowCount;
+
+        // חישוב רוחב מקסימלי לכרטיס
+        final totalHorizontalSpacing = (crossAxisCount - 1) * 10 + 24; // spacing + padding
+        final maxCardWidth = (availableWidth - totalHorizontalSpacing) / crossAxisCount;
+
+        // חישוב aspect ratio שמתאים למסך
+        // נשתמש ביחס שמבטיח שהכרטיסים נכנסים במסך
+        final calculatedAspectRatio = maxCardWidth / maxCardHeight;
+
+        return Padding(
+          padding: const EdgeInsets.all(12),
+          child: GridView.count(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: calculatedAspectRatio.clamp(0.6, 1.0),
+            physics: const NeverScrollableScrollPhysics(), // ❌ אין גלילה!
+            shrinkWrap: true,
+            children: List.generate(
+              _cards.length,
+              (index) => _buildMemoryCard(index),
+            ),
+          ),
+        );
       },
     );
   }
