@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/kid_button.dart';
 import 'letters_learning_screen.dart';
 import 'letters_quiz_screen.dart';
+import 'letters_memory_game_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול האותיות
@@ -94,6 +95,26 @@ class LettersMenuScreen extends StatelessWidget {
                     );
                   },
                   color: Colors.green.shade500,
+                  width: 300,
+                  height: 90,
+                ),
+                const SizedBox(height: 24),
+
+                // כפתור משחק זיכרון
+                KidButton(
+                  text: Localizations.localeOf(context).languageCode == 'he'
+                      ? 'משחק זיכרון 🎮'
+                      : 'Memory Game 🎮',
+                  icon: Icons.extension,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LettersMemoryGameScreen(),
+                      ),
+                    );
+                  },
+                  color: Colors.purple.shade500,
                   width: 300,
                   height: 90,
                 ),
