@@ -126,15 +126,22 @@ class _KidButtonState extends State<KidButton>
                 const SizedBox(width: 12),
               ],
               Flexible(
-                child: Text(
-                  widget.text,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      widget.text,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

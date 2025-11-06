@@ -298,18 +298,20 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                       SizedBox(height: responsive.spacing(12)),
 
                       // אפשרויות תשובה - מלבנים צבעוניים דקים כמו בחידון מספרים
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: responsive.horizontalSpacing,
-                          vertical: responsive.spacing(8),
-                        ),
-                        child: GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          mainAxisSpacing: responsive.spacing(8),
-                          crossAxisSpacing: responsive.spacing(8),
-                          childAspectRatio: responsive.quizButtonAspectRatio,
+                      Flexible(
+                        flex: 2,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.horizontalSpacing,
+                            vertical: responsive.spacing(8),
+                          ),
+                          child: GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: 2,
+                            mainAxisSpacing: responsive.spacing(8),
+                            crossAxisSpacing: responsive.spacing(8),
+                            childAspectRatio: responsive.quizButtonAspectRatio,
                           children: List.generate(_options.length, (index) {
                             final colorData = _options[index];
                             final color = colorData['color'] as Color;
@@ -349,8 +351,10 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                           }),
                         ),
                       ),
+                        ),
+                      ),
 
-                      SizedBox(height: responsive.verticalSpacing),
+                      SizedBox(height: responsive.verticalSpacing * 2),
 
                       // כפתור להאזנה לשאלה שוב
                       Padding(

@@ -273,14 +273,15 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                       SizedBox(height: responsive.spacing(16)),
 
                       // אפשרויות תשובה
-                      SizedBox(
-                        height: responsive.height(20),
+                      Flexible(
+                        flex: 2,
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: responsive.spacing(20),
                             vertical: responsive.spacing(8)
                           ),
                           child: GridView.count(
+                            shrinkWrap: true,
                             crossAxisCount: 2,
                             mainAxisSpacing: responsive.spacing(8),
                             crossAxisSpacing: responsive.spacing(8),

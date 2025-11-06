@@ -241,25 +241,30 @@ class _NumbersLearningScreenState extends State<NumbersLearningScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    KidButton(
-                      text: l10n.back,
-                      onPressed: _goToPrevious,
-                      enabled: _currentNumber > 1,
-                      color: Colors.blue.shade400,
-                      width: responsive.width(35),
+                    Expanded(
+                      child: KidButton(
+                        text: l10n.back,
+                        onPressed: _goToPrevious,
+                        enabled: _currentNumber > 1,
+                        color: Colors.blue.shade400,
+                      ),
                     ),
-                    KidButton(
-                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                      onPressed: _speakCurrentNumber,
-                      color: Colors.green.shade400,
-                      width: responsive.width(35),
+                    SizedBox(width: responsive.horizontalSpacing),
+                    Expanded(
+                      child: KidButton(
+                        text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                        onPressed: _speakCurrentNumber,
+                        color: Colors.green.shade400,
+                      ),
                     ),
-                    KidButton(
-                      text: l10n.next,
-                      onPressed: _goToNext,
-                      enabled: _currentNumber < 10,
-                      color: Colors.blue.shade400,
-                      width: responsive.width(35),
+                    SizedBox(width: responsive.horizontalSpacing),
+                    Expanded(
+                      child: KidButton(
+                        text: l10n.next,
+                        onPressed: _goToNext,
+                        enabled: _currentNumber < 10,
+                        color: Colors.blue.shade400,
+                      ),
                     ),
                   ],
                 ),

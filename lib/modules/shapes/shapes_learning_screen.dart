@@ -148,8 +148,12 @@ class _ShapesLearningScreenState extends State<ShapesLearningScreen>
                     child: GestureDetector(
                       onTap: _speakCurrentShape,
                       child: Container(
-                        width: responsive.width(60),
-                        height: responsive.width(60),
+                        width: responsive.isTablet
+                            ? responsive.width(35)
+                            : responsive.width(60),
+                        height: responsive.isTablet
+                            ? responsive.width(35)
+                            : responsive.width(60),
                         child: CustomPaint(
                           painter: ShapePainter(
                             shapeType: currentShape['type'],

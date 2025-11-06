@@ -350,14 +350,15 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
                       SizedBox(height: responsive.spacing(12)),
 
                       // אפשרויות תשובה - 4 אותיות בלבד (רק התווים, לא השמות)
-                      SizedBox(
-                        height: responsive.height(20),
+                      Flexible(
+                        flex: 2,
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: responsive.horizontalSpacing,
                             vertical: responsive.spacing(8),
                           ),
                           child: GridView.count(
+                            shrinkWrap: true,
                             crossAxisCount: 2,
                             mainAxisSpacing: responsive.spacing(8),
                             crossAxisSpacing: responsive.spacing(8),
@@ -411,8 +412,10 @@ class _LettersQuizScreenState extends State<LettersQuizScreen> {
                           ),
                         ),
                       ),
+                        ),
+                      ),
 
-                      SizedBox(height: responsive.spacing(16)),
+                      SizedBox(height: responsive.spacing(32)),
 
                       // כפתור להאזנה לשאלה שוב
                       Padding(

@@ -406,14 +406,15 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                       SizedBox(height: responsive.verticalSpacing * 1.5),
 
                       // אפשרויות תשובה - מלבנים עם צורות דקים כמו בחידון מספרים
-                      Container(
-                        height: responsive.height(30),
+                      Flexible(
+                        flex: 2,
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: responsive.spacing(20),
                             vertical: responsive.spacing(8),
                           ),
                           child: GridView.count(
+                            shrinkWrap: true,
                             crossAxisCount: 2,
                             mainAxisSpacing: responsive.spacing(8),
                             crossAxisSpacing: responsive.spacing(8),
@@ -459,8 +460,10 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                           ),
                         ),
                       ),
+                        ),
+                      ),
 
-                      SizedBox(height: responsive.verticalSpacing),
+                      SizedBox(height: responsive.verticalSpacing * 2),
 
                       // כפתור להאזנה לשאלה שוב
                       Padding(
