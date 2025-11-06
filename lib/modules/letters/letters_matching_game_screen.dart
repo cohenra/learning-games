@@ -503,21 +503,44 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
     // Determine grid layout based on difficulty
     int crossAxisCount = _difficultyLevel == 3 ? 3 : 2;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.0,
-        ),
-        itemCount: _options.length,
-        itemBuilder: (context, index) {
-          return _buildOptionCard(_options[index], responsive);
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableHeight = constraints.maxHeight;
+        final availableWidth = constraints.maxWidth;
+
+        // Calculate number of rows needed
+        final rowCount = (_options.length / crossAxisCount).ceil();
+
+        // Calculate spacing
+        const padding = 12.0;
+        const spacing = 12.0;
+
+        final totalVerticalSpacing = (rowCount - 1) * spacing + (padding * 2);
+        final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
+
+        final totalHorizontalSpacing = (crossAxisCount - 1) * spacing + (padding * 2);
+        final cardWidth = (availableWidth - totalHorizontalSpacing) / crossAxisCount;
+
+        // Calculate aspect ratio based on available space
+        final aspectRatio = cardWidth / cardHeight;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
+              childAspectRatio: aspectRatio,
+            ),
+            itemCount: _options.length,
+            itemBuilder: (context, index) {
+              return _buildOptionCard(_options[index], responsive);
+            },
+          ),
+        );
+      },
     );
   }
 
