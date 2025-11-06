@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
 import 'dart:math';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
-import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
-/// משחק בניית צורות - Shape Building Puzzle
-/// מתאים לגילאי 3-6, מפתח זיהוי צורות וקואורדינציה מרחבית
+/// משחק בניית צורות - פשוט ובעל הגיון
 class ShapesBuildingGameScreen extends StatefulWidget {
   const ShapesBuildingGameScreen({super.key});
 
@@ -17,424 +15,314 @@ class ShapesBuildingGameScreen extends StatefulWidget {
 }
 
 class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
-    with TickerProviderStateMixin {
-
-  // רמות קושי
-  static const int EASY = 1;     // 4 צורות - בית פשוט
-  static const int MEDIUM = 2;   // 6 צורות - רכב
-  static const int HARD = 3;     // 8 צורות - עץ + שמש
-
-  int _difficulty = EASY;
-  List<PuzzleShape> _availableShapes = [];
-  List<ShapeSlot> _slots = [];
-  int _placedShapes = 0;
-  int _totalAttempts = 0;
-  Timer? _gameTimer;
-  int _elapsedSeconds = 0;
-  bool _gameStarted = false;
-  bool _gameCompleted = false;
-  bool _showReward = false;
+    with SingleTickerProviderStateMixin {
   bool _isInitialized = false;
+  bool _isHebrew = true;
 
-  // אנימציות
-  late AnimationController _snapController;
-  late AnimationController _errorController;
-  late AnimationController _celebrationController;
+  // Game state
+  int _difficultyLevel = 1; // 1=Easy, 2=Medium, 3=Hard
+  bool _gameStarted = false;
+  int _score = 0;
+  List<ShapeSlotModel> _slots = [];
+  List<DraggableShapeModel> _availableShapes = [];
+
+  // Animation
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    _initializeAnimations();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      _initializeGame();
+      _isHebrew = Localizations.localeOf(context).languageCode == 'he';
       _isInitialized = true;
     }
   }
 
-  void _initializeAnimations() {
-    _snapController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-
-    _errorController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _celebrationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
-  void _initializeGame() {
-    _gameStarted = false;
-    _gameCompleted = false;
-    _showReward = false;
-    _placedShapes = 0;
-    _totalAttempts = 0;
-    _elapsedSeconds = 0;
-    _gameTimer?.cancel();
+  void _startGame(int difficulty) {
+    setState(() {
+      _difficultyLevel = difficulty;
+      _gameStarted = true;
+      _score = 0;
+      _generateLevel();
+    });
+  }
 
-    // בחירת תבנית לפי קושי
-    if (_difficulty == EASY) {
-      _buildHousePattern();
-    } else if (_difficulty == MEDIUM) {
-      _buildCarPattern();
+  void _generateLevel() {
+    if (_difficultyLevel == 1) {
+      _buildEasyPattern();
+    } else if (_difficultyLevel == 2) {
+      _buildMediumPattern();
     } else {
-      _buildTreePattern();
+      _buildHardPattern();
     }
+  }
 
+  void _buildEasyPattern() {
+    // בית פשוט: משולש גג + ריבוע גוף + ריבוע חלון + מלבן דלת
+    _slots = [
+      ShapeSlotModel(
+        shapeType: ShapeType.triangle,
+        position: const Offset(0.5, 0.25),
+        size: 100,
+        color: Colors.red.shade500,
+        label: _isHebrew ? 'גג משולש' : 'Triangle Roof',
+      ),
+      ShapeSlotModel(
+        shapeType: ShapeType.square,
+        position: const Offset(0.5, 0.55),
+        size: 120,
+        color: Colors.orange.shade300,
+        label: _isHebrew ? 'גוף הבית' : 'House Body',
+      ),
+      ShapeSlotModel(
+        shapeType: ShapeType.square,
+        position: const Offset(0.35, 0.5),
+        size: 35,
+        color: Colors.lightBlue.shade300,
+        label: _isHebrew ? 'חלון' : 'Window',
+      ),
+      ShapeSlotModel(
+        shapeType: ShapeType.rectangle,
+        position: const Offset(0.65, 0.65),
+        size: 55,
+        color: Colors.brown.shade300,
+        label: _isHebrew ? 'דלת' : 'Door',
+      ),
+    ];
+
+    _availableShapes = _slots.map((slot) {
+      return DraggableShapeModel(
+        shapeType: slot.shapeType,
+        size: slot.size,
+        color: slot.color,
+      );
+    }).toList();
+
+    _availableShapes.shuffle(Random());
     setState(() {});
   }
 
-  void _buildHousePattern() {
-    // בית פשוט: משולש (גג) + ריבוע (גוף) + ריבוע קטן (חלון) + מלבן (דלת)
+  void _buildMediumPattern() {
+    // רכב: מלבן גוף + 2 עיגולים גלגלים + ריבוע חלון + משולש פנס
     _slots = [
-      ShapeSlot(
-        id: 'roof',
-        shapeType: ShapeType.triangle,
-        position: const Offset(0.5, 0.2),
-        size: 80,
-        color: Colors.red,
-        name: 'משולש',
-      ),
-      ShapeSlot(
-        id: 'body',
-        shapeType: ShapeType.square,
-        position: const Offset(0.5, 0.5),
-        size: 100,
-        color: Colors.brown,
-        name: 'ריבוע',
-      ),
-      ShapeSlot(
-        id: 'window',
-        shapeType: ShapeType.square,
-        position: const Offset(0.35, 0.45),
-        size: 30,
-        color: Colors.blue,
-        name: 'ריבוע קטן',
-      ),
-      ShapeSlot(
-        id: 'door',
-        shapeType: ShapeType.rectangle,
-        position: const Offset(0.65, 0.6),
-        size: 50,
-        color: Colors.orange,
-        name: 'מלבן',
-      ),
-    ];
-
-    _availableShapes = _slots.map((slot) {
-      return PuzzleShape(
-        id: slot.id,
-        shapeType: slot.shapeType,
-        color: slot.color,
-        size: slot.size,
-        name: slot.name,
-      );
-    }).toList();
-
-    _availableShapes.shuffle(Random());
-  }
-
-  void _buildCarPattern() {
-    // רכב: מלבן (גוף) + מלבן (חלון) + 2 עיגולים (גלגלים) + משולש (פנס) + ריבוע (דלת)
-    _slots = [
-      ShapeSlot(
-        id: 'body',
+      ShapeSlotModel(
         shapeType: ShapeType.rectangle,
         position: const Offset(0.5, 0.5),
-        size: 120,
-        color: Colors.blue,
-        name: 'מלבן גדול',
+        size: 140,
+        color: Colors.blue.shade400,
+        label: _isHebrew ? 'גוף הרכב' : 'Car Body',
       ),
-      ShapeSlot(
-        id: 'window',
-        shapeType: ShapeType.rectangle,
-        position: const Offset(0.4, 0.4),
-        size: 50,
-        color: Colors.lightBlue,
-        name: 'מלבן קטן',
-      ),
-      ShapeSlot(
-        id: 'wheel1',
+      ShapeSlotModel(
         shapeType: ShapeType.circle,
-        position: const Offset(0.35, 0.65),
-        size: 40,
-        color: Colors.black,
-        name: 'עיגול',
+        position: const Offset(0.35, 0.7),
+        size: 45,
+        color: Colors.black87,
+        label: _isHebrew ? 'גלגל שמאלי' : 'Left Wheel',
       ),
-      ShapeSlot(
-        id: 'wheel2',
+      ShapeSlotModel(
         shapeType: ShapeType.circle,
-        position: const Offset(0.65, 0.65),
-        size: 40,
-        color: Colors.black,
-        name: 'עיגול',
+        position: const Offset(0.65, 0.7),
+        size: 45,
+        color: Colors.black87,
+        label: _isHebrew ? 'גלגל ימני' : 'Right Wheel',
       ),
-      ShapeSlot(
-        id: 'light',
+      ShapeSlotModel(
+        shapeType: ShapeType.square,
+        position: const Offset(0.4, 0.45),
+        size: 40,
+        color: Colors.lightBlue.shade200,
+        label: _isHebrew ? 'חלון' : 'Window',
+      ),
+      ShapeSlotModel(
         shapeType: ShapeType.triangle,
         position: const Offset(0.7, 0.5),
-        size: 25,
-        color: Colors.yellow,
-        name: 'משולש',
-      ),
-      ShapeSlot(
-        id: 'door',
-        shapeType: ShapeType.square,
-        position: const Offset(0.5, 0.5),
-        size: 35,
-        color: Colors.grey,
-        name: 'ריבוע',
+        size: 30,
+        color: Colors.yellow.shade600,
+        label: _isHebrew ? 'פנס' : 'Light',
       ),
     ];
 
     _availableShapes = _slots.map((slot) {
-      return PuzzleShape(
-        id: slot.id,
+      return DraggableShapeModel(
         shapeType: slot.shapeType,
-        color: slot.color,
         size: slot.size,
-        name: slot.name,
+        color: slot.color,
       );
     }).toList();
 
     _availableShapes.shuffle(Random());
+    setState(() {});
   }
 
-  void _buildTreePattern() {
-    // עץ מורכב: משולש (עלווה x3) + מלבן (גזע) + עיגול (שמש) + כוכב + לב + מעויין
+  void _buildHardPattern() {
+    // עץ: 3 משולשים (עלווה) + מלבן (גזע) + עיגול (שמש) + כוכב
     _slots = [
-      ShapeSlot(
-        id: 'leaves1',
+      ShapeSlotModel(
         shapeType: ShapeType.triangle,
-        position: const Offset(0.5, 0.25),
-        size: 70,
-        color: Colors.green,
-        name: 'משולש',
-      ),
-      ShapeSlot(
-        id: 'leaves2',
-        shapeType: ShapeType.triangle,
-        position: const Offset(0.5, 0.35),
-        size: 70,
-        color: Colors.green.shade700,
-        name: 'משולש',
-      ),
-      ShapeSlot(
-        id: 'leaves3',
-        shapeType: ShapeType.triangle,
-        position: const Offset(0.5, 0.45),
+        position: const Offset(0.4, 0.25),
         size: 70,
         color: Colors.green.shade600,
-        name: 'משולש',
+        label: _isHebrew ? 'עלווה עליונה' : 'Top Leaves',
       ),
-      ShapeSlot(
-        id: 'trunk',
+      ShapeSlotModel(
+        shapeType: ShapeType.triangle,
+        position: const Offset(0.4, 0.38),
+        size: 80,
+        color: Colors.green.shade700,
+        label: _isHebrew ? 'עלווה אמצעית' : 'Middle Leaves',
+      ),
+      ShapeSlotModel(
+        shapeType: ShapeType.triangle,
+        position: const Offset(0.4, 0.52),
+        size: 90,
+        color: Colors.green.shade800,
+        label: _isHebrew ? 'עלווה תחתונה' : 'Bottom Leaves',
+      ),
+      ShapeSlotModel(
         shapeType: ShapeType.rectangle,
-        position: const Offset(0.5, 0.65),
-        size: 50,
-        color: Colors.brown,
-        name: 'מלבן',
+        position: const Offset(0.4, 0.75),
+        size: 60,
+        color: Colors.brown.shade600,
+        label: _isHebrew ? 'גזע' : 'Trunk',
       ),
-      ShapeSlot(
-        id: 'sun',
+      ShapeSlotModel(
         shapeType: ShapeType.circle,
-        position: const Offset(0.15, 0.15),
-        size: 45,
-        color: Colors.yellow,
-        name: 'עיגול',
+        position: const Offset(0.75, 0.2),
+        size: 50,
+        color: Colors.yellow.shade600,
+        label: _isHebrew ? 'שמש' : 'Sun',
       ),
-      ShapeSlot(
-        id: 'star',
+      ShapeSlotModel(
         shapeType: ShapeType.star,
-        position: const Offset(0.85, 0.2),
-        size: 35,
-        color: Colors.orange,
-        name: 'כוכב',
-      ),
-      ShapeSlot(
-        id: 'heart',
-        shapeType: ShapeType.heart,
-        position: const Offset(0.3, 0.5),
-        size: 30,
-        color: Colors.pink,
-        name: 'לב',
-      ),
-      ShapeSlot(
-        id: 'diamond',
-        shapeType: ShapeType.diamond,
-        position: const Offset(0.7, 0.5),
-        size: 30,
-        color: Colors.purple,
-        name: 'מעויין',
+        position: const Offset(0.75, 0.45),
+        size: 40,
+        color: Colors.amber.shade400,
+        label: _isHebrew ? 'כוכב' : 'Star',
       ),
     ];
 
     _availableShapes = _slots.map((slot) {
-      return PuzzleShape(
-        id: slot.id,
+      return DraggableShapeModel(
         shapeType: slot.shapeType,
-        color: slot.color,
         size: slot.size,
-        name: slot.name,
+        color: slot.color,
       );
     }).toList();
 
     _availableShapes.shuffle(Random());
+    setState(() {});
   }
 
-  void _startGame() {
-    setState(() {
-      _gameStarted = true;
-    });
+  void _checkDrop(DraggableShapeModel shape, ShapeSlotModel slot) {
+    if (slot.isPlaced) return;
 
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    final appProvider = context.read<AppProvider>();
+
+    if (shape.shapeType == slot.shapeType) {
+      // נכון!
       setState(() {
-        _elapsedSeconds++;
+        slot.isPlaced = true;
+        _availableShapes.remove(shape);
+        _score += 10;
       });
-    });
-  }
 
-  void _onShapeDropped(PuzzleShape shape, ShapeSlot slot) {
-    if (!_gameStarted) {
-      _startGame();
-    }
+      _animationController.forward(from: 0);
+      appProvider.speak(_isHebrew ? 'כל הכבוד!' : 'Great job!');
 
-    setState(() {
-      _totalAttempts++;
-    });
-
-    final appProvider = context.read<AppProvider>();
-
-    if (shape.id == slot.id) {
-      // צורה נכונה במקום נכון!
-      _handleCorrectPlacement(shape, slot, appProvider);
+      // בדיקה אם סיימנו
+      if (_availableShapes.isEmpty) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            _showCompletionDialog();
+          }
+        });
+      }
     } else {
-      // צורה לא נכונה
-      _handleIncorrectPlacement(shape, appProvider);
+      // לא נכון
+      appProvider.speak(_isHebrew ? 'נסה צורה אחרת' : 'Try another shape');
     }
   }
 
-  void _handleCorrectPlacement(PuzzleShape shape, ShapeSlot slot, AppProvider appProvider) {
-    setState(() {
-      _availableShapes.removeWhere((s) => s.id == shape.id);
-      _slots.firstWhere((s) => s.id == slot.id).isPlaced = true;
-      _placedShapes++;
-    });
-
-    // אנימציית snap
-    _snapController.forward().then((_) {
-      _snapController.reverse();
-    });
-
-    // קול הצלחה
-    appProvider.speak(_getShapeName(shape.shapeType));
-
-    // בדיקה אם סיימנו
-    if (_availableShapes.isEmpty) {
-      _handleGameComplete();
-    }
-  }
-
-  void _handleIncorrectPlacement(PuzzleShape shape, AppProvider appProvider) {
-    // אנימציית טעות
-    _errorController.forward().then((_) {
-      _errorController.reverse();
-    });
-  }
-
-  void _handleGameComplete() {
-    _gameTimer?.cancel();
-    setState(() {
-      _gameCompleted = true;
-      _showReward = true;
-    });
-
-    final stars = _calculateStars();
-    final appProvider = context.read<AppProvider>();
-
-    for (int i = 0; i < stars; i++) {
-      appProvider.addStar('shapes');
-    }
-
-    _celebrationController.forward();
-
-    final l10n = AppLocalizations.of(context)!;
-    Future.delayed(const Duration(milliseconds: 500), () {
-      appProvider.speak(l10n.awesome);
-    });
-  }
-
-  int _calculateStars() {
-    if (_totalAttempts == 0) return 0;
-    final accuracy = _placedShapes / _totalAttempts;
-
-    if (accuracy >= 0.95) return 3;
-    if (accuracy >= 0.85) return 2;
-    return 1;
-  }
-
-  String _getShapeName(ShapeType shapeType) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (shapeType) {
-      case ShapeType.circle: return l10n.shapeCircle;
-      case ShapeType.square: return l10n.shapeSquare;
-      case ShapeType.triangle: return l10n.shapeTriangle;
-      case ShapeType.rectangle: return l10n.shapeRectangle;
-      case ShapeType.star: return l10n.shapeStar;
-      case ShapeType.heart: return l10n.shapeHeart;
-      case ShapeType.diamond: return l10n.shapeDiamond;
-      default: return '';
-    }
-  }
-
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
-
-  @override
-  void dispose() {
-    _snapController.dispose();
-    _errorController.dispose();
-    _celebrationController.dispose();
-    _gameTimer?.cancel();
-    super.dispose();
+  void _showCompletionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(
+          _isHebrew ? '🎉 מעולה! 🎉' : '🎉 Excellent! 🎉',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 28),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _isHebrew ? 'השלמת את התבנית!' : 'You completed the pattern!',
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _isHebrew ? 'ניקוד: $_score' : 'Score: $_score',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _gameStarted = false;
+              });
+            },
+            child: Text(_isHebrew ? 'חזרה לתפריט' : 'Back to Menu'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _startGame(_difficultyLevel);
+            },
+            child: Text(_isHebrew ? 'שחק שוב' : 'Play Again'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isHebrew ? 'בניית צורות 🏗️' : 'Shape Building 🏗️'),
+        title: Text(_isHebrew ? 'משחק בנייה 🏗️' : 'Building Game 🏗️'),
         centerTitle: true,
         backgroundColor: Colors.purple,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 32),
-            onPressed: () {
-              setState(() {
-                _initializeGame();
-              });
-            },
-            tooltip: isHebrew ? 'משחק חדש' : 'New Game',
-          ),
-        ],
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -447,199 +335,120 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // פאנל סטטיסטיקות
-              _buildStatsPanel(l10n, isHebrew),
-
-              const SizedBox(height: 8),
-
-              // בחירת קושי
-              if (!_gameStarted) _buildDifficultySelector(l10n, isHebrew),
-              if (!_gameStarted) const SizedBox(height: 8),
-
-              // אזור התבנית (canvas לבניה)
-              Expanded(
-                child: _buildBuildingArea(),
-              ),
-
-              const SizedBox(height: 8),
-
-              // צורות זמינות בתחתית
-              _buildShapesArea(),
-
-              const SizedBox(height: 8),
-            ],
-          ),
+          child: _gameStarted ? _buildGameView(responsive) : _buildDifficultySelector(responsive),
         ),
-      ),
-      floatingActionButton: _showReward ? const RewardAnimation() : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  Widget _buildStatsPanel(AppLocalizations l10n, bool isHebrew) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.purple.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatItem(
-            icon: Icons.timer,
-            label: isHebrew ? 'זמן' : 'Time',
-            value: _formatTime(_elapsedSeconds),
-            color: Colors.orange,
-          ),
-          _buildStatItem(
-            icon: Icons.check_circle,
-            label: isHebrew ? 'הוצבו' : 'Placed',
-            value: '$_placedShapes',
-            color: Colors.green,
-          ),
-          _buildStatItem(
-            icon: Icons.extension,
-            label: isHebrew ? 'נותרו' : 'Left',
-            value: '${_availableShapes.length}',
-            color: Colors.blue,
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey.shade600,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDifficultySelector(AppLocalizations l10n, bool isHebrew) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(16),
-      ),
+  Widget _buildDifficultySelector(ResponsiveHelper responsive) {
+    return Center(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            isHebrew ? 'בחר רמת קושי:' : 'Choose Difficulty:',
+            _isHebrew ? '🏗️ בחר רמת קושי 🏗️' : '🏗️ Choose Difficulty 🏗️',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: responsive.fontSize(32),
               fontWeight: FontWeight.bold,
               color: Colors.purple.shade700,
             ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildDifficultyButton(
-                label: isHebrew ? 'קל - בית' : 'Easy - House',
-                emoji: '🏠',
-                difficulty: EASY,
-                color: Colors.green,
-              ),
-              _buildDifficultyButton(
-                label: isHebrew ? 'בינוני - רכב' : 'Medium - Car',
-                emoji: '🚗',
-                difficulty: MEDIUM,
-                color: Colors.orange,
-              ),
-              _buildDifficultyButton(
-                label: isHebrew ? 'קשה - עץ' : 'Hard - Tree',
-                emoji: '🌳',
-                difficulty: HARD,
-                color: Colors.red,
-              ),
-            ],
+          SizedBox(height: responsive.spacing(40)),
+
+          Padding(
+            padding: responsive.safePadding,
+            child: KidButton(
+              text: _isHebrew ? 'קל - בנה בית 🏠' : 'Easy - Build a House 🏠',
+              icon: Icons.home,
+              onPressed: () => _startGame(1),
+              color: Colors.green.shade400,
+              width: responsive.width(80),
+              height: responsive.buttonHeight,
+            ),
+          ),
+          SizedBox(height: responsive.verticalSpacing),
+
+          Padding(
+            padding: responsive.safePadding,
+            child: KidButton(
+              text: _isHebrew ? 'בינוני - בנה רכב 🚗' : 'Medium - Build a Car 🚗',
+              icon: Icons.directions_car,
+              onPressed: () => _startGame(2),
+              color: Colors.orange.shade400,
+              width: responsive.width(80),
+              height: responsive.buttonHeight,
+            ),
+          ),
+          SizedBox(height: responsive.verticalSpacing),
+
+          Padding(
+            padding: responsive.safePadding,
+            child: KidButton(
+              text: _isHebrew ? 'קשה - בנה עץ 🌳' : 'Hard - Build a Tree 🌳',
+              icon: Icons.park,
+              onPressed: () => _startGame(3),
+              color: Colors.red.shade400,
+              width: responsive.width(80),
+              height: responsive.buttonHeight,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDifficultyButton({
-    required String label,
-    required String emoji,
-    required int difficulty,
-    required Color color,
-  }) {
-    final isSelected = _difficulty == difficulty;
+  Widget _buildGameView(ResponsiveHelper responsive) {
+    return Column(
+      children: [
+        // Score panel
+        _buildScorePanel(),
+        const SizedBox(height: 12),
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _difficulty = difficulty;
-          _initializeGame();
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey.shade400,
-            width: 2,
-          ),
+        // Building area
+        Expanded(
+          child: _buildBuildingArea(),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.grey.shade700,
-              ),
-              textAlign: TextAlign.center,
+
+        // Available shapes
+        _buildShapesArea(),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _buildScorePanel() {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.purple.shade200, width: 2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('⭐', style: TextStyle(fontSize: 24)),
+          const SizedBox(width: 8),
+          Text(
+            '$_score',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.purple.shade700,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 24),
+          Text(
+            _isHebrew ? 'נותרו: ${_availableShapes.length}' : 'Remaining: ${_availableShapes.length}',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.purple.shade700,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -650,80 +459,46 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.purple.shade200, width: 3),
+        border: Border.all(color: Colors.purple.shade300, width: 3),
       ),
-      child: _availableShapes.isEmpty && _gameCompleted
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('🎉', style: TextStyle(fontSize: 80)),
-                  const SizedBox(height: 16),
-                  Text(
-                    Localizations.localeOf(context).languageCode == 'he'
-                        ? '!כל הכבוד'
-                        : 'Well Done!',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.purple.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                return Stack(
-                  children: _slots.map((slot) {
-                    return _buildShapeSlot(slot, constraints);
-                  }).toList(),
-                );
-              },
-            ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: _slots.map((slot) {
+              return _buildSlot(slot, constraints);
+            }).toList(),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildShapeSlot(ShapeSlot slot, BoxConstraints constraints) {
+  Widget _buildSlot(ShapeSlotModel slot, BoxConstraints constraints) {
     final left = slot.position.dx * constraints.maxWidth - (slot.size / 2);
     final top = slot.position.dy * constraints.maxHeight - (slot.size / 2);
 
     return Positioned(
       left: left,
       top: top,
-      child: DragTarget<PuzzleShape>(
+      child: DragTarget<DraggableShapeModel>(
         onWillAccept: (shape) => shape != null && !slot.isPlaced,
-        onAccept: (shape) {
-          _onShapeDropped(shape, slot);
-        },
+        onAccept: (shape) => _checkDrop(shape, slot),
         builder: (context, candidateData, rejectedData) {
           final isHovering = candidateData.isNotEmpty;
 
-          if (slot.isPlaced) {
-            // צורה שכבר הוצבה
-            return _buildShape(
-              slot.shapeType,
-              slot.color,
-              slot.size,
-              isPlaced: true,
-            );
-          } else {
-            // חור ריק
-            return Container(
-              width: slot.size,
-              height: slot.size,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isHovering ? slot.color : slot.color.withOpacity(0.3),
-                  width: isHovering ? 3 : 2,
-                  style: BorderStyle.solid,
-                ),
-                borderRadius: slot.shapeType == ShapeType.circle
-                    ? BorderRadius.circular(slot.size / 2)
-                    : BorderRadius.circular(8),
-              ),
-            );
-          }
+          return Container(
+            width: slot.size,
+            height: slot.size,
+            child: slot.isPlaced
+                ? _buildShapeWidget(slot.shapeType, slot.size, slot.color, opacity: 1.0)
+                : _buildShapeWidget(
+                    slot.shapeType,
+                    slot.size,
+                    slot.color,
+                    opacity: isHovering ? 0.5 : 0.2,
+                    showBorder: true,
+                  ),
+          );
         },
       ),
     );
@@ -735,12 +510,17 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.purple.shade200, width: 2),
       ),
       child: _availableShapes.isEmpty
-          ? const SizedBox.shrink()
+          ? Center(
+              child: Text(
+                '✨',
+                style: TextStyle(fontSize: 48),
+              ),
+            )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: _availableShapes.map((shape) {
@@ -750,98 +530,82 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
     );
   }
 
-  Widget _buildDraggableShape(PuzzleShape shape) {
-    return Draggable<PuzzleShape>(
+  Widget _buildDraggableShape(DraggableShapeModel shape) {
+    return Draggable<DraggableShapeModel>(
       data: shape,
       feedback: Material(
         color: Colors.transparent,
         child: Transform.scale(
           scale: 1.2,
-          child: _buildShape(shape.shapeType, shape.color, shape.size),
+          child: _buildShapeWidget(shape.shapeType, shape.size, shape.color),
         ),
       ),
       childWhenDragging: Opacity(
         opacity: 0.3,
-        child: _buildShape(shape.shapeType, shape.color, shape.size),
+        child: _buildShapeWidget(shape.shapeType, shape.size, shape.color),
       ),
-      child: _buildShape(shape.shapeType, shape.color, shape.size),
+      child: _buildShapeWidget(shape.shapeType, shape.size, shape.color),
     );
   }
 
-  Widget _buildShape(ShapeType shapeType, Color color, double size, {bool isPlaced = false}) {
+  Widget _buildShapeWidget(ShapeType type, double size, Color color, {double opacity = 1.0, bool showBorder = false}) {
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
         painter: ShapePainter(
-          shapeType: shapeType,
-          color: color,
-          isPlaced: isPlaced,
+          shapeType: type,
+          color: color.withOpacity(opacity),
+          showBorder: showBorder,
         ),
       ),
     );
   }
 }
 
-/// סוגי צורות
-enum ShapeType {
-  circle,
-  square,
-  triangle,
-  rectangle,
-  star,
-  heart,
-  diamond,
-}
+// Models
+enum ShapeType { circle, square, triangle, rectangle, star }
 
-/// מודל לצורה בפאזל
-class PuzzleShape {
-  final String id;
+class ShapeSlotModel {
   final ShapeType shapeType;
-  final Color color;
-  final double size;
-  final String name;
-
-  PuzzleShape({
-    required this.id,
-    required this.shapeType,
-    required this.color,
-    required this.size,
-    required this.name,
-  });
-}
-
-/// מודל למקום בתבנית
-class ShapeSlot {
-  final String id;
-  final ShapeType shapeType;
-  final Offset position; // 0.0-1.0 (יחסי למסך)
+  final Offset position;
   final double size;
   final Color color;
-  final String name;
+  final String label;
   bool isPlaced;
 
-  ShapeSlot({
-    required this.id,
+  ShapeSlotModel({
     required this.shapeType,
     required this.position,
     required this.size,
     required this.color,
-    required this.name,
+    required this.label,
     this.isPlaced = false,
   });
 }
 
-/// Painter לציור צורות
+class DraggableShapeModel {
+  final ShapeType shapeType;
+  final double size;
+  final Color color;
+
+  DraggableShapeModel({
+    required this.shapeType,
+    required this.size,
+    required this.color,
+  });
+}
+
+// Custom Painter
 class ShapePainter extends CustomPainter {
   final ShapeType shapeType;
   final Color color;
-  final bool isPlaced;
+  final bool showBorder;
 
   ShapePainter({
     required this.shapeType,
     required this.color,
-    this.isPlaced = false,
+    this.showBorder = false,
   });
 
   @override
@@ -850,20 +614,29 @@ class ShapePainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
 
+    final borderPaint = Paint()
+      ..color = color.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
     switch (shapeType) {
       case ShapeType.circle:
-        canvas.drawCircle(
-          Offset(size.width / 2, size.height / 2),
-          size.width / 2,
-          paint,
-        );
+        final center = Offset(size.width / 2, size.height / 2);
+        final radius = size.width / 2;
+        canvas.drawCircle(center, radius, paint);
+        if (showBorder) {
+          canvas.drawCircle(center, radius, borderPaint);
+        }
         break;
+
       case ShapeType.square:
-        canvas.drawRect(
-          Rect.fromLTWH(0, 0, size.width, size.height),
-          paint,
-        );
+        final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+        canvas.drawRect(rect, paint);
+        if (showBorder) {
+          canvas.drawRect(rect, borderPaint);
+        }
         break;
+
       case ShapeType.triangle:
         final path = Path();
         path.moveTo(size.width / 2, 0);
@@ -871,26 +644,29 @@ class ShapePainter extends CustomPainter {
         path.lineTo(0, size.height);
         path.close();
         canvas.drawPath(path, paint);
+        if (showBorder) {
+          canvas.drawPath(path, borderPaint);
+        }
         break;
+
       case ShapeType.rectangle:
-        canvas.drawRect(
-          Rect.fromLTWH(
-            size.width * 0.1,
-            size.height * 0.2,
-            size.width * 0.8,
-            size.height * 0.6,
-          ),
-          paint,
+        final rect = Rect.fromLTWH(
+          size.width * 0.1,
+          size.height * 0.25,
+          size.width * 0.8,
+          size.height * 0.5,
         );
+        canvas.drawRect(rect, paint);
+        if (showBorder) {
+          canvas.drawRect(rect, borderPaint);
+        }
         break;
+
       case ShapeType.star:
         _drawStar(canvas, size, paint);
-        break;
-      case ShapeType.heart:
-        _drawHeart(canvas, size, paint);
-        break;
-      case ShapeType.diamond:
-        _drawDiamond(canvas, size, paint);
+        if (showBorder) {
+          _drawStar(canvas, size, borderPaint);
+        }
         break;
     }
   }
@@ -918,29 +694,6 @@ class ShapePainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  void _drawHeart(Canvas canvas, Size size, Paint paint) {
-    final path = Path();
-    final width = size.width;
-    final height = size.height;
-
-    path.moveTo(width / 2, height * 0.35);
-    path.cubicTo(width / 2, height * 0.25, width * 0.4, height * 0.1, width * 0.25, height * 0.2);
-    path.cubicTo(width * 0.1, height * 0.3, width * 0.1, height * 0.55, width / 2, height * 0.85);
-    path.cubicTo(width * 0.9, height * 0.55, width * 0.9, height * 0.3, width * 0.75, height * 0.2);
-    path.cubicTo(width * 0.6, height * 0.1, width / 2, height * 0.25, width / 2, height * 0.35);
-    canvas.drawPath(path, paint);
-  }
-
-  void _drawDiamond(Canvas canvas, Size size, Paint paint) {
-    final path = Path();
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
