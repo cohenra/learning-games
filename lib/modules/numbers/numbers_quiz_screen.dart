@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
 import '../../widgets/reward_animation.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך חידון מספרים - שאלות אקראיות עם בחירה מרובה
@@ -147,6 +148,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+    final responsive = ResponsiveHelper(context);
     final isQuizCompleted = _currentQuestionIndex >= _totalQuestions - 1 &&
         _selectedAnswer != null;
 
@@ -163,6 +165,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
       body: Stack(
         children: [
           Container(
+            width: double.infinity,
+            height: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -175,152 +179,355 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                children: [
-                  // התקדמות
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isTablet = MediaQuery.of(context).size.width >= 600;
+
+                  if (isTablet) {
+                    // Tablet: fit everything on one screen
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                      // התקדמות
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: responsive.spacing(20),
+                          vertical: responsive.spacing(8)
                         ),
-                        Row(
-                          children: List.generate(
-                            _score,
-                            (index) => const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: Text('⭐', style: TextStyle(fontSize: 20)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // שאלה
-                  Text(
-                    l10n.howMany,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // נקודות המייצגות את המספר
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Center(
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: List.generate(
-                            _correctAnswer,
-                            (index) => Container(
-                              width: 45,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.blue.shade400,
-                                    Colors.blue.shade600,
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blue.shade200,
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
+                              style: TextStyle(
+                                fontSize: responsive.subtitleSize,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
+                            Row(
+                              children: List.generate(
+                                _score,
+                                (index) => Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(2)),
+                                  child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(20))),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
 
-                  // אפשרויות תשובה
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 6.0,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: _options.map((option) {
-                          return GestureDetector(
-                            onTap: () => _handleAnswer(option),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    _getButtonColor(option),
-                                    _getButtonColor(option).withOpacity(0.8),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getButtonColor(option)
-                                        .withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '$option',
-                                  style: const TextStyle(
-                                    fontSize: 52,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
+                      SizedBox(height: responsive.spacing(8)),
 
-                  // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                  if (_isCorrect == true)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        l10n.correct,
+                      // שאלה
+                      Text(
+                        l10n.howMany,
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: responsive.questionTextSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
+                          color: Colors.blue.shade700,
                         ),
                       ),
-                    )
-                  else
-                    const SizedBox(height: 16),
-                ],
+
+                      SizedBox(height: responsive.spacing(12)),
+
+                      // נקודות המייצגות את המספר
+                      SizedBox(
+                        height: responsive.height(30),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                          child: Center(
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: responsive.spacing(10),
+                              runSpacing: responsive.spacing(10),
+                              children: List.generate(
+                                _correctAnswer,
+                                (index) => Container(
+                                  width: responsive.iconSize(45),
+                                  height: responsive.iconSize(45),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade600,
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.blue.shade200,
+                                        blurRadius: responsive.spacing(8),
+                                        offset: Offset(0, responsive.spacing(4)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.spacing(16)),
+
+                      // אפשרויות תשובה
+                      Flexible(
+                        flex: 2,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: responsive.spacing(20),
+                            vertical: responsive.spacing(8)
+                          ),
+                          child: GridView.count(
+                            shrinkWrap: true,
+                            crossAxisCount: 2,
+                            mainAxisSpacing: responsive.spacing(8),
+                            crossAxisSpacing: responsive.spacing(8),
+                            childAspectRatio: responsive.quizButtonAspectRatio,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: _options.map((option) {
+                              return GestureDetector(
+                                onTap: () => _handleAnswer(option),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        _getButtonColor(option),
+                                        _getButtonColor(option).withOpacity(0.8),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _getButtonColor(option)
+                                            .withOpacity(0.3),
+                                        blurRadius: responsive.spacing(10),
+                                        offset: Offset(0, responsive.spacing(6)),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '$option',
+                                          style: TextStyle(
+                                            fontSize: responsive.largeNumberSize,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+
+                      // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                      if (_isCorrect == true)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: responsive.spacing(16)),
+                          child: Text(
+                            l10n.correct,
+                            style: TextStyle(
+                              fontSize: responsive.questionTextSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        )
+                      else
+                        SizedBox(height: responsive.spacing(16)),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Phone: allow scrolling
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          children: [
+                            // התקדמות
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: responsive.spacing(20),
+                                vertical: responsive.spacing(8)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${l10n.question} ${_currentQuestionIndex + 1}/$_totalQuestions',
+                                    style: TextStyle(
+                                      fontSize: responsive.subtitleSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: List.generate(
+                                      _score,
+                                      (index) => Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(2)),
+                                        child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(20))),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.spacing(8)),
+
+                            // שאלה
+                            Text(
+                              l10n.howMany,
+                              style: TextStyle(
+                                fontSize: responsive.questionTextSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.spacing(12)),
+
+                            // נקודות המייצגות את המספר
+                            SizedBox(
+                              height: responsive.height(30),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                                child: Center(
+                                  child: Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: responsive.spacing(10),
+                                    runSpacing: responsive.spacing(10),
+                                    children: List.generate(
+                                      _correctAnswer,
+                                      (index) => Container(
+                                        width: responsive.iconSize(45),
+                                        height: responsive.iconSize(45),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.blue.shade400,
+                                              Colors.blue.shade600,
+                                            ],
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.blue.shade200,
+                                              blurRadius: responsive.spacing(8),
+                                              offset: Offset(0, responsive.spacing(4)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: responsive.spacing(16)),
+
+                            // אפשרויות תשובה
+                            SizedBox(
+                              height: responsive.height(20),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: responsive.spacing(20),
+                                  vertical: responsive.spacing(8)
+                                ),
+                                child: GridView.count(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: responsive.spacing(8),
+                                  crossAxisSpacing: responsive.spacing(8),
+                                  childAspectRatio: responsive.quizButtonAspectRatio,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: _options.map((option) {
+                                    return GestureDetector(
+                                      onTap: () => _handleAnswer(option),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 300),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              _getButtonColor(option),
+                                              _getButtonColor(option).withOpacity(0.8),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(responsive.spacing(20)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _getButtonColor(option)
+                                                  .withOpacity(0.3),
+                                              blurRadius: responsive.spacing(10),
+                                              offset: Offset(0, responsive.spacing(6)),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                '$option',
+                                                style: TextStyle(
+                                                  fontSize: responsive.largeNumberSize,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+
+                            // הודעת נכון (ללא כפתורים - עובר אוטומטית)
+                            if (_isCorrect == true)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: responsive.spacing(16)),
+                                child: Text(
+                                  l10n.correct,
+                                  style: TextStyle(
+                                    fontSize: responsive.questionTextSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green.shade700,
+                                  ),
+                                ),
+                              )
+                            else
+                              SizedBox(height: responsive.spacing(16)),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
             ),
           ),
@@ -342,8 +549,12 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
   }
 
   Widget _buildCompletionScreen(AppLocalizations l10n, bool isHebrew) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -356,60 +567,131 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.wellDone,
-                  style: TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade700,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  '${l10n.score}: $_score / $_totalQuestions',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Wrap(
-                  children: List.generate(
-                    _score,
-                    (index) => const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text('⭐', style: TextStyle(fontSize: 48)),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = MediaQuery.of(context).size.width >= 600;
+
+              if (isTablet) {
+                // Tablet: fit everything on one screen
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  Text(
+                    l10n.wellDone,
+                    style: TextStyle(
+                      fontSize: responsive.fontSize(56),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade700,
                     ),
                   ),
-                ),
-                const SizedBox(height: 60),
-                KidButton(
-                  text: l10n.playAgain,
-                  onPressed: () {
-                    setState(() {
-                      _currentQuestionIndex = 0;
-                      _score = 0;
-                      _selectedAnswer = null;
-                      _isCorrect = null;
-                    });
-                    _generateQuestion();
-                  },
-                  color: Colors.orange.shade500,
-                  width: 250,
-                ),
-                const SizedBox(height: 20),
-                KidButton(
-                  text: l10n.back,
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.blue.shade400,
-                  width: 250,
-                ),
-              ],
-            ),
+                  SizedBox(height: responsive.spacing(40)),
+                  Text(
+                    '${l10n.score}: $_score / $_totalQuestions',
+                    style: TextStyle(
+                      fontSize: responsive.titleSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: responsive.spacing(40)),
+                  Wrap(
+                    children: List.generate(
+                      _score,
+                      (index) => Padding(
+                        padding: EdgeInsets.all(responsive.spacing(8)),
+                        child: Text('⭐', style: TextStyle(fontSize: responsive.emojiSize)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: responsive.spacing(60)),
+                  KidButton(
+                    text: l10n.playAgain,
+                    onPressed: () {
+                      setState(() {
+                        _currentQuestionIndex = 0;
+                        _score = 0;
+                        _selectedAnswer = null;
+                        _isCorrect = null;
+                      });
+                      _generateQuestion();
+                    },
+                    color: Colors.orange.shade500,
+                    width: responsive.width(60),
+                  ),
+                  SizedBox(height: responsive.spacing(20)),
+                  KidButton(
+                    text: l10n.back,
+                    onPressed: () => Navigator.pop(context),
+                    color: Colors.blue.shade400,
+                    width: responsive.width(60),
+                  ),
+                    ],
+                  ),
+                );
+              } else {
+                // Phone: allow scrolling
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.wellDone,
+                            style: TextStyle(
+                              fontSize: responsive.fontSize(56),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(40)),
+                          Text(
+                            '${l10n.score}: $_score / $_totalQuestions',
+                            style: TextStyle(
+                              fontSize: responsive.titleSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(40)),
+                          Wrap(
+                            children: List.generate(
+                              _score,
+                              (index) => Padding(
+                                padding: EdgeInsets.all(responsive.spacing(8)),
+                                child: Text('⭐', style: TextStyle(fontSize: responsive.emojiSize)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(60)),
+                          KidButton(
+                            text: l10n.playAgain,
+                            onPressed: () {
+                              setState(() {
+                                _currentQuestionIndex = 0;
+                                _score = 0;
+                                _selectedAnswer = null;
+                                _isCorrect = null;
+                              });
+                              _generateQuestion();
+                            },
+                            color: Colors.orange.shade500,
+                            width: responsive.width(60),
+                          ),
+                          SizedBox(height: responsive.spacing(20)),
+                          KidButton(
+                            text: l10n.back,
+                            onPressed: () => Navigator.pop(context),
+                            color: Colors.blue.shade400,
+                            width: responsive.width(60),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך למידת צבעים - מציג צבע אחד בכל פעם עם ייצוג ויזואלי
@@ -120,6 +121,7 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
     final currentColor = _getCurrentColor();
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -128,6 +130,8 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
         backgroundColor: Colors.pink,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -140,105 +144,140 @@ class _ColorsLearningScreenState extends State<ColorsLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(height: 20),
-
-              // שם הצבע בחלק העליון
-              FadeTransition(
-                opacity: _animationController,
-                child: Text(
-                  _getColorName(l10n),
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade800,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                ),
-              ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                  SizedBox(height: responsive.verticalSpacing),
 
-              // הריבוע הצבעוני הגדול
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _animationController,
-                  curve: Curves.elasticOut,
-                ),
-                child: GestureDetector(
-                  onTap: _speakCurrentColor,
-                  child: Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      color: currentColor,
-                      borderRadius: BorderRadius.circular(30),
-                      border: currentColor == Colors.white
-                          ? Border.all(color: Colors.grey.shade400, width: 3)
-                          : null,
-                      boxShadow: [
-                        BoxShadow(
-                          color: currentColor.withOpacity(0.5),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
+                  // שם הצבע בחלק העליון
+                  FadeTransition(
+                    opacity: _animationController,
+                    child: Padding(
+                      padding: responsive.safePadding,
+                      child: Text(
+                        _getColorName(l10n),
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade800,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: responsive.verticalSpacing),
+
+                  // הריבוע הצבעוני הגדול
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _animationController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: GestureDetector(
+                      onTap: _speakCurrentColor,
+                      child: Container(
+                        width: responsive.width(75),
+                        height: responsive.width(75),
+                        constraints: BoxConstraints(
+                          maxWidth: 300,
+                          maxHeight: 300,
+                        ),
+                        decoration: BoxDecoration(
+                          color: currentColor,
+                          borderRadius: BorderRadius.circular(responsive.spacing(30)),
+                          border: currentColor == Colors.white
+                              ? Border.all(color: Colors.grey.shade400, width: responsive.spacing(3))
+                              : null,
+                          boxShadow: [
+                            BoxShadow(
+                              color: currentColor.withOpacity(0.5),
+                              blurRadius: responsive.spacing(30),
+                              offset: Offset(0, responsive.spacing(10)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: responsive.verticalSpacing),
+
+                  // כפתורי ניווט
+                  Padding(
+                    padding: responsive.safePadding,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Flexible(
+                          child: KidButton(
+                            text: l10n.back,
+                            onPressed: _goToPrevious,
+                            enabled: _currentColorIndex > 0,
+                            color: Colors.blue.shade400,
+                            width: responsive.width(25),
+                            height: responsive.buttonHeight * 0.8,
+                          ),
+                        ),
+                        SizedBox(width: responsive.horizontalSpacing),
+                        Flexible(
+                          child: KidButton(
+                            text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                            onPressed: _speakCurrentColor,
+                            color: Colors.green.shade400,
+                            width: responsive.width(25),
+                            height: responsive.buttonHeight * 0.8,
+                          ),
+                        ),
+                        SizedBox(width: responsive.horizontalSpacing),
+                        Flexible(
+                          child: KidButton(
+                            text: l10n.next,
+                            onPressed: _goToNext,
+                            enabled: _currentColorIndex < _colors.length - 1,
+                            color: Colors.blue.shade400,
+                            width: responsive.width(25),
+                            height: responsive.buttonHeight * 0.8,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 20),
+                  SizedBox(height: responsive.verticalSpacing),
 
-              // כפתורי ניווט
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    KidButton(
-                      text: l10n.back,
-                      onPressed: _goToPrevious,
-                      enabled: _currentColorIndex > 0,
-                      color: Colors.blue.shade400,
-                      width: 140,
+                  // אינדיקטור התקדמות
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _colors.length,
+                      (index) => Container(
+                        width: responsive.spacing(12),
+                        height: responsive.spacing(12),
+                        margin: EdgeInsets.symmetric(horizontal: responsive.spacing(4)),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == _currentColorIndex
+                              ? Colors.pink.shade600
+                              : Colors.grey.shade300,
+                        ),
+                      ),
                     ),
-                    KidButton(
-                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                      onPressed: _speakCurrentColor,
-                      color: Colors.green.shade400,
-                      width: 140,
-                    ),
-                    KidButton(
-                      text: l10n.next,
-                      onPressed: _goToNext,
-                      enabled: _currentColorIndex < _colors.length - 1,
-                      color: Colors.blue.shade400,
-                      width: 140,
-                    ),
-                  ],
-                ),
-              ),
-
-              // אינדיקטור התקדמות
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _colors.length,
-                  (index) => Container(
-                    width: 12,
-                    height: 12,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: index == _currentColorIndex
-                          ? Colors.pink.shade600
-                          : Colors.grey.shade300,
+                  ),
+                  SizedBox(height: responsive.verticalSpacing),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+              );
+            },
           ),
         ),
       ),

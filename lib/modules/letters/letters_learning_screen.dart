@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך למידת אותיות - מציג אות אחת בכל פעם
@@ -169,6 +170,7 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
     final l10n = AppLocalizations.of(context)!;
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
     final currentLetter = _letters[_currentIndex];
@@ -180,6 +182,8 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
         backgroundColor: Colors.blue,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -192,134 +196,160 @@ class _LettersLearningScreenState extends State<LettersLearningScreen>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // האות הגדולה
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _animationController,
-                  curve: Curves.elasticOut,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                SizedBox(height: responsive.verticalSpacing),
+                // האות הגדולה
+                ScaleTransition(
+                  scale: CurvedAnimation(
+                    parent: _animationController,
+                    curve: Curves.elasticOut,
+                  ),
+                  child: GestureDetector(
+                    onTap: _speakCurrentLetter,
+                    child: Text(
+                      currentLetter['letter'] as String,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(180),
+                        fontWeight: FontWeight.bold,
+                        color: currentLetter['color'] as Color,
+                        shadows: [
+                          Shadow(
+                            color: (currentLetter['color'] as Color).withOpacity(0.3),
+                            blurRadius: responsive.spacing(20),
+                            offset: Offset(0, responsive.spacing(4)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                child: GestureDetector(
-                  onTap: _speakCurrentLetter,
+
+                SizedBox(height: responsive.verticalSpacing),
+
+                // שם האות
+                FadeTransition(
+                  opacity: _animationController,
                   child: Text(
-                    currentLetter['letter'] as String,
+                    _getLetterName(l10n),
                     style: TextStyle(
-                      fontSize: 180,
+                      fontSize: responsive.titleSize,
                       fontWeight: FontWeight.bold,
-                      color: currentLetter['color'] as Color,
-                      shadows: [
-                        Shadow(
-                          color: (currentLetter['color'] as Color).withOpacity(0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: responsive.verticalSpacing * 2),
+
+                // ייצוג ויזואלי - עיגול צבעוני גדול
+                Container(
+                  width: responsive.width(40),
+                  height: responsive.width(40),
+                  constraints: BoxConstraints(
+                    maxWidth: 150,
+                    maxHeight: 150,
+                  ),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        (currentLetter['color'] as Color).withOpacity(0.3),
+                        (currentLetter['color'] as Color).withOpacity(0.6),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (currentLetter['color'] as Color).withOpacity(0.4),
+                        blurRadius: responsive.spacing(20),
+                        offset: Offset(0, responsive.spacing(8)),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      currentLetter['letter'] as String,
+                      style: TextStyle(
+                        fontSize: responsive.emojiSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: responsive.verticalSpacing * 2),
+
+                // כפתורי ניווט
+                Padding(
+                  padding: responsive.safePadding,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      KidButton(
+                        text: l10n.back,
+                        onPressed: _goToPrevious,
+                        enabled: _currentIndex > 0,
+                        color: Colors.blue.shade400,
+                        width: responsive.width(28),
+                      ),
+                      KidButton(
+                        text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
+                        onPressed: _speakCurrentLetter,
+                        color: Colors.green.shade400,
+                        width: responsive.width(28),
+                      ),
+                      KidButton(
+                        text: l10n.next,
+                        onPressed: _goToNext,
+                        enabled: _currentIndex < _letters.length - 1,
+                        color: Colors.blue.shade400,
+                        width: responsive.width(28),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: responsive.verticalSpacing),
+
+                // אינדיקטור התקדמות
+                SizedBox(
+                  height: responsive.spacing(40),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: _letters.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: responsive.spacing(12),
+                        height: responsive.spacing(12),
+                        margin: EdgeInsets.symmetric(horizontal: responsive.spacing(4)),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == _currentIndex
+                              ? Colors.blue.shade600
+                              : Colors.grey.shade300,
                         ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: responsive.verticalSpacing),
                       ],
                     ),
                   ),
                 ),
-              ),
-
-              // שם האות
-              FadeTransition(
-                opacity: _animationController,
-                child: Text(
-                  _getLetterName(l10n),
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade700,
-                  ),
-                ),
-              ),
-
-              // ייצוג ויזואלי - עיגול צבעוני גדול
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      (currentLetter['color'] as Color).withOpacity(0.3),
-                      (currentLetter['color'] as Color).withOpacity(0.6),
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (currentLetter['color'] as Color).withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    currentLetter['letter'] as String,
-                    style: TextStyle(
-                      fontSize: 80,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-
-              // כפתורי ניווט
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    KidButton(
-                      text: l10n.back,
-                      onPressed: _goToPrevious,
-                      enabled: _currentIndex > 0,
-                      color: Colors.blue.shade400,
-                      width: 140,
-                    ),
-                    KidButton(
-                      text: isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
-                      onPressed: _speakCurrentLetter,
-                      color: Colors.green.shade400,
-                      width: 140,
-                    ),
-                    KidButton(
-                      text: l10n.next,
-                      onPressed: _goToNext,
-                      enabled: _currentIndex < _letters.length - 1,
-                      color: Colors.blue.shade400,
-                      width: 140,
-                    ),
-                  ],
-                ),
-              ),
-
-              // אינדיקטור התקדמות
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: _letters.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 12,
-                      height: 12,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: index == _currentIndex
-                            ? Colors.blue.shade600
-                            : Colors.grey.shade300,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+              );
+            },
           ),
         ),
       ),

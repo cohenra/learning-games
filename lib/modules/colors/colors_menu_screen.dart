@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
 import 'colors_learning_screen.dart';
 import 'colors_quiz_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -11,6 +12,7 @@ class ColorsMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -19,6 +21,8 @@ class ColorsMenuScreen extends StatelessWidget {
         backgroundColor: Colors.pink,
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -31,74 +35,187 @@ class ColorsMenuScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // אייקון
-                const Text(
-                  '🎨',
-                  style: TextStyle(fontSize: 120),
-                ),
-                const SizedBox(height: 20),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = MediaQuery.of(context).size.width >= 600;
 
-                // כותרת
-                Text(
-                  l10n.colorsTitle,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pink.shade700,
-                  ),
-                ),
-                const SizedBox(height: 16),
+              if (isTablet) {
+                // Tablet: fit everything on one screen
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: responsive.verticalSpacing),
 
-                // תיאור
-                Text(
-                  l10n.colorsDescription,
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-                const SizedBox(height: 60),
-
-                // כפתור מצב למידה
-                KidButton(
-                  text: l10n.learnMode,
-                  icon: Icons.school,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ColorsLearningScreen(),
+                      // אייקון
+                      Text(
+                        '🎨',
+                        style: TextStyle(fontSize: responsive.emojiSize),
                       ),
-                    );
-                  },
-                  color: Colors.blue.shade500,
-                  width: 300,
-                  height: 90,
-                ),
-                const SizedBox(height: 24),
+                      SizedBox(height: responsive.verticalSpacing),
 
-                // כפתור מצב חידון
-                KidButton(
-                  text: l10n.quizMode,
-                  icon: Icons.gamepad,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ColorsQuizScreen(),
+                      // כותרת
+                      Text(
+                        l10n.colorsTitle,
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.pink.shade700,
+                        ),
                       ),
-                    );
-                  },
-                  color: Colors.green.shade500,
-                  width: 300,
-                  height: 90,
-                ),
-              ],
-            ),
+                      SizedBox(height: responsive.spacing(16)),
+
+                      // תיאור
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: Text(
+                          l10n.colorsDescription,
+                          style: TextStyle(
+                            fontSize: responsive.subtitleSize,
+                            color: Colors.grey.shade700,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: responsive.spacing(40)),
+
+                      // כפתור מצב למידה
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: KidButton(
+                          text: l10n.learnMode,
+                          icon: Icons.school,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ColorsLearningScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.blue.shade500,
+                          width: responsive.width(80),
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing),
+
+                      // כפתור מצב חידון
+                      Padding(
+                        padding: responsive.safePadding,
+                        child: KidButton(
+                          text: l10n.quizMode,
+                          icon: Icons.gamepad,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ColorsQuizScreen(),
+                              ),
+                            );
+                          },
+                          color: Colors.green.shade500,
+                          width: responsive.width(80),
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.verticalSpacing),
+                    ],
+                  ),
+                );
+              } else {
+                // Phone: allow scrolling
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // אייקון
+                          Text(
+                            '🎨',
+                            style: TextStyle(fontSize: responsive.emojiSize),
+                          ),
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // כותרת
+                          Text(
+                            l10n.colorsTitle,
+                            style: TextStyle(
+                              fontSize: responsive.titleSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink.shade700,
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(16)),
+
+                          // תיאור
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: Text(
+                              l10n.colorsDescription,
+                              style: TextStyle(
+                                fontSize: responsive.subtitleSize,
+                                color: Colors.grey.shade700,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(height: responsive.spacing(40)),
+
+                          // כפתור מצב למידה
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: KidButton(
+                              text: l10n.learnMode,
+                              icon: Icons.school,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ColorsLearningScreen(),
+                                  ),
+                                );
+                              },
+                              color: Colors.blue.shade500,
+                              width: responsive.width(80),
+                              height: responsive.buttonHeight,
+                            ),
+                          ),
+                          SizedBox(height: responsive.verticalSpacing),
+
+                          // כפתור מצב חידון
+                          Padding(
+                            padding: responsive.safePadding,
+                            child: KidButton(
+                              text: l10n.quizMode,
+                              icon: Icons.gamepad,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ColorsQuizScreen(),
+                                  ),
+                                );
+                              },
+                              color: Colors.green.shade500,
+                              width: responsive.width(80),
+                              height: responsive.buttonHeight,
+                            ),
+                          ),
+
+                          SizedBox(height: responsive.verticalSpacing),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ),
       ),
