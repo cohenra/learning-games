@@ -460,7 +460,6 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
                           ),
                         ),
                       ),
-                      ),
 
                       SizedBox(height: responsive.verticalSpacing * 2),
 
