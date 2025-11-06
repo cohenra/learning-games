@@ -351,6 +351,7 @@ class _ColorsQuizScreenState extends State<ColorsQuizScreen> {
                           }),
                         ),
                       ),
+                      ),
 
                       SizedBox(height: responsive.verticalSpacing * 2),
 
