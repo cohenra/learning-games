@@ -7,6 +7,7 @@ import 'notes_learning_screen.dart';
 import 'notes_quiz_screen.dart';
 import 'rhythm_game_screen.dart';
 import 'kids_songs_screen.dart';
+import 'music_composer_screen.dart';
 
 /// מסך תפריט מוזיקה
 class MusicMenuScreen extends StatelessWidget {
@@ -90,6 +91,22 @@ class MusicMenuScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => const RhythmGameScreen(),
+            ),
+          );
+        },
+      },
+      {
+        'titleHe': 'יוצר מוזיקה 🎹',
+        'titleEn': 'Music Composer 🎹',
+        'descriptionHe': 'צור את המוזיקה שלך',
+        'descriptionEn': 'Create your own music',
+        'icon': Icons.piano,
+        'color': Colors.teal,
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MusicComposerScreen(),
             ),
           );
         },
