@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 import 'providers/app_provider.dart';
-import 'screens/new_home_screen.dart';
+import 'screens/categories_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,7 +92,7 @@ class LearningFunApp extends StatelessWidget {
               ),
             ),
 
-            home: const NewHomeScreen(),
+            home: const CategoriesHomeScreen(),
           );
         },
       ),
