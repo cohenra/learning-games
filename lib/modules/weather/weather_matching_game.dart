@@ -195,13 +195,42 @@ class _WeatherMatchingGameState extends State<WeatherMatchingGame> {
                             decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(20), border: Border.all(color: borderColor, width: 3), boxShadow: [BoxShadow(color: borderColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Flexible(flex: 3, child: FittedBox(fit: BoxFit.contain, child: Text(option['emoji']!, style: const TextStyle(fontSize: 80)))),
+                                Flexible(
+                                  flex: 3,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      option['emoji']!,
+                                      style: const TextStyle(fontSize: 80),
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
-                                Flexible(flex: 1, child: Text(_isHebrew ? option['nameHe']! : option['nameEn']!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.teal.shade700), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                if (isSelected && _isCorrect!) Flexible(child: Padding(padding: const EdgeInsets.only(top: 4), child: Icon(Icons.check_circle, color: Colors.green, size: 28))),
-                                if (isSelected && !_isCorrect!) Flexible(child: Padding(padding: const EdgeInsets.only(top: 4), child: Icon(Icons.cancel, color: Colors.red, size: 28))),
+                                Flexible(
+                                  flex: 1,
+                                  child: Text(
+                                    _isHebrew ? option['nameHe']! : option['nameEn']!,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal.shade700,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (isSelected && _isCorrect!)
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 8),
+                                    child: Icon(Icons.check_circle, color: Colors.green, size: 32),
+                                  ),
+                                if (isSelected && !_isCorrect!)
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 8),
+                                    child: Icon(Icons.cancel, color: Colors.red, size: 32),
+                                  ),
                               ],
                             ),
                           ),

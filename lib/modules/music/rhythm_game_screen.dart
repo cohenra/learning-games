@@ -5,7 +5,7 @@ import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
 import '../../services/audio_service.dart';
 
-/// משחק קצב - תרגול ושחזור קצבים
+/// משחק קצב - תרגול ושחזור קצבים עם מספר צלילים גדל
 class RhythmGameScreen extends StatefulWidget {
   const RhythmGameScreen({super.key});
 
@@ -13,36 +13,51 @@ class RhythmGameScreen extends StatefulWidget {
   State<RhythmGameScreen> createState() => _RhythmGameScreenState();
 }
 
-class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerProviderStateMixin {
+class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProviderStateMixin {
   final FlutterTts _flutterTts = FlutterTts();
   final AudioService _audioService = AudioService();
   final Random _random = Random();
 
   int _level = 1;
   int _score = 0;
-  List<bool> _pattern = []; // true = beat, false = pause
-  List<bool> _userInput = [];
+  List<int> _pattern = []; // 0, 1, 2 = different drum sounds
+  List<int> _userInput = [];
   bool _isPlaying = false;
   bool _isListening = false;
   bool _showResult = false;
   bool? _isCorrect;
   bool _isHebrew = true;
 
-  late AnimationController _animController;
-  late Animation<double> _scaleAnimation;
+  late List<AnimationController> _animControllers;
+  late List<Animation<double>> _scaleAnimations;
+
+  // Define 3 different sounds (start with 3)
+  final List<Map<String, dynamic>> _drumTypes = [
+    {'emoji': '🥁', 'nameHe': 'תוף 1', 'nameEn': 'Drum 1', 'color': Colors.red},
+    {'emoji': '🪘', 'nameHe': 'תוף 2', 'nameEn': 'Drum 2', 'color': Colors.orange},
+    {'emoji': '🎵', 'nameHe': 'תוף 3', 'nameEn': 'Drum 3', 'color': Colors.purple},
+  ];
 
   @override
   void initState() {
     super.initState();
     _initTts();
     _audioService.initialize();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
+
+    // Create animation controllers for each drum
+    _animControllers = List.generate(
+      _drumTypes.length,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+      ),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
-    );
+
+    _scaleAnimations = _animControllers.map((controller) {
+      return Tween<double>(begin: 1.0, end: 1.3).animate(
+        CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+      );
+    }).toList();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
@@ -59,16 +74,15 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   }
 
   void _generatePattern() {
-    final patternLength = min(3 + _level, 8); // Start with 4, max 8
+    // Level 1: 3 sounds, Level 2: 4 sounds, Level 3: 5 sounds, etc.
+    final patternLength = 2 + _level; // Level 1 = 3, Level 2 = 4, etc.
+    final maxSoundTypes = min(3, _level + 2); // Start with 3 types, can use all 3
+
     _pattern = List.generate(
       patternLength,
-      (index) => _random.nextBool(),
+      (index) => _random.nextInt(maxSoundTypes), // Random drum from available types
     );
-    // Ensure at least 2 beats
-    if (_pattern.where((b) => b).length < 2) {
-      _pattern[0] = true;
-      _pattern[1] = true;
-    }
+
     _userInput = [];
     _showResult = false;
     _isCorrect = null;
@@ -80,18 +94,14 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
       _isListening = false;
     });
 
-    // First speak the instruction
     await _speak(_isHebrew ? 'הקשב לקצב' : 'Listen to the rhythm');
     await Future.delayed(const Duration(milliseconds: 500));
 
     for (int i = 0; i < _pattern.length; i++) {
-      if (_pattern[i]) {
-        _animController.forward().then((_) => _animController.reverse());
-        await _playDrumSound(); // Play drum sound
-        await Future.delayed(const Duration(milliseconds: 500));
-      } else {
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
+      final drumIndex = _pattern[i];
+      _animControllers[drumIndex].forward().then((_) => _animControllers[drumIndex].reverse());
+      await _playDrumSound();
+      await Future.delayed(const Duration(milliseconds: 600));
     }
 
     setState(() {
@@ -100,11 +110,10 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
     });
 
     await Future.delayed(const Duration(milliseconds: 300));
-    await _speak(_isHebrew ? 'עכשיו תורך! לחץ על התוף או על ההפסקה' : 'Now your turn! Tap the drum or pause');
+    await _speak(_isHebrew ? 'עכשיו תורך! חזור על הקצב' : 'Now your turn! Repeat the rhythm');
   }
 
   Future<void> _playDrumSound() async {
-    // Play real drum sound
     await _audioService.playDrum();
   }
 
@@ -114,30 +123,16 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
     await _flutterTts.speak(text);
   }
 
-  void _onDrumTap() {
+  void _onDrumTap(int drumIndex) {
     if (!_isListening || _showResult) return;
 
     setState(() {
-      _userInput.add(true);
+      _userInput.add(drumIndex);
     });
 
-    _animController.forward().then((_) => _animController.reverse());
-    _playDrumSound(); // Play drum sound when user taps
+    _animControllers[drumIndex].forward().then((_) => _animControllers[drumIndex].reverse());
+    _playDrumSound();
 
-    // Check if user finished input
-    if (_userInput.length == _pattern.length) {
-      _checkAnswer();
-    }
-  }
-
-  void _onPauseTap() {
-    if (!_isListening || _showResult) return;
-
-    setState(() {
-      _userInput.add(false);
-    });
-
-    // Check if user finished input
     if (_userInput.length == _pattern.length) {
       _checkAnswer();
     }
@@ -178,7 +173,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   void dispose() {
     _flutterTts.stop();
     _audioService.stop();
-    _animController.dispose();
+    for (var controller in _animControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -186,6 +183,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     final responsive = ResponsiveHelper(context);
     _isHebrew = Localizations.localeOf(context).languageCode == 'he';
+
+    // Get number of available drums for current level
+    final availableDrums = min(3, _level + 2);
 
     return Scaffold(
       body: Container(
@@ -229,7 +229,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: 48),
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -241,7 +241,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(20),
@@ -256,7 +256,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(20),
@@ -274,7 +274,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                 ),
               ),
 
-              SizedBox(height: responsive.spacing(30)),
+              SizedBox(height: responsive.spacing(20)),
 
               // Instructions
               Padding(
@@ -300,37 +300,41 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
               if (_pattern.isNotEmpty)
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
                     children: _pattern.asMap().entries.map((entry) {
                       final index = entry.key;
-                      final isBeat = entry.value;
+                      final drumType = entry.value;
                       final isUserInput = index < _userInput.length;
-                      final userCorrect = isUserInput && _userInput[index] == isBeat;
+                      final userCorrect = isUserInput && _userInput[index] == drumType;
 
                       Color color = Colors.grey.shade300;
                       if (_showResult && isUserInput) {
                         color = userCorrect ? Colors.green : Colors.red;
                       } else if (isUserInput) {
-                        color = Colors.blue;
+                        color = _drumTypes[drumType]['color'];
                       }
 
                       return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 4),
-                        width: 30,
-                        height: 30,
+                        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                        width: 35,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: color,
-                          shape: isBeat ? BoxShape.circle : BoxShape.rectangle,
-                          borderRadius: isBeat ? null : BorderRadius.circular(6),
+                          shape: BoxShape.circle,
                         ),
-                        child: isUserInput
-                            ? Icon(
-                                userCorrect ? Icons.check : Icons.close,
-                                color: Colors.white,
-                                size: 18,
-                              )
-                            : null,
+                        child: Center(
+                          child: isUserInput
+                              ? Icon(
+                                  userCorrect ? Icons.check : Icons.close,
+                                  color: Colors.white,
+                                  size: 20,
+                                )
+                              : Text(
+                                  _drumTypes[drumType]['emoji'],
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -338,31 +342,33 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
 
               SizedBox(height: responsive.spacing(20)),
 
-              // Drum and Pause buttons
+              // Drum buttons - only show available drums for current level
               Expanded(
                 child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Drum button
-                      GestureDetector(
-                        onTap: _onDrumTap,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: List.generate(availableDrums, (index) {
+                      final drum = _drumTypes[index];
+                      return GestureDetector(
+                        onTap: () => _onDrumTap(index),
                         child: AnimatedBuilder(
-                          animation: _scaleAnimation,
+                          animation: _scaleAnimations[index],
                           builder: (context, child) {
                             return Transform.scale(
-                              scale: _isListening ? _scaleAnimation.value : 1.0,
+                              scale: _isListening ? _scaleAnimations[index].value : 1.0,
                               child: Container(
-                                width: 150,
-                                height: 150,
+                                width: 140,
+                                height: 140,
                                 decoration: BoxDecoration(
-                                  color: _isListening ? Colors.red : Colors.red.shade300,
+                                  color: _isListening ? drum['color'] : (drum['color'] as Color).withOpacity(0.5),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.red.withOpacity(0.5),
+                                      color: (drum['color'] as Color).withOpacity(0.5),
                                       blurRadius: 20,
-                                      offset: Offset(0, 10),
+                                      offset: const Offset(0, 10),
                                     ),
                                   ],
                                 ),
@@ -371,14 +377,14 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        '🥁',
-                                        style: TextStyle(fontSize: 60),
+                                        drum['emoji'],
+                                        style: const TextStyle(fontSize: 50),
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 4),
                                       Text(
-                                        _isHebrew ? 'תוף' : 'Drum',
-                                        style: TextStyle(
-                                          fontSize: 18,
+                                        _isHebrew ? drum['nameHe'] : drum['nameEn'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
@@ -390,48 +396,8 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                             );
                           },
                         ),
-                      ),
-                      // Pause button
-                      GestureDetector(
-                        onTap: _onPauseTap,
-                        child: Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            color: _isListening ? Colors.grey.shade600 : Colors.grey.shade400,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.pause,
-                                  size: 60,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  _isHebrew ? 'הפסקה' : 'Pause',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      );
+                    }),
                   ),
                 ),
               ),
