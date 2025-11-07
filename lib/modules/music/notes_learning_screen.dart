@@ -23,6 +23,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'C',
       'colorName': 'אדום',
       'colorNameEn': 'Red',
+      'ttsHe': 'דוֹ', // Phonetic with vowel mark
     },
     {
       'emoji': '🎶',
@@ -31,6 +32,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'D',
       'colorName': 'כתום',
       'colorNameEn': 'Orange',
+      'ttsHe': 'רֶה', // Phonetic with vowel mark
     },
     {
       'emoji': '🎵',
@@ -39,6 +41,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'E',
       'colorName': 'צהוב',
       'colorNameEn': 'Yellow',
+      'ttsHe': 'מִי', // Phonetic with vowel mark
     },
     {
       'emoji': '🎶',
@@ -47,6 +50,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'F',
       'colorName': 'ירוק',
       'colorNameEn': 'Green',
+      'ttsHe': 'פָה', // Phonetic with vowel mark
     },
     {
       'emoji': '🎵',
@@ -55,6 +59,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'G',
       'colorName': 'כחול',
       'colorNameEn': 'Blue',
+      'ttsHe': 'סוֹל', // Phonetic with vowel mark
     },
     {
       'emoji': '🎶',
@@ -63,6 +68,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'A',
       'colorName': 'סגול',
       'colorNameEn': 'Purple',
+      'ttsHe': 'לָה', // Phonetic with vowel mark
     },
     {
       'emoji': '🎵',
@@ -71,6 +77,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'B',
       'colorName': 'ורוד',
       'colorNameEn': 'Pink',
+      'ttsHe': 'סִי', // Phonetic with vowel mark
     },
   ];
 
@@ -106,7 +113,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
 
   Future<void> _speakCurrent() async {
     final note = _notes[_currentIndex];
-    final text = _isHebrew ? note['nameHe']! : note['nameEn']!;
+    final text = _isHebrew ? note['ttsHe']! : note['nameEn']!;
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 
     await _flutterTts.setLanguage(lang);

@@ -80,9 +80,12 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
     for (int i = 0; i < _pattern.length; i++) {
       if (_pattern[i]) {
         _animController.forward().then((_) => _animController.reverse());
-        await Future.delayed(const Duration(milliseconds: 100));
+        _playDrumSound(); // Play drum sound
+        await Future.delayed(const Duration(milliseconds: 300));
+      } else {
+        await Future.delayed(const Duration(milliseconds: 300));
       }
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future.delayed(const Duration(milliseconds: 200));
     }
 
     setState(() {
@@ -90,7 +93,18 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
       _isListening = true;
     });
 
+    await Future.delayed(const Duration(milliseconds: 500));
     _speak(_isHebrew ? 'עכשיו תורך!' : 'Now your turn!');
+  }
+
+  Future<void> _playDrumSound() async {
+    // Play a short drum sound using TTS with quick settings
+    await _flutterTts.setSpeechRate(2.0); // Very fast
+    await _flutterTts.setPitch(0.5); // Low pitch for drum effect
+    await _flutterTts.speak('boom');
+    // Reset to normal
+    await _flutterTts.setSpeechRate(0.5);
+    await _flutterTts.setPitch(1.0);
   }
 
   Future<void> _speak(String text) async {
@@ -107,6 +121,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
     });
 
     _animController.forward().then((_) => _animController.reverse());
+    _playDrumSound(); // Play drum sound when user taps
 
     // Check if user finished input
     if (_userInput.length == _pattern.length) {
