@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../modules/animals/animals_menu_screen.dart';
 import '../modules/fruits_vegetables/fruits_vegetables_menu_screen.dart';
+import '../modules/vehicles/vehicles_menu_screen.dart';
 import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
@@ -130,7 +131,15 @@ class WorldAroundUsScreen extends StatelessWidget {
                       title: isHebrew ? 'כלי תחבורה' : 'Vehicles',
                       icon: '🚗',
                       color: Colors.blue,
-                      isAvailable: false,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const VehiclesMenuScreen(),
+                          ),
+                        );
+                      },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
