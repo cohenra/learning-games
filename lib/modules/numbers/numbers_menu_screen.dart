@@ -6,6 +6,7 @@ import 'numbers_quiz_screen.dart';
 import 'numbers_word_quiz_screen.dart';
 import 'numbers_sorting_game.dart';
 import 'numbers_compare_game.dart';
+import 'number_tracing_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול המספרים
@@ -200,6 +201,19 @@ class NumbersMenuScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => const NumbersCompareGame(),
+            ),
+          );
+        },
+      },
+      {
+        'text': isHebrew ? 'תרגול כתיבה ✍️' : 'Number Tracing ✍️',
+        'icon': Icons.edit,
+        'color': Colors.indigo.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumberTracingScreen(),
             ),
           );
         },

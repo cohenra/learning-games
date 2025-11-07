@@ -5,6 +5,7 @@ import 'letters_learning_screen.dart';
 import 'letters_quiz_screen.dart';
 import 'letters_memory_game_screen.dart';
 import 'letters_matching_game_screen.dart';
+import 'letter_tracing_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך תפריט מודול האותיות
@@ -186,6 +187,19 @@ class LettersMenuScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => const LettersMatchingGameScreen(),
+            ),
+          );
+        },
+      },
+      {
+        'text': isHebrew ? 'תרגול כתיבה ✍️' : 'Letter Tracing ✍️',
+        'icon': Icons.edit,
+        'color': Colors.teal.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LetterTracingScreen(),
             ),
           );
         },

@@ -3,6 +3,7 @@ import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
 import 'free_drawing_screen.dart';
 import 'complete_picture_screen.dart';
+import 'shape_tracing_screen.dart';
 
 /// מסך תפריט ציור
 class DrawingMenuScreen extends StatelessWidget {
@@ -44,6 +45,22 @@ class DrawingMenuScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const FreeDrawingScreen(),
+                      ),
+                    );
+                  },
+                },
+                {
+                  'titleHe': 'ציור צורות',
+                  'titleEn': 'Shape Tracing',
+                  'descriptionHe': 'תרגל לצייר צורות',
+                  'descriptionEn': 'Practice drawing shapes',
+                  'icon': Icons.change_history,
+                  'color': Colors.orange,
+                  'onTap': () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ShapeTracingScreen(),
                       ),
                     );
                   },

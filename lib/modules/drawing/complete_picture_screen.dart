@@ -20,6 +20,7 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
   bool _isHebrew = true;
   bool _showSuccess = false;
   List<Offset> drawnPoints = [];
+  Size _canvasSize = Size.zero;
 
   // רשימת אתגרים - כל אתגר מכיל תיאור של מה צריך להשלים
   final List<Map<String, dynamic>> _challenges = [
@@ -28,45 +29,40 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
       'nameEn': 'Sun',
       'descriptionHe': 'צייר קרניים לשמש!',
       'descriptionEn': 'Draw rays for the sun!',
-      'emoji': '☀️',
-      'color': Colors.yellow,
-      'checkComplete': (List<Offset> points) => points.length > 20,
+      'color': Colors.orange,
+      'type': 'sun',
     },
     {
       'nameHe': 'פרח',
       'nameEn': 'Flower',
       'descriptionHe': 'צייר עלי כותרת לפרח!',
       'descriptionEn': 'Draw petals for the flower!',
-      'emoji': '🌸',
       'color': Colors.pink,
-      'checkComplete': (List<Offset> points) => points.length > 30,
+      'type': 'flower',
     },
     {
       'nameHe': 'בית',
       'nameEn': 'House',
       'descriptionHe': 'צייר גג לבית!',
       'descriptionEn': 'Draw a roof for the house!',
-      'emoji': '🏠',
       'color': Colors.red,
-      'checkComplete': (List<Offset> points) => points.length > 25,
+      'type': 'house',
     },
     {
       'nameHe': 'עץ',
       'nameEn': 'Tree',
       'descriptionHe': 'צייר עלים לעץ!',
       'descriptionEn': 'Draw leaves for the tree!',
-      'emoji': '🌳',
       'color': Colors.green,
-      'checkComplete': (List<Offset> points) => points.length > 35,
+      'type': 'tree',
     },
     {
       'nameHe': 'דג',
       'nameEn': 'Fish',
       'descriptionHe': 'צייר סנפירים לדג!',
       'descriptionEn': 'Draw fins for the fish!',
-      'emoji': '🐟',
       'color': Colors.blue,
-      'checkComplete': (List<Offset> points) => points.length > 20,
+      'type': 'fish',
     },
   ];
 
@@ -98,16 +94,139 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
   }
 
   void _checkIfComplete() {
-    final challenge = _challenges[_currentLevel];
-    final checkComplete = challenge['checkComplete'] as bool Function(List<Offset>);
+    if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
 
-    if (checkComplete(drawnPoints)) {
+    final challenge = _challenges[_currentLevel];
+    final type = challenge['type'] as String;
+
+    bool isComplete = false;
+
+    switch (type) {
+      case 'sun':
+        // בדיקה שציירו סביב המעגל (קרניים)
+        isComplete = _checkSunRays();
+        break;
+      case 'flower':
+        // בדיקה שציירו סביב המרכז (עלי כותרת)
+        isComplete = _checkFlowerPetals();
+        break;
+      case 'house':
+        // בדיקה שציירו למעלה (גג)
+        isComplete = _checkHouseRoof();
+        break;
+      case 'tree':
+        // בדיקה שציירו למעלה (עלים)
+        isComplete = _checkTreeLeaves();
+        break;
+      case 'fish':
+        // בדיקה שציירו בצדדים (סנפירים)
+        isComplete = _checkFishFins();
+        break;
+    }
+
+    if (isComplete && !_showSuccess) {
       setState(() {
         _showSuccess = true;
       });
-
       _speak(_isHebrew ? 'כל הכבוד! מעולה!' : 'Well done! Excellent!');
     }
+  }
+
+  bool _checkSunRays() {
+    // בדיקה שציירו לפחות ב-3 כיוונים שונים סביב המעגל
+    final center = Offset(_canvasSize.width / 2, _canvasSize.height / 2);
+    final radius = min(_canvasSize.width, _canvasSize.height) / 4;
+
+    int sectorsDrawn = 0;
+    List<bool> sectors = List.filled(8, false); // 8 sectors around circle
+
+    for (var point in drawnPoints) {
+      if (point.dx < 0) continue; // Skip separator
+
+      final distance = (point - center).distance;
+      if (distance > radius + 20) { // Outside the sun circle
+        // Calculate angle
+        final angle = atan2(point.dy - center.dy, point.dx - center.dx);
+        final sectorIndex = ((angle + pi) / (2 * pi / 8)).floor() % 8;
+        sectors[sectorIndex] = true;
+      }
+    }
+
+    sectorsDrawn = sectors.where((s) => s).length;
+    return sectorsDrawn >= 4; // Need at least 4 rays in different directions
+  }
+
+  bool _checkFlowerPetals() {
+    // בדיקה שציירו סביב המרכז
+    final center = Offset(_canvasSize.width / 2, _canvasSize.height / 2 + 40);
+    final innerRadius = 30.0;
+    final outerRadius = 80.0;
+
+    int petalPoints = 0;
+    for (var point in drawnPoints) {
+      if (point.dx < 0) continue;
+
+      final distance = (point - center).distance;
+      if (distance > innerRadius && distance < outerRadius) {
+        petalPoints++;
+      }
+    }
+
+    return petalPoints > 40; // Need substantial drawing around center
+  }
+
+  bool _checkHouseRoof() {
+    // בדיקה שציירו למעלה (גג משולש)
+    final roofTop = _canvasSize.height * 0.25;
+    final roofBottom = _canvasSize.height * 0.45;
+
+    int roofPoints = 0;
+    for (var point in drawnPoints) {
+      if (point.dx < 0) continue;
+
+      if (point.dy < roofBottom && point.dy > roofTop) {
+        roofPoints++;
+      }
+    }
+
+    return roofPoints > 30; // Need substantial drawing in roof area
+  }
+
+  bool _checkTreeLeaves() {
+    // בדיקה שציירו למעלה (עלים)
+    final leavesTop = _canvasSize.height * 0.2;
+    final leavesBottom = _canvasSize.height * 0.5;
+
+    int leafPoints = 0;
+    for (var point in drawnPoints) {
+      if (point.dx < 0) continue;
+
+      if (point.dy < leavesBottom && point.dy > leavesTop) {
+        leafPoints++;
+      }
+    }
+
+    return leafPoints > 50; // Need substantial drawing in leaves area
+  }
+
+  bool _checkFishFins() {
+    // בדיקה שציירו בצדדים (סנפירים)
+    final centerY = _canvasSize.height / 2;
+    final leftSide = _canvasSize.width * 0.2;
+    final rightSide = _canvasSize.width * 0.8;
+
+    int finPoints = 0;
+    for (var point in drawnPoints) {
+      if (point.dx < 0) continue;
+
+      // Count points on sides
+      if ((point.dx < leftSide || point.dx > rightSide) &&
+          (point.dy > centerY - 80 && point.dy < centerY + 80)) {
+        finPoints++;
+      }
+    }
+
+    return finPoints > 25; // Need drawing on sides for fins
   }
 
   Future<void> _speak(String text) async {
@@ -217,11 +336,6 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      challenge['emoji'] as String,
-                      style: const TextStyle(fontSize: 40),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         _isHebrew ? challenge['descriptionHe']! : challenge['descriptionEn']!,
@@ -256,63 +370,75 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Stack(
-                      children: [
-                        // Base shape (emoji in center)
-                        Center(
-                          child: Text(
-                            challenge['emoji'] as String,
-                            style: const TextStyle(fontSize: 150),
-                          ),
-                        ),
-                        // Drawing layer
-                        GestureDetector(
-                          onPanUpdate: (details) {
-                            setState(() {
-                              drawnPoints.add(details.localPosition);
-                            });
-                            _checkIfComplete();
-                          },
-                          onPanEnd: (details) {
-                            setState(() {
-                              drawnPoints.add(const Offset(-1, -1)); // Separator
-                            });
-                          },
-                          child: CustomPaint(
-                            painter: SimpleDrawingPainter(
-                              drawnPoints,
-                              challenge['color'] as Color,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        _canvasSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+                        return Stack(
+                          children: [
+                            // Base incomplete shape
+                            CustomPaint(
+                              painter: IncompletePicturePainter(
+                                challenge['type'] as String,
+                                _canvasSize,
+                              ),
+                              size: Size.infinite,
                             ),
-                            size: Size.infinite,
-                          ),
-                        ),
-                        // Success overlay
-                        if (_showSuccess)
-                          Container(
-                            color: Colors.green.withOpacity(0.3),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 100,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    _isHebrew ? 'מעולה!' : 'Excellent!',
-                                    style: TextStyle(
-                                      fontSize: responsive.fontSize(32),
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
+                            // Drawing layer
+                            GestureDetector(
+                              onPanStart: (details) {
+                                setState(() {
+                                  drawnPoints.add(details.localPosition);
+                                });
+                              },
+                              onPanUpdate: (details) {
+                                setState(() {
+                                  drawnPoints.add(details.localPosition);
+                                });
+                              },
+                              onPanEnd: (details) {
+                                setState(() {
+                                  drawnPoints.add(const Offset(-1, -1)); // Separator
+                                });
+                                _checkIfComplete();
+                              },
+                              child: CustomPaint(
+                                painter: SimpleDrawingPainter(
+                                  drawnPoints,
+                                  challenge['color'] as Color,
+                                ),
+                                size: Size.infinite,
                               ),
                             ),
-                          ),
-                      ],
+                            // Success overlay
+                            if (_showSuccess)
+                              Container(
+                                color: Colors.green.withOpacity(0.3),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 100,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        _isHebrew ? 'מעולה!' : 'Excellent!',
+                                        style: TextStyle(
+                                          fontSize: responsive.fontSize(32),
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -358,6 +484,170 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
         ),
       ),
     );
+  }
+}
+
+/// ציור התמונה החלקית (לא שלמה)
+class IncompletePicturePainter extends CustomPainter {
+  final String type;
+  final Size canvasSize;
+
+  IncompletePicturePainter(this.type, this.canvasSize);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0
+      ..color = Colors.grey.shade700;
+
+    final fillPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.grey.shade300;
+
+    final center = Offset(size.width / 2, size.height / 2);
+
+    switch (type) {
+      case 'sun':
+        _drawSunWithoutRays(canvas, center, paint, fillPaint);
+        break;
+      case 'flower':
+        _drawFlowerWithoutPetals(canvas, center, paint, fillPaint);
+        break;
+      case 'house':
+        _drawHouseWithoutRoof(canvas, center, paint, fillPaint);
+        break;
+      case 'tree':
+        _drawTreeWithoutLeaves(canvas, center, paint, fillPaint);
+        break;
+      case 'fish':
+        _drawFishWithoutFins(canvas, center, paint, fillPaint);
+        break;
+    }
+  }
+
+  void _drawSunWithoutRays(Canvas canvas, Offset center, Paint stroke, Paint fill) {
+    final radius = min(canvasSize.width, canvasSize.height) / 4;
+    canvas.drawCircle(center, radius, fill);
+    canvas.drawCircle(center, radius, stroke);
+
+    // Draw face
+    final eyeOffset = radius / 3;
+    canvas.drawCircle(
+      Offset(center.dx - eyeOffset / 2, center.dy - eyeOffset / 2),
+      5,
+      Paint()..color = Colors.black,
+    );
+    canvas.drawCircle(
+      Offset(center.dx + eyeOffset / 2, center.dy - eyeOffset / 2),
+      5,
+      Paint()..color = Colors.black,
+    );
+
+    // Smile
+    final smilePath = Path();
+    smilePath.addArc(
+      Rect.fromCenter(center: center, width: radius, height: radius),
+      0.3,
+      2.5,
+    );
+    canvas.drawPath(smilePath, stroke..strokeWidth = 3);
+  }
+
+  void _drawFlowerWithoutPetals(Canvas canvas, Offset center, Paint stroke, Paint fill) {
+    // Stem
+    final stemPath = Path();
+    stemPath.moveTo(center.dx, center.dy + 40);
+    stemPath.lineTo(center.dx, center.dy + 150);
+    canvas.drawPath(stemPath, stroke..strokeWidth = 6..color = Colors.green.shade700);
+
+    // Center circle only (no petals)
+    final flowerCenter = Offset(center.dx, center.dy + 40);
+    canvas.drawCircle(flowerCenter, 30, fill..color = Colors.yellow.shade700);
+    canvas.drawCircle(flowerCenter, 30, stroke..color = Colors.grey.shade700);
+  }
+
+  void _drawHouseWithoutRoof(Canvas canvas, Offset center, Paint stroke, Paint fill) {
+    // House body (square/rectangle)
+    final houseRect = Rect.fromCenter(
+      center: Offset(center.dx, center.dy + 20),
+      width: min(canvasSize.width, canvasSize.height) * 0.5,
+      height: min(canvasSize.width, canvasSize.height) * 0.4,
+    );
+    canvas.drawRect(houseRect, fill..color = Colors.brown.shade200);
+    canvas.drawRect(houseRect, stroke);
+
+    // Door
+    final doorRect = Rect.fromCenter(
+      center: Offset(center.dx, houseRect.bottom - 40),
+      width: 40,
+      height: 70,
+    );
+    canvas.drawRect(doorRect, Paint()..color = Colors.brown.shade700);
+
+    // Window
+    final windowRect = Rect.fromCenter(
+      center: Offset(center.dx - 50, center.dy + 10),
+      width: 35,
+      height: 35,
+    );
+    canvas.drawRect(windowRect, Paint()..color = Colors.lightBlue.shade200);
+    canvas.drawRect(windowRect, stroke);
+  }
+
+  void _drawTreeWithoutLeaves(Canvas canvas, Offset center, Paint stroke, Paint fill) {
+    // Trunk
+    final trunkRect = Rect.fromCenter(
+      center: Offset(center.dx, center.dy + 50),
+      width: 40,
+      height: 120,
+    );
+    canvas.drawRect(trunkRect, fill..color = Colors.brown.shade600);
+    canvas.drawRect(trunkRect, stroke);
+
+    // Draw hint for where leaves should be
+    stroke.style = PaintingStyle.stroke;
+    stroke.strokeWidth = 2;
+    stroke.color = Colors.grey.shade400;
+    final hintPath = Path();
+    hintPath.addOval(Rect.fromCenter(
+      center: Offset(center.dx, center.dy - 20),
+      width: 130,
+      height: 100,
+    ));
+    canvas.drawPath(hintPath, stroke..style = PaintingStyle.stroke);
+  }
+
+  void _drawFishWithoutFins(Canvas canvas, Offset center, Paint stroke, Paint fill) {
+    // Fish body (oval)
+    final bodyRect = Rect.fromCenter(
+      center: center,
+      width: 150,
+      height: 80,
+    );
+    canvas.drawOval(bodyRect, fill..color = Colors.blue.shade200);
+    canvas.drawOval(bodyRect, stroke);
+
+    // Eye
+    canvas.drawCircle(
+      Offset(center.dx + 40, center.dy - 10),
+      8,
+      Paint()..color = Colors.black,
+    );
+
+    // Tail
+    final tailPath = Path();
+    tailPath.moveTo(center.dx - 75, center.dy);
+    tailPath.lineTo(center.dx - 110, center.dy - 30);
+    tailPath.lineTo(center.dx - 110, center.dy + 30);
+    tailPath.close();
+    canvas.drawPath(tailPath, fill..color = Colors.blue.shade300);
+    canvas.drawPath(tailPath, stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }
 
