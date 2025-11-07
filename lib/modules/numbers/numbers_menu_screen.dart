@@ -40,340 +40,170 @@ class NumbersMenuScreen extends StatelessWidget {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final isTablet = MediaQuery.of(context).size.width >= 600;
+              // רשימת כל הכפתורים
+              final buttons = _getButtons(context, l10n);
 
-              if (isTablet) {
-                // Tablet: fit everything on one screen
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: responsive.verticalSpacing),
+              // חישוב גובה זמין
+              final availableHeight = constraints.maxHeight;
+              final numButtons = buttons.length;
 
-                      // אייקון
-                      Text(
-                        '🔢',
-                        style: TextStyle(fontSize: responsive.emojiSize),
-                      ),
-                      SizedBox(height: responsive.verticalSpacing),
+              // רווחים: אייקון + כותרת + תיאור + כפתורים
+              const iconHeight = 60.0;
+              const titleHeight = 40.0;
+              const descriptionHeight = 60.0;
+              const topBottomPadding = 40.0;
 
-                      // כותרת
-                      Text(
-                        l10n.numbersTitle,
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade700,
+              final usedHeight = iconHeight + titleHeight + descriptionHeight + topBottomPadding;
+              final availableForButtons = availableHeight - usedHeight;
+
+              // חישוב גובה כפתור ורווח
+              final totalSpacing = (numButtons - 1) * 8.0; // 8px בין כפתורים
+              final buttonHeight = ((availableForButtons - totalSpacing) / numButtons).clamp(50.0, responsive.buttonHeight);
+
+              return SingleChildScrollView(
+                physics: numButtons <= 5 ? const NeverScrollableScrollPhysics() : null,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 8),
+
+                        // אייקון
+                        Text(
+                          '🔢',
+                          style: TextStyle(fontSize: responsive.emojiSize * 0.7),
                         ),
-                      ),
-                      SizedBox(height: responsive.spacing(16)),
+                        const SizedBox(height: 8),
 
-                      // תיאור
-                      Padding(
-                        padding: responsive.safePadding,
-                        child: Text(
-                          l10n.numbersDescription,
+                        // כותרת
+                        Text(
+                          l10n.numbersTitle,
                           style: TextStyle(
-                            fontSize: responsive.subtitleSize,
-                            color: Colors.grey.shade700,
+                            fontSize: responsive.titleSize * 0.9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(height: responsive.spacing(40)),
+                        const SizedBox(height: 8),
 
-                      // שורה ראשונה - 3 כפתורים
-                      Padding(
-                        padding: responsive.safePadding,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            // כפתור מצב למידה
-                            Expanded(
-                              child: KidButton(
-                                text: l10n.learnMode,
-                                icon: Icons.school,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const NumbersLearningScreen(),
-                                    ),
-                                  );
-                                },
-                                color: Colors.blue.shade500,
-                                height: responsive.buttonHeight,
-                              ),
-                            ),
-                            SizedBox(width: responsive.horizontalSpacing),
-
-                            // כפתור מצב חידון
-                            Expanded(
-                              child: KidButton(
-                                text: l10n.quizMode,
-                                icon: Icons.gamepad,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const NumbersQuizScreen(),
-                                    ),
-                                  );
-                                },
-                                color: Colors.green.shade500,
-                                height: responsive.buttonHeight,
-                              ),
-                            ),
-                            SizedBox(width: responsive.horizontalSpacing),
-
-                            // כפתור חידון מילים
-                            Expanded(
-                              child: KidButton(
-                                text: l10n.wordQuizMode,
-                                icon: Icons.abc,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const NumbersWordQuizScreen(),
-                                    ),
-                                  );
-                                },
-                                color: Colors.purple.shade500,
-                                height: responsive.buttonHeight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: responsive.verticalSpacing),
-
-                      // שורה שנייה - 2 משחקים
-                      Padding(
-                        padding: responsive.safePadding,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // כפתור מיון מספרים
-                            Expanded(
-                              child: KidButton(
-                                text: Localizations.localeOf(context).languageCode == 'he'
-                                    ? 'מיון מספרים'
-                                    : 'Number Sorting',
-                                icon: Icons.sort,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const NumbersSortingGame(),
-                                    ),
-                                  );
-                                },
-                                color: Colors.teal.shade500,
-                                height: responsive.buttonHeight,
-                              ),
-                            ),
-                            SizedBox(width: responsive.horizontalSpacing),
-
-                            // כפתור השוואת מספרים
-                            Expanded(
-                              child: KidButton(
-                                text: Localizations.localeOf(context).languageCode == 'he'
-                                    ? 'מי גדול יותר?'
-                                    : 'Which is Bigger?',
-                                icon: Icons.compare_arrows,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const NumbersCompareGame(),
-                                    ),
-                                  );
-                                },
-                                color: Colors.deepOrange.shade500,
-                                height: responsive.buttonHeight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: responsive.verticalSpacing),
-                    ],
-                  ),
-                );
-              } else {
-                // Phone: allow scrolling
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: responsive.verticalSpacing),
-
-                          // אייקון
-                          Text(
-                            '🔢',
-                            style: TextStyle(fontSize: responsive.emojiSize),
-                          ),
-                          SizedBox(height: responsive.verticalSpacing),
-
-                          // כותרת
-                          Text(
-                            l10n.numbersTitle,
+                        // תיאור
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            l10n.numbersDescription,
                             style: TextStyle(
-                              fontSize: responsive.titleSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade700,
+                              fontSize: responsive.subtitleSize * 0.85,
+                              color: Colors.grey.shade700,
                             ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: responsive.spacing(16)),
+                        ),
+                        const SizedBox(height: 16),
 
-                          // תיאור
-                          Padding(
-                            padding: responsive.safePadding,
-                            child: Text(
-                              l10n.numbersDescription,
-                              style: TextStyle(
-                                fontSize: responsive.subtitleSize,
-                                color: Colors.grey.shade700,
+                        // כפתורים
+                        ...buttons.map((buttonData) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: responsive.safePadding,
+                              child: KidButton(
+                                text: buttonData['text'] as String,
+                                icon: buttonData['icon'] as IconData,
+                                onPressed: buttonData['onPressed'] as VoidCallback,
+                                color: buttonData['color'] as Color,
+                                width: responsive.width(80),
+                                height: buttonHeight,
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          SizedBox(height: responsive.spacing(40)),
+                          );
+                        }).toList(),
 
-                          // שורה ראשונה - 3 כפתורים
-                          Padding(
-                            padding: responsive.safePadding,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                // כפתור מצב למידה
-                                Expanded(
-                                  child: KidButton(
-                                    text: l10n.learnMode,
-                                    icon: Icons.school,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const NumbersLearningScreen(),
-                                        ),
-                                      );
-                                    },
-                                    color: Colors.blue.shade500,
-                                    height: responsive.buttonHeight,
-                                  ),
-                                ),
-                                SizedBox(width: responsive.horizontalSpacing),
-
-                                // כפתור מצב חידון
-                                Expanded(
-                                  child: KidButton(
-                                    text: l10n.quizMode,
-                                    icon: Icons.gamepad,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const NumbersQuizScreen(),
-                                        ),
-                                      );
-                                    },
-                                    color: Colors.green.shade500,
-                                    height: responsive.buttonHeight,
-                                  ),
-                                ),
-                                SizedBox(width: responsive.horizontalSpacing),
-
-                                // כפתור חידון מילים
-                                Expanded(
-                                  child: KidButton(
-                                    text: l10n.wordQuizMode,
-                                    icon: Icons.abc,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const NumbersWordQuizScreen(),
-                                        ),
-                                      );
-                                    },
-                                    color: Colors.purple.shade500,
-                                    height: responsive.buttonHeight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: responsive.verticalSpacing),
-
-                          // שורה שנייה - 2 משחקים
-                          Padding(
-                            padding: responsive.safePadding,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // כפתור מיון מספרים
-                                Expanded(
-                                  child: KidButton(
-                                    text: Localizations.localeOf(context).languageCode == 'he'
-                                        ? 'מיון מספרים'
-                                        : 'Number Sorting',
-                                    icon: Icons.sort,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const NumbersSortingGame(),
-                                        ),
-                                      );
-                                    },
-                                    color: Colors.teal.shade500,
-                                    height: responsive.buttonHeight,
-                                  ),
-                                ),
-                                SizedBox(width: responsive.horizontalSpacing),
-
-                                // כפתור השוואת מספרים
-                                Expanded(
-                                  child: KidButton(
-                                    text: Localizations.localeOf(context).languageCode == 'he'
-                                        ? 'מי גדול יותר?'
-                                        : 'Which is Bigger?',
-                                    icon: Icons.compare_arrows,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const NumbersCompareGame(),
-                                        ),
-                                      );
-                                    },
-                                    color: Colors.deepOrange.shade500,
-                                    height: responsive.buttonHeight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: responsive.verticalSpacing),
-                        ],
-                      ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   ),
-                );
-              }
+                ),
+              );
             },
           ),
         ),
       ),
     );
+  }
+
+  List<Map<String, dynamic>> _getButtons(BuildContext context, AppLocalizations l10n) {
+    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
+
+    return [
+      {
+        'text': l10n.learnMode,
+        'icon': Icons.school,
+        'color': Colors.blue.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumbersLearningScreen(),
+            ),
+          );
+        },
+      },
+      {
+        'text': l10n.quizMode,
+        'icon': Icons.gamepad,
+        'color': Colors.green.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumbersQuizScreen(),
+            ),
+          );
+        },
+      },
+      {
+        'text': l10n.wordQuizMode,
+        'icon': Icons.abc,
+        'color': Colors.purple.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumbersWordQuizScreen(),
+            ),
+          );
+        },
+      },
+      {
+        'text': isHebrew ? 'מיון מספרים 🔢' : 'Number Sorting 🔢',
+        'icon': Icons.sort,
+        'color': Colors.teal.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumbersSortingGame(),
+            ),
+          );
+        },
+      },
+      {
+        'text': isHebrew ? 'מי גדול יותר? ⚖️' : 'Which is Bigger? ⚖️',
+        'icon': Icons.compare_arrows,
+        'color': Colors.deepOrange.shade500,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const NumbersCompareGame(),
+            ),
+          );
+        },
+      },
+    ];
   }
 }
