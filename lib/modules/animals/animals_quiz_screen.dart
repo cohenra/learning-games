@@ -276,17 +276,40 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
 
                   // Options
                   Expanded(
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(20),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 20,
-                        childAspectRatio: 1.0,
-                      ),
-                      itemCount: _options.length,
-                      itemBuilder: (context, index) {
-                        return _buildOptionCard(index);
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final availableHeight = constraints.maxHeight;
+                        final availableWidth = constraints.maxWidth;
+
+                        const padding = 20.0;
+                        const spacing = 20.0;
+
+                        // 4 items in 2x2 grid
+                        final rowCount = 2;
+
+                        // Calculate card dimensions
+                        final totalVerticalSpacing = spacing + (padding * 2);
+                        final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
+
+                        final totalHorizontalSpacing = spacing + (padding * 2);
+                        final cardWidth = (availableWidth - totalHorizontalSpacing) / 2;
+
+                        final aspectRatio = cardWidth / cardHeight;
+
+                        return GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(padding),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: spacing,
+                            mainAxisSpacing: spacing,
+                            childAspectRatio: aspectRatio,
+                          ),
+                          itemCount: _options.length,
+                          itemBuilder: (context, index) {
+                            return _buildOptionCard(index);
+                          },
+                        );
                       },
                     ),
                   ),
@@ -349,17 +372,29 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              option['emoji']!,
-              style: const TextStyle(fontSize: 80),
+            Flexible(
+              flex: 3,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Text(
+                  option['emoji']!,
+                  style: const TextStyle(fontSize: 60),
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              _isHebrew ? option['nameHe']! : option['nameEn']!,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.green.shade700,
+            const SizedBox(height: 8),
+            Flexible(
+              flex: 1,
+              child: Text(
+                _isHebrew ? option['nameHe']! : option['nameEn']!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade700,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (isSelected && _isCorrect!)

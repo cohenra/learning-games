@@ -187,33 +187,45 @@ class _AnimalsLearningScreenState extends State<AnimalsLearningScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Previous button
-                    KidButton(
-                      text: _isHebrew ? 'הקודם' : 'Previous',
-                      icon: _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                      onPressed: _currentIndex > 0 ? _goToPrevious : null,
-                      color: _currentIndex > 0 ? Colors.blue : Colors.grey,
-                      width: responsive.width(35),
-                      height: 60,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: KidButton(
+                          text: _isHebrew ? 'הקודם' : 'Previous',
+                          icon: _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
+                          onPressed: _currentIndex > 0 ? _goToPrevious : null,
+                          color: _currentIndex > 0 ? Colors.blue : Colors.grey,
+                          height: 60,
+                        ),
+                      ),
                     ),
 
                     // Repeat button
-                    KidButton(
-                      text: _isHebrew ? 'שמע שוב 🔊' : 'Hear Again 🔊',
-                      icon: Icons.volume_up,
-                      onPressed: _speakCurrent,
-                      color: Colors.green,
-                      width: responsive.width(35),
-                      height: 60,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: KidButton(
+                          text: _isHebrew ? 'שמע שוב 🔊' : 'Hear Again 🔊',
+                          icon: Icons.volume_up,
+                          onPressed: _speakCurrent,
+                          color: Colors.green,
+                          height: 60,
+                        ),
+                      ),
                     ),
 
                     // Next button
-                    KidButton(
-                      text: _isHebrew ? 'הבא' : 'Next',
-                      icon: _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
-                      onPressed: _currentIndex < _animals.length - 1 ? _goToNext : null,
-                      color: _currentIndex < _animals.length - 1 ? Colors.orange : Colors.grey,
-                      width: responsive.width(35),
-                      height: 60,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: KidButton(
+                          text: _isHebrew ? 'הבא' : 'Next',
+                          icon: _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
+                          onPressed: _currentIndex < _animals.length - 1 ? _goToNext : null,
+                          color: _currentIndex < _animals.length - 1 ? Colors.orange : Colors.grey,
+                          height: 60,
+                        ),
+                      ),
                     ),
                   ],
                 ),
