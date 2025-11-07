@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/responsive_helper.dart';
+import '../modules/music/music_menu_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך יצירתי ומהנה - מוזיקה ופעילויות יצירתיות
@@ -95,7 +96,15 @@ class CreativeFunScreen extends StatelessWidget {
                       title: isHebrew ? 'מוזיקה' : 'Music',
                       icon: '🎵',
                       color: Colors.purple,
-                      isAvailable: false,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MusicMenuScreen(),
+                          ),
+                        );
+                      },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
