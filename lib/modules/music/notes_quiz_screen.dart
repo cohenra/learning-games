@@ -41,11 +41,12 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
   void initState() {
     super.initState();
     _initTts();
+    _generateQuestion(); // Generate first question immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
       });
-      _generateQuestion();
+      _speakQuestion(); // Speak after getting language
     });
   }
 
@@ -74,9 +75,6 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
 
     // Find correct answer index
     _correctAnswerIndex = _options.indexOf(_correctNote);
-
-    // Speak question
-    _speakQuestion();
   }
 
   Future<void> _speakQuestion() async {
@@ -109,6 +107,7 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
           _isCorrect = null;
         });
         _generateQuestion();
+        _speakQuestion();
       } else {
         _showResults();
       }

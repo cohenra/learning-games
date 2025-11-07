@@ -94,22 +94,23 @@ class MusicMenuScreen extends StatelessWidget {
           );
         },
       },
-      {
-        'titleHe': 'שירי ילדים 🎤',
-        'titleEn': 'Kids Songs 🎤',
-        'descriptionHe': 'שמע שירים לילדים',
-        'descriptionEn': 'Listen to kids songs',
-        'icon': Icons.library_music,
-        'color': Colors.pink,
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const KidsSongsScreen(),
-            ),
-          );
-        },
-      },
+      // Kids Songs temporarily disabled - keeping code for future use
+      // {
+      //   'titleHe': 'שירי ילדים 🎤',
+      //   'titleEn': 'Kids Songs 🎤',
+      //   'descriptionHe': 'שמע שירים לילדים',
+      //   'descriptionEn': 'Listen to kids songs',
+      //   'icon': Icons.library_music,
+      //   'color': Colors.pink,
+      //   'onTap': () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => const KidsSongsScreen(),
+      //       ),
+      //     );
+      //   },
+      // },
     ];
   }
 
