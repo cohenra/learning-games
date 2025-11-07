@@ -303,7 +303,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
                           style: TextStyle(
                             fontSize: responsive.fontSize(20),
                             fontWeight: FontWeight.bold,
-                            color: currentColor.shade700,
+                            color: Color.lerp(currentColor, Colors.black, 0.4)!,
                           ),
                           textAlign: TextAlign.center,
                         ),

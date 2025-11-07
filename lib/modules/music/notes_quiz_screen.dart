@@ -434,7 +434,7 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: option['color'].shade700,
+                color: Color.lerp(option['color'], Colors.black, 0.4)!,
               ),
               textAlign: TextAlign.center,
             ),
