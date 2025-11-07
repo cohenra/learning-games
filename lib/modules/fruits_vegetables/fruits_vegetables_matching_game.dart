@@ -1,0 +1,452 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:math';
+import '../../widgets/kid_button.dart';
+import '../../utils/responsive_helper.dart';
+
+/// משחק התאמה של פירות וירקות
+class FruitsVegetablesMatchingGame extends StatefulWidget {
+  const FruitsVegetablesMatchingGame({super.key});
+
+  @override
+  State<FruitsVegetablesMatchingGame> createState() =>
+      _FruitsVegetablesMatchingGameState();
+}
+
+class _FruitsVegetablesMatchingGameState
+    extends State<FruitsVegetablesMatchingGame> {
+  final FlutterTts _flutterTts = FlutterTts();
+  final Random _random = Random();
+
+  final List<Map<String, String>> _allItems = [
+    {'emoji': '🍎', 'nameHe': 'תפוח', 'nameEn': 'Apple'},
+    {'emoji': '🍌', 'nameHe': 'בננה', 'nameEn': 'Banana'},
+    {'emoji': '🍊', 'nameHe': 'תפוז', 'nameEn': 'Orange'},
+    {'emoji': '🍇', 'nameHe': 'ענבים', 'nameEn': 'Grapes'},
+    {'emoji': '🍓', 'nameHe': 'תות', 'nameEn': 'Strawberry'},
+    {'emoji': '🍉', 'nameHe': 'אבטיח', 'nameEn': 'Watermelon'},
+    {'emoji': '🥕', 'nameHe': 'גזר', 'nameEn': 'Carrot'},
+    {'emoji': '🥔', 'nameHe': 'תפוח אדמה', 'nameEn': 'Potato'},
+    {'emoji': '🍅', 'nameHe': 'עגבנייה', 'nameEn': 'Tomato'},
+    {'emoji': '🥒', 'nameHe': 'מלפפון', 'nameEn': 'Cucumber'},
+    {'emoji': '🌽', 'nameHe': 'תירס', 'nameEn': 'Corn'},
+    {'emoji': '🥦', 'nameHe': 'ברוקולי', 'nameEn': 'Broccoli'},
+  ];
+
+  List<Map<String, dynamic>> _options = [];
+  late Map<String, String> _correctItem;
+  int? _selectedIndex;
+  bool _answered = false;
+  bool? _isCorrect;
+  int _score = 0;
+  int _currentQuestion = 0;
+  final int _totalQuestions = 10;
+  bool _isHebrew = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initTts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _isHebrew = Localizations.localeOf(context).languageCode == 'he';
+      });
+      _generateQuestion();
+      _speakQuestion();
+    });
+  }
+
+  Future<void> _initTts() async {
+    await _flutterTts.setVolume(1.0);
+    await _flutterTts.setSpeechRate(0.4);
+    await _flutterTts.setPitch(1.0);
+  }
+
+  void _generateQuestion() {
+    // Pick correct item
+    _correctItem = _allItems[_random.nextInt(_allItems.length)];
+
+    // Create wrong options
+    List<Map<String, String>> wrongOptions = List.from(_allItems);
+    wrongOptions.removeWhere((item) => item['emoji'] == _correctItem['emoji']);
+    wrongOptions.shuffle(_random);
+
+    // Take 3 wrong options
+    final selectedWrong = wrongOptions.take(3).toList();
+
+    // Combine and shuffle
+    _options = [_correctItem, ...selectedWrong]
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+    _options.shuffle(_random);
+
+    _selectedIndex = null;
+    _answered = false;
+    _isCorrect = null;
+  }
+
+  Future<void> _speakQuestion() async {
+    final text = _isHebrew ? _correctItem['nameHe']! : _correctItem['nameEn']!;
+    final lang = _isHebrew ? 'he-IL' : 'en-US';
+    await _flutterTts.setLanguage(lang);
+    await _flutterTts.speak(text);
+  }
+
+  void _checkAnswer(int index) {
+    if (_answered) return;
+
+    setState(() {
+      _selectedIndex = index;
+      _answered = true;
+      _isCorrect = _options[index]['emoji'] == _correctItem['emoji'];
+      if (_isCorrect!) {
+        _score += 10;
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (_currentQuestion < _totalQuestions - 1) {
+        setState(() {
+          _currentQuestion++;
+        });
+        _generateQuestion();
+        _speakQuestion();
+      } else {
+        _showResults();
+      }
+    });
+  }
+
+  void _showResults() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(
+          _isHebrew ? 'כל הכבוד!' : 'Well Done!',
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _isHebrew
+                  ? 'הניקוד שלך: $_score/${_totalQuestions * 10}'
+                  : 'Your Score: $_score/${_totalQuestions * 10}',
+              style: const TextStyle(fontSize: 24),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _score >= 70
+                  ? (_isHebrew ? '🎉 מעולה!' : '🎉 Excellent!')
+                  : (_isHebrew ? '💪 נסה שוב!' : '💪 Try Again!'),
+              style: const TextStyle(fontSize: 32),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _score = 0;
+                _currentQuestion = 0;
+                _generateQuestion();
+                _speakQuestion();
+              });
+            },
+            child: Text(_isHebrew ? 'שחק שוב' : 'Play Again'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text(_isHebrew ? 'חזור' : 'Back'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _flutterTts.stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
+    _isHebrew = Localizations.localeOf(context).languageCode == 'he';
+
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.green.shade100,
+              Colors.yellow.shade100,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.all(responsive.spacing(12)),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
+                        color: Colors.green.shade700,
+                        size: 32,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _isHebrew ? 'משחק התאמה' : 'Matching Game',
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              // Score and progress
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_isHebrew ? 'שאלה' : 'Question'} ${_currentQuestion + 1}/$_totalQuestions',
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(18),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_isHebrew ? 'ניקוד' : 'Score'}: $_score',
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(18),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: responsive.spacing(20)),
+
+              // Question
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      _isHebrew ? 'איפה ה...' : 'Where is the...',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(22),
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _isHebrew ? _correctItem['nameHe']! : _correctItem['nameEn']!,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(32),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: responsive.spacing(20)),
+
+              // Options
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableHeight = constraints.maxHeight;
+                    final availableWidth = constraints.maxWidth;
+
+                    const padding = 16.0;
+                    const spacing = 12.0;
+                    const rowCount = 2;
+
+                    final totalVerticalSpacing = spacing + (padding * 2);
+                    final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
+
+                    final totalHorizontalSpacing = spacing + (padding * 2);
+                    final cardWidth = (availableWidth - totalHorizontalSpacing) / 2;
+
+                    final aspectRatio = cardWidth / cardHeight;
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(padding),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: spacing,
+                        crossAxisSpacing: spacing,
+                        childAspectRatio: aspectRatio,
+                      ),
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _options.length,
+                      itemBuilder: (context, index) {
+                        return _buildOptionCard(index);
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              // Repeat question button
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: KidButton(
+                  text: _isHebrew ? 'שמע שוב את השאלה 🔊' : 'Hear Question Again 🔊',
+                  icon: Icons.volume_up,
+                  onPressed: _speakQuestion,
+                  color: Colors.blue,
+                  height: 60,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionCard(int index) {
+    final option = _options[index];
+    final isSelected = _selectedIndex == index;
+    final isCorrectOption = option['emoji'] == _correctItem['emoji'];
+
+    Color borderColor = Colors.green.shade200;
+    Color backgroundColor = Colors.white;
+
+    if (_answered && isSelected) {
+      if (_isCorrect!) {
+        borderColor = Colors.green;
+        backgroundColor = Colors.green.shade50;
+      } else {
+        borderColor = Colors.red;
+        backgroundColor = Colors.red.shade50;
+      }
+    } else if (_answered && isCorrectOption) {
+      borderColor = Colors.green;
+      backgroundColor = Colors.green.shade50;
+    }
+
+    return GestureDetector(
+      onTap: () => _checkAnswer(index),
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: borderColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              flex: 3,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Text(
+                  option['emoji']!,
+                  style: const TextStyle(fontSize: 80),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Flexible(
+              flex: 1,
+              child: Text(
+                _isHebrew ? option['nameHe']! : option['nameEn']!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade700,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isSelected && _isCorrect!)
+              const Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Icon(Icons.check_circle, color: Colors.green, size: 28),
+                ),
+              ),
+            if (isSelected && !_isCorrect!)
+              const Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Icon(Icons.cancel, color: Colors.red, size: 28),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

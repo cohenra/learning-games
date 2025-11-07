@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../modules/animals/animals_menu_screen.dart';
+import '../modules/fruits_vegetables/fruits_vegetables_menu_screen.dart';
 import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
@@ -135,8 +136,16 @@ class WorldAroundUsScreen extends StatelessWidget {
                       context: context,
                       title: isHebrew ? 'פירות וירקות' : 'Fruits & Vegetables',
                       icon: '🍎',
-                      color: Colors.red,
-                      isAvailable: false,
+                      color: Colors.orange,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FruitsVegetablesMenuScreen(),
+                          ),
+                        );
+                      },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
