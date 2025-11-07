@@ -89,6 +89,8 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   }
 
   Future<void> _playPattern() async {
+    if (!mounted) return;
+
     setState(() {
       _isPlaying = true;
       _isListening = false;
@@ -98,11 +100,19 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
     await Future.delayed(const Duration(milliseconds: 500));
 
     for (int i = 0; i < _pattern.length; i++) {
+      if (!mounted) return; // Check if widget is still mounted
+
       final instrumentIndex = _pattern[i];
-      _animControllers[instrumentIndex].forward().then((_) => _animControllers[instrumentIndex].reverse());
+      _animControllers[instrumentIndex].forward().then((_) {
+        if (mounted) {
+          _animControllers[instrumentIndex].reverse();
+        }
+      });
       await _playInstrumentSound(instrumentIndex);
       await Future.delayed(const Duration(milliseconds: 600));
     }
+
+    if (!mounted) return;
 
     setState(() {
       _isPlaying = false;
@@ -125,13 +135,17 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   }
 
   void _onInstrumentTap(int instrumentIndex) {
-    if (!_isListening || _showResult) return;
+    if (!_isListening || _showResult || !mounted) return;
 
     setState(() {
       _userInput.add(instrumentIndex);
     });
 
-    _animControllers[instrumentIndex].forward().then((_) => _animControllers[instrumentIndex].reverse());
+    _animControllers[instrumentIndex].forward().then((_) {
+      if (mounted) {
+        _animControllers[instrumentIndex].reverse();
+      }
+    });
     _playInstrumentSound(instrumentIndex);
 
     if (_userInput.length == _pattern.length) {
@@ -140,6 +154,8 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   }
 
   void _checkAnswer() {
+    if (!mounted) return;
+
     bool correct = true;
     for (int i = 0; i < _pattern.length; i++) {
       if (_pattern[i] != _userInput[i]) {
@@ -166,6 +182,8 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   }
 
   void _nextRound() {
+    if (!mounted) return;
+
     setState(() {
       _generatePattern();
       _userInput = [];
@@ -175,11 +193,15 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
       _isListening = false;
     });
     Future.delayed(const Duration(milliseconds: 300), () {
-      _playPattern();
+      if (mounted) {
+        _playPattern();
+      }
     });
   }
 
   void _tryAgain() {
+    if (!mounted) return;
+
     setState(() {
       _userInput = [];
       _showResult = false;
@@ -188,7 +210,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
       _isListening = false;
     });
     Future.delayed(const Duration(milliseconds: 300), () {
-      _playPattern();
+      if (mounted) {
+        _playPattern();
+      }
     });
   }
 
