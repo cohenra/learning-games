@@ -26,7 +26,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'אדום',
       'colorNameEn': 'Red',
       'ttsHe': 'דוֹ',
-      'ttsEn': 'Cee',
+      'ttsEn': 'Do',
     },
     {
       'emoji': '🎶',
@@ -36,7 +36,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'כתום',
       'colorNameEn': 'Orange',
       'ttsHe': 'רֶה',
-      'ttsEn': 'Dee',
+      'ttsEn': 'Re',
     },
     {
       'emoji': '🎵',
@@ -46,7 +46,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'צהוב',
       'colorNameEn': 'Yellow',
       'ttsHe': 'מִי',
-      'ttsEn': 'Eee',
+      'ttsEn': 'Mi',
     },
     {
       'emoji': '🎶',
@@ -56,7 +56,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'ירוק',
       'colorNameEn': 'Green',
       'ttsHe': 'פָה',
-      'ttsEn': 'Eff',
+      'ttsEn': 'Fa',
     },
     {
       'emoji': '🎵',
@@ -66,7 +66,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'כחול',
       'colorNameEn': 'Blue',
       'ttsHe': 'סוֹל',
-      'ttsEn': 'Gee',
+      'ttsEn': 'Sol',
     },
     {
       'emoji': '🎶',
@@ -76,7 +76,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'סגול',
       'colorNameEn': 'Purple',
       'ttsHe': 'לָה',
-      'ttsEn': 'Ay',
+      'ttsEn': 'La',
     },
     {
       'emoji': '🎵',
@@ -86,7 +86,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'colorName': 'ורוד',
       'colorNameEn': 'Pink',
       'ttsHe': 'סִי',
-      'ttsEn': 'Bee',
+      'ttsEn': 'Si',
     },
   ];
 
