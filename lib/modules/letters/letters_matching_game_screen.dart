@@ -376,11 +376,11 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
       children: [
         // Stats panel
         _buildStatsPanel(responsive),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
         // Current letter display
         _buildLetterDisplay(responsive),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
         // Instruction text
         Padding(
@@ -390,14 +390,16 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
                 ? 'בחר את התמונה שמתחילה באות $_currentLetter'
                 : 'Choose the picture that starts with $_currentLetter',
             style: TextStyle(
-              fontSize: responsive.fontSize(18),
+              fontSize: responsive.fontSize(14),
               fontWeight: FontWeight.bold,
               color: Colors.blue.shade700,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
         // Options grid (Expanded to fill available space)
         Expanded(
@@ -406,7 +408,7 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
 
         // Bottom buttons
         _buildBottomButtons(responsive),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -453,18 +455,18 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
     return GestureDetector(
       onTap: _speakLetter,
       child: Container(
-        height: 120,
+        height: 70,
         margin: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.blue.shade400, Colors.purple.shade400],
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.blue.shade200,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -480,7 +482,7 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
                   child: Text(
                     '🎉 $_currentLetter 🎉',
                     style: TextStyle(
-                      fontSize: responsive.fontSize(80),
+                      fontSize: responsive.fontSize(50),
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -489,7 +491,7 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
               : Text(
                   _currentLetter,
                   style: TextStyle(
-                    fontSize: responsive.fontSize(80),
+                    fontSize: responsive.fontSize(50),
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -596,7 +598,7 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
               text: _isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
               onPressed: _speakLetter,
               color: Colors.green.shade400,
-              height: 60,
+              height: 50,
             ),
           ),
           const SizedBox(width: 12),
@@ -611,7 +613,7 @@ class _LettersMatchingGameScreenState extends State<LettersMatchingGameScreen>
                 }
               },
               color: Colors.orange.shade400,
-              height: 60,
+              height: 50,
             ),
           ),
         ],

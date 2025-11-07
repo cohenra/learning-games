@@ -406,11 +406,11 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
       children: [
         // Stats panel
         _buildStatsPanel(responsive),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
         // Instructions
         _buildInstructions(responsive),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
         // Color grid (Expanded to fill available space)
         Expanded(
@@ -419,7 +419,7 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
 
         // Bottom buttons
         _buildBottomButtons(responsive),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -464,12 +464,12 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
 
   Widget _buildInstructions(ResponsiveHelper responsive) {
     return Container(
-      height: 60,
+      height: 45,
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.pink.shade200, width: 2),
       ),
       child: Center(
@@ -478,11 +478,13 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
               ? 'מצא את הצבע השונה! 🔍'
               : 'Find the different color! 🔍',
           style: TextStyle(
-            fontSize: responsive.fontSize(24),
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.bold,
             color: Colors.pink.shade700,
           ),
           textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -617,7 +619,7 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
               text: _isHebrew ? 'הקשב 🔊' : 'Listen 🔊',
               onPressed: _speakInstructions,
               color: Colors.green.shade400,
-              height: 60,
+              height: 50,
             ),
           ),
           const SizedBox(width: 12),
@@ -632,7 +634,7 @@ class _ColorsOddOneOutGameScreenState extends State<ColorsOddOneOutGameScreen>
                 }
               },
               color: Colors.orange.shade400,
-              height: 60,
+              height: 50,
             ),
           ),
         ],
