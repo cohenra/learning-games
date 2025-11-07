@@ -4,7 +4,7 @@ import 'dart:math';
 import '../../utils/responsive_helper.dart';
 import '../../widgets/kid_button.dart';
 
-/// מסך תרגול כתיבת אותיות
+/// מסך תרגול כתיבת אותיות - גרסה משופרת
 class LetterTracingScreen extends StatefulWidget {
   const LetterTracingScreen({super.key});
 
@@ -15,14 +15,29 @@ class LetterTracingScreen extends StatefulWidget {
 class _LetterTracingScreenState extends State<LetterTracingScreen> {
   final FlutterTts _flutterTts = FlutterTts();
 
-  int _currentLevel = 0;
   bool _isHebrew = true;
-  bool _showSuccess = false;
+  String _selectedDifficulty = ''; // 'easy', 'medium', 'hard'
+  String? _selectedLetter; // null means show grid
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
+  bool _showSuccess = false;
 
-  // רמות המשחק - כל רמה עם קושי שונה
-  List<Map<String, dynamic>> _levels = [];
+  // All Hebrew letters
+  final List<String> _hebrewLetters = [
+    'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ',
+    'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'
+  ];
+
+  // All English letters
+  final List<String> _englishLetters = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+  ];
+
+  final List<Color> _colors = [
+    Colors.blue, Colors.green, Colors.red, Colors.orange, Colors.purple,
+    Colors.pink, Colors.teal, Colors.indigo, Colors.cyan, Colors.amber,
+  ];
 
   @override
   void initState() {
@@ -31,43 +46,9 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
-        _levels = _isHebrew ? _hebrewLevels : _englishLevels;
       });
-      _speakInstruction();
     });
   }
-
-  // Hebrew letters
-  final List<Map<String, dynamic>> _hebrewLevels = [
-    // Easy
-    {'letter': 'א', 'difficulty': 'easy', 'color': Colors.blue},
-    {'letter': 'ב', 'difficulty': 'easy', 'color': Colors.green},
-    {'letter': 'ג', 'difficulty': 'easy', 'color': Colors.red},
-    // Medium
-    {'letter': 'ד', 'difficulty': 'medium', 'color': Colors.purple},
-    {'letter': 'ה', 'difficulty': 'medium', 'color': Colors.orange},
-    {'letter': 'ו', 'difficulty': 'medium', 'color': Colors.pink},
-    // Hard
-    {'letter': 'ז', 'difficulty': 'hard', 'color': Colors.teal},
-    {'letter': 'ח', 'difficulty': 'hard', 'color': Colors.indigo},
-    {'letter': 'ט', 'difficulty': 'hard', 'color': Colors.cyan},
-  ];
-
-  // English letters
-  final List<Map<String, dynamic>> _englishLevels = [
-    // Easy
-    {'letter': 'A', 'difficulty': 'easy', 'color': Colors.blue},
-    {'letter': 'B', 'difficulty': 'easy', 'color': Colors.green},
-    {'letter': 'C', 'difficulty': 'easy', 'color': Colors.red},
-    // Medium
-    {'letter': 'D', 'difficulty': 'medium', 'color': Colors.purple},
-    {'letter': 'E', 'difficulty': 'medium', 'color': Colors.orange},
-    {'letter': 'F', 'difficulty': 'medium', 'color': Colors.pink},
-    // Hard
-    {'letter': 'G', 'difficulty': 'hard', 'color': Colors.teal},
-    {'letter': 'H', 'difficulty': 'hard', 'color': Colors.indigo},
-    {'letter': 'I', 'difficulty': 'hard', 'color': Colors.cyan},
-  ];
 
   Future<void> _initTts() async {
     await _flutterTts.setVolume(1.0);
@@ -75,11 +56,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     await _flutterTts.setPitch(1.0);
   }
 
-  Future<void> _speakInstruction() async {
-    if (_levels.isEmpty) return;
-
-    final level = _levels[_currentLevel];
-    final letter = level['letter'] as String;
+  Future<void> _speakInstruction(String letter) async {
     final text = _isHebrew ? 'כתוב את האות $letter' : 'Write the letter $letter';
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 
@@ -90,14 +67,48 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   void _checkIfComplete() {
     if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
 
-    // Check if enough drawing was done
+    // Easier completion check - just need 25 valid points
     final validPoints = drawnPoints.where((p) => p.dx >= 0).length;
 
-    if (validPoints > 40 && !_showSuccess) {
+    if (validPoints > 25 && !_showSuccess) {
       setState(() {
         _showSuccess = true;
       });
-      _speak(_isHebrew ? 'כל הכבוד! כתבת יפה!' : 'Well done! You wrote it nicely!');
+      _speak(_isHebrew ? 'כל הכבוד!' : 'Well done!');
+
+      // Auto-advance to next letter after 1.5 seconds
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted && _showSuccess) {
+          _goToNextLetter();
+        }
+      });
+    }
+  }
+
+  void _goToNextLetter() {
+    final letters = _isHebrew ? _hebrewLetters : _englishLetters;
+    final currentIndex = letters.indexOf(_selectedLetter!);
+
+    if (currentIndex < letters.length - 1) {
+      final nextLetter = letters[currentIndex + 1];
+      setState(() {
+        _selectedLetter = nextLetter;
+        drawnPoints.clear();
+        _showSuccess = false;
+      });
+      _speakInstruction(nextLetter);
+    } else {
+      // Completed all letters - go back to grid
+      _speak(_isHebrew ? 'סיימת את כל האותיות! מעולה!' : 'You completed all letters! Excellent!');
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _selectedLetter = null;
+            drawnPoints.clear();
+            _showSuccess = false;
+          });
+        }
+      });
     }
   }
 
@@ -105,22 +116,6 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     final lang = _isHebrew ? 'he-IL' : 'en-US';
     await _flutterTts.setLanguage(lang);
     await _flutterTts.speak(text);
-  }
-
-  void _nextLevel() {
-    if (_currentLevel < _levels.length - 1) {
-      setState(() {
-        _currentLevel++;
-        drawnPoints.clear();
-        _showSuccess = false;
-      });
-      _speakInstruction();
-    } else {
-      _speak(_isHebrew ? 'סיימת את כל האותיות! מעולה!' : 'You completed all letters! Excellent!');
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context);
-      });
-    }
   }
 
   void _clearDrawing() {
@@ -141,23 +136,159 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     final responsive = ResponsiveHelper(context);
     _isHebrew = Localizations.localeOf(context).languageCode == 'he';
 
-    if (_levels.isEmpty) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    final level = _levels[_currentLevel];
-    final difficulty = level['difficulty'] as String;
-
-    String difficultyText = '';
-    if (difficulty == 'easy') {
-      difficultyText = _isHebrew ? 'קל' : 'Easy';
-    } else if (difficulty == 'medium') {
-      difficultyText = _isHebrew ? 'בינוני' : 'Medium';
+    if (_selectedDifficulty.isEmpty) {
+      return _buildDifficultySelector(responsive);
+    } else if (_selectedLetter == null) {
+      return _buildLetterGrid(responsive);
     } else {
-      difficultyText = _isHebrew ? 'קשה' : 'Hard';
+      return _buildTracingScreen(responsive);
     }
+  }
+
+  Widget _buildDifficultySelector(ResponsiveHelper responsive) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.blue.shade50, Colors.purple.shade50],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '✍️',
+                style: TextStyle(fontSize: responsive.iconSize(80)),
+              ),
+              SizedBox(height: responsive.spacing(20)),
+              Text(
+                _isHebrew ? 'תרגול כתיבת אותיות' : 'Letter Tracing',
+                style: TextStyle(
+                  fontSize: responsive.titleSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue.shade700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: responsive.spacing(40)),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'קל - עם מדריך ברור ✨' : 'Easy - With Clear Guide ✨',
+                  icon: Icons.star,
+                  onPressed: () => setState(() => _selectedDifficulty = 'easy'),
+                  color: Colors.green,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+              SizedBox(height: responsive.verticalSpacing),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'בינוני - עם מדריך קל 💫' : 'Medium - With Light Guide 💫',
+                  icon: Icons.star_half,
+                  onPressed: () => setState(() => _selectedDifficulty = 'medium'),
+                  color: Colors.orange,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+              SizedBox(height: responsive.verticalSpacing),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'קשה - בלי מדריך 🌟' : 'Hard - Without Guide 🌟',
+                  icon: Icons.star_border,
+                  onPressed: () => setState(() => _selectedDifficulty = 'hard'),
+                  color: Colors.red,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLetterGrid(ResponsiveHelper responsive) {
+    final letters = _isHebrew ? _hebrewLetters : _englishLetters;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isHebrew ? 'בחר אות' : 'Choose a Letter'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => setState(() => _selectedDifficulty = ''),
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.blue.shade50, Colors.purple.shade50],
+          ),
+        ),
+        child: SafeArea(
+          child: GridView.builder(
+            padding: EdgeInsets.all(responsive.spacing(16)),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: responsive.spacing(12),
+              mainAxisSpacing: responsive.spacing(12),
+              childAspectRatio: 1.0,
+            ),
+            itemCount: letters.length,
+            itemBuilder: (context, index) {
+              final letter = letters[index];
+              final color = _colors[index % _colors.length];
+
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedLetter = letter;
+                  });
+                  _speakInstruction(letter);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: color, width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      letter,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(40),
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                        fontFamily: _isHebrew ? 'Rubik' : null,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTracingScreen(ResponsiveHelper responsive) {
+    final letters = _isHebrew ? _hebrewLetters : _englishLetters;
+    final letterIndex = letters.indexOf(_selectedLetter!);
+    final color = _colors[letterIndex % _colors.length];
 
     return Scaffold(
       body: Container(
@@ -167,10 +298,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade50,
-              Colors.purple.shade50,
-            ],
+            colors: [Colors.blue.shade50, Colors.purple.shade50],
           ),
         ),
         child: SafeArea(
@@ -187,11 +315,15 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                         color: Colors.blue.shade700,
                         size: 32,
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => setState(() {
+                        _selectedLetter = null;
+                        drawnPoints.clear();
+                        _showSuccess = false;
+                      }),
                     ),
                     Expanded(
                       child: Text(
-                        _isHebrew ? 'תרגול כתיבת אותיות' : 'Letter Tracing',
+                        '${_isHebrew ? 'כתוב את האות' : 'Write the letter'} $_selectedLetter',
                         style: TextStyle(
                           fontSize: responsive.titleSize,
                           fontWeight: FontWeight.bold,
@@ -200,46 +332,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Text(
-                      '${_currentLevel + 1}/${_levels.length}',
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(18),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                ),
-              ),
-
-              // Instructions
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: (level['color'] as Color).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      '${_isHebrew ? 'כתוב את האות' : 'Write the letter'} ${level['letter']}',
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(20),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      difficultyText,
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(14),
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -269,13 +362,13 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
 
                         return Stack(
                           children: [
-                            // Guide letter (based on difficulty)
+                            // Guide letter (ALWAYS shown)
                             CustomPaint(
                               painter: GuideLetterPainter(
-                                level['letter'] as String,
-                                difficulty,
+                                _selectedLetter!,
+                                _selectedDifficulty,
                                 _canvasSize,
-                                level['color'] as Color,
+                                color,
                                 _isHebrew,
                               ),
                               size: Size.infinite,
@@ -294,15 +387,12 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                               },
                               onPanEnd: (details) {
                                 setState(() {
-                                  drawnPoints.add(const Offset(-1, -1)); // Separator
+                                  drawnPoints.add(const Offset(-1, -1));
                                 });
                                 _checkIfComplete();
                               },
                               child: CustomPaint(
-                                painter: DrawingPainter(
-                                  drawnPoints,
-                                  level['color'] as Color,
-                                ),
+                                painter: DrawingPainter(drawnPoints, color),
                                 size: Size.infinite,
                               ),
                             ),
@@ -342,37 +432,18 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
 
               SizedBox(height: responsive.spacing(16)),
 
-              // Buttons
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                child: Row(
-                  children: [
-                    if (!_showSuccess)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: KidButton(
-                            text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
-                            icon: Icons.delete,
-                            onPressed: _clearDrawing,
-                            color: Colors.orange,
-                            height: 60,
-                          ),
-                        ),
-                      ),
-                    if (_showSuccess)
-                      Expanded(
-                        child: KidButton(
-                          text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
-                          icon: Icons.arrow_forward,
-                          onPressed: _nextLevel,
-                          color: Colors.green,
-                          height: 60,
-                        ),
-                      ),
-                  ],
+              // Clear button (only when not showing success)
+              if (!_showSuccess)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                  child: KidButton(
+                    text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
+                    icon: Icons.delete,
+                    onPressed: _clearDrawing,
+                    color: Colors.orange,
+                    height: 60,
+                  ),
                 ),
-              ),
 
               SizedBox(height: responsive.spacing(16)),
             ],
@@ -383,7 +454,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   }
 }
 
-/// ציור אות המדריך (תלוי ברמת הקושי)
+/// ציור אות המדריך - תמיד מציג את האות
 class GuideLetterPainter extends CustomPainter {
   final String letter;
   final String difficulty;
@@ -395,18 +466,23 @@ class GuideLetterPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (difficulty == 'hard') {
-      // No guide for hard difficulty
-      return;
-    }
-
     final center = Offset(size.width / 2, size.height / 2);
     final fontSize = min(size.width, size.height) * 0.7;
+
+    // Determine opacity based on difficulty
+    double opacity;
+    if (difficulty == 'easy') {
+      opacity = 0.4; // Clear guide
+    } else if (difficulty == 'medium') {
+      opacity = 0.25; // Light guide
+    } else {
+      opacity = 0.15; // Faint guide (but still visible!)
+    }
 
     final textStyle = TextStyle(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
-      color: difficulty == 'easy' ? color.withOpacity(0.3) : color.withOpacity(0.15),
+      color: color.withOpacity(opacity),
       fontFamily: isHebrew ? 'Rubik' : null,
     );
 
@@ -423,34 +499,7 @@ class GuideLetterPainter extends CustomPainter {
       center.dy - textPainter.height / 2,
     );
 
-    if (difficulty == 'easy') {
-      // Draw solid guide letter
-      textPainter.paint(canvas, offset);
-    } else if (difficulty == 'medium') {
-      // Draw dotted outline
-      textPainter.paint(canvas, offset);
-
-      // Draw dots around the letter
-      final paint = Paint()
-        ..color = color.withOpacity(0.5)
-        ..strokeWidth = 6.0
-        ..style = PaintingStyle.fill;
-
-      // Draw a few guide dots
-      final numDots = 12;
-      final letterRect = Rect.fromCenter(
-        center: center,
-        width: textPainter.width,
-        height: textPainter.height,
-      );
-
-      for (int i = 0; i < numDots; i++) {
-        final angle = (i * 2 * pi / numDots);
-        final x = center.dx + (letterRect.width / 2.5) * cos(angle);
-        final y = center.dy + (letterRect.height / 2.5) * sin(angle);
-        canvas.drawCircle(Offset(x, y), 4, paint);
-      }
-    }
+    textPainter.paint(canvas, offset);
   }
 
   @override

@@ -4,7 +4,7 @@ import 'dart:math';
 import '../../utils/responsive_helper.dart';
 import '../../widgets/kid_button.dart';
 
-/// מסך תרגול כתיבת מספרים
+/// מסך תרגול כתיבת מספרים - גרסה משופרת
 class NumberTracingScreen extends StatefulWidget {
   const NumberTracingScreen({super.key});
 
@@ -15,29 +15,28 @@ class NumberTracingScreen extends StatefulWidget {
 class _NumberTracingScreenState extends State<NumberTracingScreen> {
   final FlutterTts _flutterTts = FlutterTts();
 
-  int _currentLevel = 0;
   bool _isHebrew = true;
-  bool _showSuccess = false;
+  String _selectedDifficulty = ''; // 'easy', 'medium', 'hard'
+  int? _selectedNumber; // null means show grid
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
+  bool _showSuccess = false;
 
-  // רמות המשחק - כל רמה עם קושי שונה
-  final List<Map<String, dynamic>> _levels = [
-    // Easy - digits 1-3
-    {'number': '1', 'difficulty': 'easy', 'color': Colors.blue, 'value': 1},
-    {'number': '2', 'difficulty': 'easy', 'color': Colors.green, 'value': 2},
-    {'number': '3', 'difficulty': 'easy', 'color': Colors.red, 'value': 3},
-
-    // Medium - digits 4-6
-    {'number': '4', 'difficulty': 'medium', 'color': Colors.purple, 'value': 4},
-    {'number': '5', 'difficulty': 'medium', 'color': Colors.orange, 'value': 5},
-    {'number': '6', 'difficulty': 'medium', 'color': Colors.pink, 'value': 6},
-
-    // Hard - digits 7-9
-    {'number': '7', 'difficulty': 'hard', 'color': Colors.teal, 'value': 7},
-    {'number': '8', 'difficulty': 'hard', 'color': Colors.indigo, 'value': 8},
-    {'number': '9', 'difficulty': 'hard', 'color': Colors.cyan, 'value': 9},
-  ];
+  // All numbers 0-10
+  final List<int> _allNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  final Map<int, Color> _numberColors = {
+    0: Colors.purple,
+    1: Colors.blue,
+    2: Colors.green,
+    3: Colors.red,
+    4: Colors.orange,
+    5: Colors.pink,
+    6: Colors.teal,
+    7: Colors.indigo,
+    8: Colors.cyan,
+    9: Colors.amber,
+    10: Colors.deepPurple,
+  };
 
   @override
   void initState() {
@@ -47,7 +46,6 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
       });
-      _speakInstruction();
     });
   }
 
@@ -57,9 +55,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
     await _flutterTts.setPitch(1.0);
   }
 
-  Future<void> _speakInstruction() async {
-    final level = _levels[_currentLevel];
-    final number = level['number'] as String;
+  Future<void> _speakInstruction(int number) async {
     final text = _isHebrew ? 'כתוב את המספר $number' : 'Write the number $number';
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 
@@ -70,14 +66,47 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
   void _checkIfComplete() {
     if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
 
-    // Check if enough drawing was done
+    // Easier completion check - just need 25 valid points
     final validPoints = drawnPoints.where((p) => p.dx >= 0).length;
 
-    if (validPoints > 40 && !_showSuccess) {
+    if (validPoints > 25 && !_showSuccess) {
       setState(() {
         _showSuccess = true;
       });
-      _speak(_isHebrew ? 'כל הכבוד! כתבת יפה!' : 'Well done! You wrote it nicely!');
+      _speak(_isHebrew ? 'כל הכבוד!' : 'Well done!');
+
+      // Auto-advance to next number after 1.5 seconds
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted && _showSuccess) {
+          _goToNextNumber();
+        }
+      });
+    }
+  }
+
+  void _goToNextNumber() {
+    // Find next number in the list
+    final currentIndex = _allNumbers.indexOf(_selectedNumber!);
+    if (currentIndex < _allNumbers.length - 1) {
+      final nextNumber = _allNumbers[currentIndex + 1];
+      setState(() {
+        _selectedNumber = nextNumber;
+        drawnPoints.clear();
+        _showSuccess = false;
+      });
+      _speakInstruction(nextNumber);
+    } else {
+      // Completed all numbers - go back to grid
+      _speak(_isHebrew ? 'סיימת את כל המספרים! מעולה!' : 'You completed all numbers! Excellent!');
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _selectedNumber = null;
+            drawnPoints.clear();
+            _showSuccess = false;
+          });
+        }
+      });
     }
   }
 
@@ -85,22 +114,6 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
     final lang = _isHebrew ? 'he-IL' : 'en-US';
     await _flutterTts.setLanguage(lang);
     await _flutterTts.speak(text);
-  }
-
-  void _nextLevel() {
-    if (_currentLevel < _levels.length - 1) {
-      setState(() {
-        _currentLevel++;
-        drawnPoints.clear();
-        _showSuccess = false;
-      });
-      _speakInstruction();
-    } else {
-      _speak(_isHebrew ? 'סיימת את כל המספרים! מעולה!' : 'You completed all numbers! Excellent!');
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context);
-      });
-    }
   }
 
   void _clearDrawing() {
@@ -120,17 +133,156 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
   Widget build(BuildContext context) {
     final responsive = ResponsiveHelper(context);
     _isHebrew = Localizations.localeOf(context).languageCode == 'he';
-    final level = _levels[_currentLevel];
-    final difficulty = level['difficulty'] as String;
 
-    String difficultyText = '';
-    if (difficulty == 'easy') {
-      difficultyText = _isHebrew ? 'קל' : 'Easy';
-    } else if (difficulty == 'medium') {
-      difficultyText = _isHebrew ? 'בינוני' : 'Medium';
+    if (_selectedDifficulty.isEmpty) {
+      return _buildDifficultySelector(responsive);
+    } else if (_selectedNumber == null) {
+      return _buildNumberGrid(responsive);
     } else {
-      difficultyText = _isHebrew ? 'קשה' : 'Hard';
+      return _buildTracingScreen(responsive);
     }
+  }
+
+  Widget _buildDifficultySelector(ResponsiveHelper responsive) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.orange.shade50, Colors.yellow.shade50],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '✍️',
+                style: TextStyle(fontSize: responsive.iconSize(80)),
+              ),
+              SizedBox(height: responsive.spacing(20)),
+              Text(
+                _isHebrew ? 'תרגול כתיבת מספרים' : 'Number Tracing',
+                style: TextStyle(
+                  fontSize: responsive.titleSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange.shade700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: responsive.spacing(40)),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'קל - עם מדריך ברור ✨' : 'Easy - With Clear Guide ✨',
+                  icon: Icons.star,
+                  onPressed: () => setState(() => _selectedDifficulty = 'easy'),
+                  color: Colors.green,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+              SizedBox(height: responsive.verticalSpacing),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'בינוני - עם מדריך קל 💫' : 'Medium - With Light Guide 💫',
+                  icon: Icons.star_half,
+                  onPressed: () => setState(() => _selectedDifficulty = 'medium'),
+                  color: Colors.orange,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+              SizedBox(height: responsive.verticalSpacing),
+              Padding(
+                padding: responsive.safePadding,
+                child: KidButton(
+                  text: _isHebrew ? 'קשה - בלי מדריך 🌟' : 'Hard - Without Guide 🌟',
+                  icon: Icons.star_border,
+                  onPressed: () => setState(() => _selectedDifficulty = 'hard'),
+                  color: Colors.red,
+                  height: responsive.buttonHeight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNumberGrid(ResponsiveHelper responsive) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isHebrew ? 'בחר מספר' : 'Choose a Number'),
+        centerTitle: true,
+        backgroundColor: Colors.orange,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => setState(() => _selectedDifficulty = ''),
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.orange.shade50, Colors.yellow.shade50],
+          ),
+        ),
+        child: SafeArea(
+          child: GridView.builder(
+            padding: EdgeInsets.all(responsive.spacing(16)),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: responsive.spacing(12),
+              mainAxisSpacing: responsive.spacing(12),
+              childAspectRatio: 1.0,
+            ),
+            itemCount: _allNumbers.length,
+            itemBuilder: (context, index) {
+              final number = _allNumbers[index];
+              final color = _numberColors[number]!;
+
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedNumber = number;
+                  });
+                  _speakInstruction(number);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: color, width: 3),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$number',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(60),
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTracingScreen(ResponsiveHelper responsive) {
+    final number = _selectedNumber!;
+    final color = _numberColors[number]!;
 
     return Scaffold(
       body: Container(
@@ -140,10 +292,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.orange.shade50,
-              Colors.yellow.shade50,
-            ],
+            colors: [Colors.orange.shade50, Colors.yellow.shade50],
           ),
         ),
         child: SafeArea(
@@ -160,11 +309,15 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                         color: Colors.orange.shade700,
                         size: 32,
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => setState(() {
+                        _selectedNumber = null;
+                        drawnPoints.clear();
+                        _showSuccess = false;
+                      }),
                     ),
                     Expanded(
                       child: Text(
-                        _isHebrew ? 'תרגול כתיבת מספרים' : 'Number Tracing',
+                        '${_isHebrew ? 'כתוב את המספר' : 'Write the number'} $number',
                         style: TextStyle(
                           fontSize: responsive.titleSize,
                           fontWeight: FontWeight.bold,
@@ -173,46 +326,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Text(
-                      '${_currentLevel + 1}/${_levels.length}',
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(18),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange.shade700,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                ),
-              ),
-
-              // Instructions
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: (level['color'] as Color).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      '${_isHebrew ? 'כתוב את המספר' : 'Write the number'} ${level['number']}',
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(20),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      difficultyText,
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(14),
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -242,13 +356,13 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
 
                         return Stack(
                           children: [
-                            // Guide number (based on difficulty)
+                            // Guide number (ALWAYS shown - regardless of difficulty)
                             CustomPaint(
                               painter: GuideNumberPainter(
-                                level['number'] as String,
-                                difficulty,
+                                '$number',
+                                _selectedDifficulty,
                                 _canvasSize,
-                                level['color'] as Color,
+                                color,
                               ),
                               size: Size.infinite,
                             ),
@@ -266,15 +380,12 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                               },
                               onPanEnd: (details) {
                                 setState(() {
-                                  drawnPoints.add(const Offset(-1, -1)); // Separator
+                                  drawnPoints.add(const Offset(-1, -1));
                                 });
                                 _checkIfComplete();
                               },
                               child: CustomPaint(
-                                painter: DrawingPainter(
-                                  drawnPoints,
-                                  level['color'] as Color,
-                                ),
+                                painter: DrawingPainter(drawnPoints, color),
                                 size: Size.infinite,
                               ),
                             ),
@@ -314,37 +425,18 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
 
               SizedBox(height: responsive.spacing(16)),
 
-              // Buttons
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                child: Row(
-                  children: [
-                    if (!_showSuccess)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: KidButton(
-                            text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
-                            icon: Icons.delete,
-                            onPressed: _clearDrawing,
-                            color: Colors.orange,
-                            height: 60,
-                          ),
-                        ),
-                      ),
-                    if (_showSuccess)
-                      Expanded(
-                        child: KidButton(
-                          text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
-                          icon: Icons.arrow_forward,
-                          onPressed: _nextLevel,
-                          color: Colors.green,
-                          height: 60,
-                        ),
-                      ),
-                  ],
+              // Clear button (only when not showing success)
+              if (!_showSuccess)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                  child: KidButton(
+                    text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
+                    icon: Icons.delete,
+                    onPressed: _clearDrawing,
+                    color: Colors.orange,
+                    height: 60,
+                  ),
                 ),
-              ),
 
               SizedBox(height: responsive.spacing(16)),
             ],
@@ -355,7 +447,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
   }
 }
 
-/// ציור מספר המדריך (תלוי ברמת הקושי)
+/// ציור מספר המדריך - עכשיו תמיד מציג את המספר
 class GuideNumberPainter extends CustomPainter {
   final String number;
   final String difficulty;
@@ -366,18 +458,23 @@ class GuideNumberPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (difficulty == 'hard') {
-      // No guide for hard difficulty
-      return;
-    }
-
     final center = Offset(size.width / 2, size.height / 2);
     final fontSize = min(size.width, size.height) * 0.7;
+
+    // Determine opacity based on difficulty
+    double opacity;
+    if (difficulty == 'easy') {
+      opacity = 0.4; // Clear guide
+    } else if (difficulty == 'medium') {
+      opacity = 0.25; // Light guide
+    } else {
+      opacity = 0.15; // Faint guide (but still visible!)
+    }
 
     final textStyle = TextStyle(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
-      color: difficulty == 'easy' ? color.withOpacity(0.3) : color.withOpacity(0.15),
+      color: color.withOpacity(opacity),
     );
 
     final textSpan = TextSpan(text: number, style: textStyle);
@@ -393,34 +490,7 @@ class GuideNumberPainter extends CustomPainter {
       center.dy - textPainter.height / 2,
     );
 
-    if (difficulty == 'easy') {
-      // Draw solid guide number
-      textPainter.paint(canvas, offset);
-    } else if (difficulty == 'medium') {
-      // Draw dotted outline
-      textPainter.paint(canvas, offset);
-
-      // Draw dots around the number
-      final paint = Paint()
-        ..color = color.withOpacity(0.5)
-        ..strokeWidth = 6.0
-        ..style = PaintingStyle.fill;
-
-      // Draw a few guide dots
-      final numDots = 12;
-      final numberRect = Rect.fromCenter(
-        center: center,
-        width: textPainter.width,
-        height: textPainter.height,
-      );
-
-      for (int i = 0; i < numDots; i++) {
-        final angle = (i * 2 * pi / numDots);
-        final x = center.dx + (numberRect.width / 2.5) * cos(angle);
-        final y = center.dy + (numberRect.height / 2.5) * sin(angle);
-        canvas.drawCircle(Offset(x, y), 4, paint);
-      }
-    }
+    textPainter.paint(canvas, offset);
   }
 
   @override

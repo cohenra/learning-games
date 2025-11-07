@@ -474,8 +474,12 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
   }
 
   Widget _buildSlot(ShapeSlotModel slot, BoxConstraints constraints) {
-    final left = slot.position.dx * constraints.maxWidth - (slot.size / 2);
-    final top = slot.position.dy * constraints.maxHeight - (slot.size / 2);
+    // Increase the hit area by adding padding around the shape
+    final hitAreaPadding = slot.size * 0.5; // 50% padding makes it much easier to drop
+    final hitAreaSize = slot.size + hitAreaPadding;
+
+    final left = slot.position.dx * constraints.maxWidth - (hitAreaSize / 2);
+    final top = slot.position.dy * constraints.maxHeight - (hitAreaSize / 2);
 
     return Positioned(
       left: left,
@@ -487,17 +491,23 @@ class _ShapesBuildingGameScreenState extends State<ShapesBuildingGameScreen>
           final isHovering = candidateData.isNotEmpty;
 
           return Container(
-            width: slot.size,
-            height: slot.size,
-            child: slot.isPlaced
-                ? _buildShapeWidget(slot.shapeType, slot.size, slot.color, opacity: 1.0)
-                : _buildShapeWidget(
-                    slot.shapeType,
-                    slot.size,
-                    slot.color,
-                    opacity: isHovering ? 0.5 : 0.2,
-                    showBorder: true,
-                  ),
+            width: hitAreaSize,
+            height: hitAreaSize,
+            // Center the actual shape within the larger hit area
+            alignment: Alignment.center,
+            child: Container(
+              width: slot.size,
+              height: slot.size,
+              child: slot.isPlaced
+                  ? _buildShapeWidget(slot.shapeType, slot.size, slot.color, opacity: 1.0)
+                  : _buildShapeWidget(
+                      slot.shapeType,
+                      slot.size,
+                      slot.color,
+                      opacity: isHovering ? 0.5 : 0.2,
+                      showBorder: true,
+                    ),
+            ),
           );
         },
       ),

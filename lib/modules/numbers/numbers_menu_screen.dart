@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
 import 'numbers_learning_screen.dart';
@@ -44,9 +45,9 @@ class NumbersMenuScreen extends StatelessWidget {
               // רשימת כל הכפתורים
               final buttons = _getButtons(context, l10n);
 
-              // חישוב גובה זמין
+              // חישוב גובה זמין - עכשיו עם 2 כפתורים בשורה
               final availableHeight = constraints.maxHeight;
-              final numButtons = buttons.length;
+              final numRows = (buttons.length / 2).ceil(); // Number of rows needed
 
               // רווחים: אייקון + כותרת + תיאור + כפתורים
               const iconHeight = 60.0;
@@ -57,9 +58,9 @@ class NumbersMenuScreen extends StatelessWidget {
               final usedHeight = iconHeight + titleHeight + descriptionHeight + topBottomPadding;
               final availableForButtons = availableHeight - usedHeight;
 
-              // חישוב גובה כפתור ורווח
-              final totalSpacing = (numButtons - 1) * 8.0; // 8px בין כפתורים
-              final buttonHeight = ((availableForButtons - totalSpacing) / numButtons).clamp(50.0, responsive.buttonHeight);
+              // חישוב גובה כפתור ורווח - מחושב לפי מספר שורות ולא מספר כפתורים
+              final totalSpacing = (numRows - 1) * 8.0; // 8px בין שורות
+              final buttonHeight = ((availableForButtons - totalSpacing) / numRows).clamp(60.0, responsive.buttonHeight);
 
               return SingleChildScrollView(
                 physics: numButtons <= 5 ? const NeverScrollableScrollPhysics() : null,
@@ -105,20 +106,34 @@ class NumbersMenuScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
 
-                        // כפתורים
-                        ...buttons.map((buttonData) {
+                        // כפתורים - 2 בשורה
+                        ...List.generate(numRows, (rowIndex) {
+                          final startIndex = rowIndex * 2;
+                          final endIndex = min(startIndex + 2, buttons.length);
+                          final rowButtons = buttons.sublist(startIndex, endIndex);
+
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Padding(
-                              padding: responsive.safePadding,
-                              child: KidButton(
-                                text: buttonData['text'] as String,
-                                icon: buttonData['icon'] as IconData,
-                                onPressed: buttonData['onPressed'] as VoidCallback,
-                                color: buttonData['color'] as Color,
-                                width: responsive.width(80),
-                                height: buttonHeight,
-                              ),
+                            padding: EdgeInsets.only(
+                              bottom: 8,
+                              left: responsive.spacing(12),
+                              right: responsive.spacing(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: rowButtons.map((buttonData) {
+                                return Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    child: KidButton(
+                                      text: buttonData['text'] as String,
+                                      icon: buttonData['icon'] as IconData,
+                                      onPressed: buttonData['onPressed'] as VoidCallback,
+                                      color: buttonData['color'] as Color,
+                                      height: buttonHeight,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           );
                         }).toList(),
