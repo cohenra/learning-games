@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
+import '../../services/audio_service.dart';
 
 /// מסך למידת תווים מוזיקליים
 class NotesLearningScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class NotesLearningScreen extends StatefulWidget {
 
 class _NotesLearningScreenState extends State<NotesLearningScreen> {
   final FlutterTts _flutterTts = FlutterTts();
+  final AudioService _audioService = AudioService();
   int _currentIndex = 0;
 
   final List<Map<String, String>> _notes = [
@@ -97,6 +99,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
   void initState() {
     super.initState();
     _initTts();
+    _audioService.initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
@@ -113,9 +116,15 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
 
   Future<void> _speakCurrent() async {
     final note = _notes[_currentIndex];
+    final noteLetter = note['letter']!;
     final text = _isHebrew ? note['ttsHe']! : note['nameEn']!;
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 
+    // Play the musical note sound
+    await _audioService.playNote(noteLetter);
+
+    // Speak the note name
+    await Future.delayed(const Duration(milliseconds: 300));
     await _flutterTts.setLanguage(lang);
     await _flutterTts.speak(text);
   }
@@ -141,6 +150,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
   @override
   void dispose() {
     _flutterTts.stop();
+    _audioService.stop();
     super.dispose();
   }
 

@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   flame: ^1.33.0
   flame_audio: ^2.11.11
+  audioplayers: ^5.2.1
   shared_preferences: ^2.2.2
   provider: ^6.1.5
   lottie: ^3.3.0
@@ -23,5 +24,8 @@ flutter:
   generate: true
   assets:
     - assets/audio/
+    - assets/audio/notes/
+    - assets/audio/instruments/
+    - assets/audio/drums/
     - assets/images/
     - assets/lottie/

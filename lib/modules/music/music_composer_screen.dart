@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
+import '../../services/audio_service.dart';
 
 /// מסך יצירת מוזיקה - פסנתר לילדים
 class MusicComposerScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class MusicComposerScreen extends StatefulWidget {
 }
 
 class _MusicComposerScreenState extends State<MusicComposerScreen> {
-  final FlutterTts _flutterTts = FlutterTts();
+  final AudioService _audioService = AudioService();
   bool _isHebrew = true;
   bool _isPlaying = false;
 
@@ -29,10 +29,10 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
 
   // Available instruments
   final List<Map<String, dynamic>> _instruments = [
-    {'nameHe': 'פסנתר', 'nameEn': 'Piano', 'icon': '🎹', 'speechRate': 1.5, 'volume': 1.0},
-    {'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'icon': '🎸', 'speechRate': 0.8, 'volume': 0.9},
-    {'nameHe': 'חליל', 'nameEn': 'Flute', 'icon': '🎶', 'speechRate': 2.0, 'volume': 0.8},
-    {'nameHe': 'תוף', 'nameEn': 'Drum', 'icon': '🥁', 'speechRate': 3.0, 'volume': 1.0},
+    {'nameHe': 'פסנתר', 'nameEn': 'Piano', 'icon': '🎹', 'id': 'piano'},
+    {'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'icon': '🎸', 'id': 'guitar'},
+    {'nameHe': 'חליל', 'nameEn': 'Flute', 'icon': '🎶', 'id': 'flute'},
+    {'nameHe': 'תוף', 'nameEn': 'Drum', 'icon': '🥁', 'id': 'drum'},
   ];
 
   int _selectedInstrument = 0;
@@ -42,7 +42,7 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
   @override
   void initState() {
     super.initState();
-    _initTts();
+    _audioService.initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
@@ -50,23 +50,12 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
     });
   }
 
-  Future<void> _initTts() async {
-    await _flutterTts.setVolume(1.0);
-    await _flutterTts.setSpeechRate(1.0);
-    await _flutterTts.setPitch(1.0);
-  }
-
   Future<void> _playNote(Map<String, dynamic> note) async {
-    final instrument = _instruments[_selectedInstrument];
+    final instrument = _instruments[_selectedInstrument]['id'];
+    final noteLetter = note['letter'] as String;
 
-    await _flutterTts.setVolume(1.0);
-    await _flutterTts.setSpeechRate(instrument['speechRate'] * 2.0);
-    await _flutterTts.setPitch(note['pitch']);
-
-    // Use multiple sounds for better musical effect
-    final sounds = ['doo', 'dee', 'daa', 'doh', 'duu', 'dai', 'dow'];
-    final noteIndex = _notes.indexOf(note);
-    await _flutterTts.speak(sounds[noteIndex]);
+    // Play the note with the selected instrument
+    await _audioService.playNote(noteLetter, instrument: instrument);
   }
 
   void _onNoteTap(int index) async {
@@ -92,6 +81,8 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
       _isPlaying = true;
     });
 
+    final instrument = _instruments[_selectedInstrument]['id'];
+
     for (int i = 0; i < _recordedNotes.length; i++) {
       if (!_isPlaying) break; // Allow stopping
 
@@ -116,12 +107,12 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
     setState(() {
       _isPlaying = false;
     });
-    _flutterTts.stop();
+    _audioService.stop();
   }
 
   @override
   void dispose() {
-    _flutterTts.stop();
+    _audioService.stop();
     super.dispose();
   }
 

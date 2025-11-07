@@ -3,6 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
 import '../../widgets/kid_button.dart';
 import '../../utils/responsive_helper.dart';
+import '../../services/audio_service.dart';
 
 /// משחק קצב - תרגול ושחזור קצבים
 class RhythmGameScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class RhythmGameScreen extends StatefulWidget {
 
 class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerProviderStateMixin {
   final FlutterTts _flutterTts = FlutterTts();
+  final AudioService _audioService = AudioService();
   final Random _random = Random();
 
   int _level = 1;
@@ -33,6 +35,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   void initState() {
     super.initState();
     _initTts();
+    _audioService.initialize();
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -101,15 +104,8 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   }
 
   Future<void> _playDrumSound() async {
-    // Play a drum sound using TTS with very specific settings
-    await _flutterTts.setVolume(1.0);
-    await _flutterTts.setSpeechRate(5.0); // Very very fast
-    await _flutterTts.setPitch(0.3); // Very low pitch for drum effect
-    await _flutterTts.speak('dum dum dum');
-    await Future.delayed(const Duration(milliseconds: 100));
-    // Reset to normal
-    await _flutterTts.setSpeechRate(0.5);
-    await _flutterTts.setPitch(1.0);
+    // Play real drum sound
+    await _audioService.playDrum();
   }
 
   Future<void> _speak(String text) async {
@@ -181,6 +177,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
   @override
   void dispose() {
     _flutterTts.stop();
+    _audioService.stop();
     _animController.dispose();
     super.dispose();
   }
