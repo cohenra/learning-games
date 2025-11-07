@@ -5,6 +5,7 @@ import '../modules/numbers/numbers_menu_screen.dart';
 import '../modules/colors/colors_menu_screen.dart';
 import '../modules/letters/letters_menu_screen.dart';
 import '../modules/shapes/shapes_menu_screen.dart';
+import '../modules/animals/animals_menu_screen.dart';
 import '../screens/settings_screen.dart';
 import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -142,6 +143,21 @@ class NewHomeScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ShapesMenuScreen(),
+                          ),
+                        );
+                      },
+                      isAvailable: true,
+                    ),
+                    _buildModuleCard(
+                      context: context,
+                      title: Localizations.localeOf(context).languageCode == 'he' ? 'בעלי חיים' : 'Animals',
+                      icon: '🐾',
+                      color: Colors.green,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AnimalsMenuScreen(),
                           ),
                         );
                       },
