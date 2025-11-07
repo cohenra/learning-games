@@ -84,7 +84,7 @@ class FruitsVegetablesMenuScreen extends StatelessWidget {
                       crossAxisCount: 2,
                       mainAxisSpacing: spacing,
                       crossAxisSpacing: spacing,
-                      aspectRatio: aspectRatio,
+                      childAspectRatio: aspectRatio,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         _buildMenuCard(
@@ -153,8 +153,8 @@ class FruitsVegetablesMenuScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.shade300,
-              color.shade400,
+              Color.lerp(color, Colors.white, 0.3)!,
+              Color.lerp(color, Colors.black, 0.1)!,
             ],
           ),
           borderRadius: BorderRadius.circular(20),
