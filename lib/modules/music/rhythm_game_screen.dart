@@ -31,11 +31,11 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   late List<AnimationController> _animControllers;
   late List<Animation<double>> _scaleAnimations;
 
-  // Define 3 different sounds (start with 3)
-  final List<Map<String, dynamic>> _drumTypes = [
-    {'emoji': '🥁', 'nameHe': 'תוף 1', 'nameEn': 'Drum 1', 'color': Colors.red},
-    {'emoji': '🪘', 'nameHe': 'תוף 2', 'nameEn': 'Drum 2', 'color': Colors.orange},
-    {'emoji': '🎵', 'nameHe': 'תוף 3', 'nameEn': 'Drum 3', 'color': Colors.purple},
+  // Define 3 different musical instruments with different sounds
+  final List<Map<String, dynamic>> _instruments = [
+    {'emoji': '🎹', 'nameHe': 'פסנתר', 'nameEn': 'Piano', 'color': Colors.blue, 'note': 'C'},
+    {'emoji': '🎸', 'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'color': Colors.orange, 'note': 'E'},
+    {'emoji': '🎺', 'nameHe': 'חצוצרה', 'nameEn': 'Trumpet', 'color': Colors.red, 'note': 'G'},
   ];
 
   @override
@@ -44,9 +44,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
     _initTts();
     _audioService.initialize();
 
-    // Create animation controllers for each drum
+    // Create animation controllers for each instrument
     _animControllers = List.generate(
-      _drumTypes.length,
+      _instruments.length,
       (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 200),
@@ -98,9 +98,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
     await Future.delayed(const Duration(milliseconds: 500));
 
     for (int i = 0; i < _pattern.length; i++) {
-      final drumIndex = _pattern[i];
-      _animControllers[drumIndex].forward().then((_) => _animControllers[drumIndex].reverse());
-      await _playDrumSound();
+      final instrumentIndex = _pattern[i];
+      _animControllers[instrumentIndex].forward().then((_) => _animControllers[instrumentIndex].reverse());
+      await _playInstrumentSound(instrumentIndex);
       await Future.delayed(const Duration(milliseconds: 600));
     }
 
@@ -113,8 +113,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
     await _speak(_isHebrew ? 'עכשיו תורך! חזור על הקצב' : 'Now your turn! Repeat the rhythm');
   }
 
-  Future<void> _playDrumSound() async {
-    await _audioService.playDrum();
+  Future<void> _playInstrumentSound(int instrumentIndex) async {
+    final note = _instruments[instrumentIndex]['note'] as String;
+    await _audioService.playNote(note);
   }
 
   Future<void> _speak(String text) async {
@@ -123,15 +124,15 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
     await _flutterTts.speak(text);
   }
 
-  void _onDrumTap(int drumIndex) {
+  void _onInstrumentTap(int instrumentIndex) {
     if (!_isListening || _showResult) return;
 
     setState(() {
-      _userInput.add(drumIndex);
+      _userInput.add(instrumentIndex);
     });
 
-    _animControllers[drumIndex].forward().then((_) => _animControllers[drumIndex].reverse());
-    _playDrumSound();
+    _animControllers[instrumentIndex].forward().then((_) => _animControllers[instrumentIndex].reverse());
+    _playInstrumentSound(instrumentIndex);
 
     if (_userInput.length == _pattern.length) {
       _checkAnswer();
@@ -165,7 +166,9 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   }
 
   void _nextRound() {
-    _generatePattern();
+    setState(() {
+      _generatePattern();
+    });
     _playPattern();
   }
 
@@ -183,9 +186,6 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   Widget build(BuildContext context) {
     final responsive = ResponsiveHelper(context);
     _isHebrew = Localizations.localeOf(context).languageCode == 'he';
-
-    // Get number of available drums for current level
-    final availableDrums = min(3, _level + 2);
 
     return Scaffold(
       body: Container(
@@ -312,7 +312,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                       if (_showResult && isUserInput) {
                         color = userCorrect ? Colors.green : Colors.red;
                       } else if (isUserInput) {
-                        color = _drumTypes[drumType]['color'];
+                        color = _instruments[drumType]['color'];
                       }
 
                       return Container(
@@ -331,7 +331,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                                   size: 20,
                                 )
                               : Text(
-                                  _drumTypes[drumType]['emoji'],
+                                  _instruments[drumType]['emoji'],
                                   style: const TextStyle(fontSize: 20),
                                 ),
                         ),
@@ -342,17 +342,17 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
 
               SizedBox(height: responsive.spacing(20)),
 
-              // Drum buttons - only show available drums for current level
+              // Instrument buttons - show all 3 instruments
               Expanded(
                 child: Center(
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 20,
                     runSpacing: 20,
-                    children: List.generate(availableDrums, (index) {
-                      final drum = _drumTypes[index];
+                    children: List.generate(_instruments.length, (index) {
+                      final instrument = _instruments[index];
                       return GestureDetector(
-                        onTap: () => _onDrumTap(index),
+                        onTap: () => _onInstrumentTap(index),
                         child: AnimatedBuilder(
                           animation: _scaleAnimations[index],
                           builder: (context, child) {
@@ -362,11 +362,11 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                                 width: 140,
                                 height: 140,
                                 decoration: BoxDecoration(
-                                  color: _isListening ? drum['color'] : (drum['color'] as Color).withOpacity(0.5),
+                                  color: _isListening ? instrument['color'] : (instrument['color'] as Color).withOpacity(0.5),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: (drum['color'] as Color).withOpacity(0.5),
+                                      color: (instrument['color'] as Color).withOpacity(0.5),
                                       blurRadius: 20,
                                       offset: const Offset(0, 10),
                                     ),
@@ -377,12 +377,12 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        drum['emoji'],
+                                        instrument['emoji'],
                                         style: const TextStyle(fontSize: 50),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        _isHebrew ? drum['nameHe'] : drum['nameEn'],
+                                        _isHebrew ? instrument['nameHe'] : instrument['nameEn'],
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
