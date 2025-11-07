@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../utils/responsive_helper.dart';
+import '../modules/family/family_menu_screen.dart';
+import '../modules/emotions/emotions_menu_screen.dart';
+import '../modules/professions/professions_menu_screen.dart';
+import '../modules/body_parts/body_parts_menu_screen.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 
 /// מסך אנשים ורגשות - משפחה, רגשות, מקצועות, גוף האדם
@@ -113,28 +117,32 @@ class PeopleFeelingsScreen extends StatelessWidget {
                       title: isHebrew ? 'משפחה' : 'Family',
                       icon: '👨‍👩‍👧‍👦',
                       color: Colors.orange,
-                      isAvailable: false,
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const FamilyMenuScreen())); },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
                       title: isHebrew ? 'רגשות' : 'Emotions',
                       icon: '😊',
                       color: Colors.pink,
-                      isAvailable: false,
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const EmotionsMenuScreen())); },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
                       title: isHebrew ? 'מקצועות' : 'Professions',
                       icon: '👨‍⚕️',
                       color: Colors.blue,
-                      isAvailable: false,
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfessionsMenuScreen())); },
+                      isAvailable: true,
                     ),
                     _buildModuleCard(
                       context: context,
                       title: isHebrew ? 'גוף האדם' : 'Body Parts',
                       icon: '👁️',
                       color: Colors.green,
-                      isAvailable: false,
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const BodyPartsMenuScreen())); },
+                      isAvailable: true,
                     ),
                       ],
                     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../modules/animals/animals_menu_screen.dart';
 import '../modules/fruits_vegetables/fruits_vegetables_menu_screen.dart';
+import '../modules/weather/weather_menu_screen.dart';
 import '../modules/vehicles/vehicles_menu_screen.dart';
 import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -124,6 +125,7 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
@@ -139,6 +141,7 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
@@ -154,6 +157,7 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
@@ -161,7 +165,8 @@ class WorldAroundUsScreen extends StatelessWidget {
                       title: isHebrew ? 'מזג אויר ועונות' : 'Weather & Seasons',
                       icon: '☀️',
                       color: Colors.amber,
-                      isAvailable: false,
+                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
+                      isAvailable: true,
                     ),
                       ],
                     );
