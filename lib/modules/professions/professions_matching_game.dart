@@ -16,18 +16,12 @@ class _ProfessionsMatchingGameState extends State<ProfessionsMatchingGame> {
   final Random _random = Random();
 
   final List<Map<String, String>> _allItems = [
-    {'emoji': '🚗', 'nameHe': 'מכונית', 'nameEn': 'Car'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat'},
+    {'emoji': '👨‍⚕️', 'nameHe': 'רופא', 'nameEn': 'Doctor'},
+    {'emoji': '👩‍🏫', 'nameHe': 'מורה', 'nameEn': 'Teacher'},
+    {'emoji': '👨‍🚒', 'nameHe': 'כבאי', 'nameEn': 'Firefighter'},
+    {'emoji': '👮', 'nameHe': 'שוטר', 'nameEn': 'Police Officer'},
+    {'emoji': '👨‍🍳', 'nameHe': 'טבח', 'nameEn': 'Chef'},
+    {'emoji': '👷', 'nameHe': 'בנאי', 'nameEn': 'Builder'},
   ];
 
   List<Map<String, dynamic>> _options = [];
@@ -44,9 +38,9 @@ class _ProfessionsMatchingGameState extends State<ProfessionsMatchingGame> {
   void initState() {
     super.initState();
     _initTts();
+    _generateQuestion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _isHebrew = Localizations.localeOf(context).languageCode == 'he');
-      _generateQuestion();
       _speakQuestion();
     });
   }

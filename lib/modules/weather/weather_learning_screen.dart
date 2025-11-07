@@ -15,26 +15,11 @@ class _WeatherLearningScreenState extends State<WeatherLearningScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, String>> _items = [
-    {'emoji': '☀️', 'nameHe': 'שמש', 'nameEn': 'Sunny'},
-    {'emoji': '🌧️', 'nameHe': 'גשום', 'nameEn': 'Rainy'},
-    {'emoji': '❄️', 'nameHe': 'שלג', 'nameEn': 'Snowy'},
-    {'emoji': '⛈️', 'nameHe': 'סערה', 'nameEn': 'Storm'},
-    {'emoji': '🌈', 'nameHe': 'קשת', 'nameEn': 'Rainbow'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus', 'descHe': 'מזג אויר גדול להרבה אנשים', 'descEn': 'A large vehicle for many people'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi', 'descHe': 'מכונית צהובה שנוסעת תמורת תשלום', 'descEn': 'A yellow car for hire'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV', 'descHe': 'רכב שטח גדול וחזק', 'descEn': 'A large and strong off-road vehicle'},
-    {'emoji': '🚐', 'nameHe': 'מיניבוס', 'nameEn': 'Van', 'descHe': 'רכב קטן להסעת נוסעים', 'descEn': 'A small vehicle for transporting passengers'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle', 'descHe': 'מזג אויר על שני גלגלים', 'descEn': 'A two-wheeled vehicle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle', 'descHe': 'מזג אויר שמניעים ברגליים', 'descEn': 'A vehicle powered by pedaling'},
-    {'emoji': '🛴', 'nameHe': 'קורקינט', 'nameEn': 'Scooter', 'descHe': 'לוח עם גלגלים לנסיעה', 'descEn': 'A board with wheels for riding'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane', 'descHe': 'מזג אויר שטס באוויר', 'descEn': 'A vehicle that flies in the air'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter', 'descHe': 'מזג אויר עם להבים מסתובבים', 'descEn': 'A vehicle with rotating blades'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train', 'descHe': 'מזג אויר על פסי רכבת', 'descEn': 'A vehicle on railway tracks'},
-    {'emoji': '🚆', 'nameHe': 'רכבת קלה', 'nameEn': 'Light Rail', 'descHe': 'רכבת עירונית מהירה', 'descEn': 'A fast urban train'},
-    {'emoji': '🚊', 'nameHe': 'חשמלית', 'nameEn': 'Tram', 'descHe': 'רכבת על פסים ברחובות', 'descEn': 'A train on tracks in the streets'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat', 'descHe': 'כלי שיט קטן על המים', 'descEn': 'A small watercraft'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship', 'descHe': 'כלי שיט גדול על הים', 'descEn': 'A large watercraft on the sea'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat', 'descHe': 'סירה מהירה עם מנוע', 'descEn': 'A fast boat with an engine'},
+    {'emoji': '☀️', 'nameHe': 'שמש', 'nameEn': 'Sunny', 'descHe': 'יום בהיר ושמשי', 'descEn': 'A bright and sunny day'},
+    {'emoji': '🌧️', 'nameHe': 'גשום', 'nameEn': 'Rainy', 'descHe': 'יורד גשם מהשמיים', 'descEn': 'Rain falling from the sky'},
+    {'emoji': '⛈️', 'nameHe': 'סוער', 'nameEn': 'Stormy', 'descHe': 'רוח חזקה וברקים', 'descEn': 'Strong wind and lightning'},
+    {'emoji': '🌨️', 'nameHe': 'שלג', 'nameEn': 'Snowy', 'descHe': 'יורד שלג לבן', 'descEn': 'White snow falling'},
+    {'emoji': '☁️', 'nameHe': 'מעונן', 'nameEn': 'Cloudy', 'descHe': 'עננים בשמיים', 'descEn': 'Clouds in the sky'},
   ];
 
   bool _isHebrew = true;

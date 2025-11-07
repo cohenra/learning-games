@@ -15,27 +15,12 @@ class _FamilyLearningScreenState extends State<FamilyLearningScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, String>> _items = [
-    {'emoji': '👨', 'nameHe': 'אבא', 'nameEn': 'Father'},
-    {'emoji': '👩', 'nameHe': 'אמא', 'nameEn': 'Mother'},
-    {'emoji': '👦', 'nameHe': 'אח', 'nameEn': 'Brother'},
-    {'emoji': '👧', 'nameHe': 'אחות', 'nameEn': 'Sister'},
-    {'emoji': '👴', 'nameHe': 'סבא', 'nameEn': 'Grandfather'},
-    {'emoji': '👵', 'nameHe': 'סבתא', 'nameEn': 'Grandmother'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus', 'descHe': 'משפחה גדול להרבה אנשים', 'descEn': 'A large vehicle for many people'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi', 'descHe': 'מכונית צהובה שנוסעת תמורת תשלום', 'descEn': 'A yellow car for hire'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV', 'descHe': 'רכב שטח גדול וחזק', 'descEn': 'A large and strong off-road vehicle'},
-    {'emoji': '🚐', 'nameHe': 'מיניבוס', 'nameEn': 'Van', 'descHe': 'רכב קטן להסעת נוסעים', 'descEn': 'A small vehicle for transporting passengers'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle', 'descHe': 'משפחה על שני גלגלים', 'descEn': 'A two-wheeled vehicle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle', 'descHe': 'משפחה שמניעים ברגליים', 'descEn': 'A vehicle powered by pedaling'},
-    {'emoji': '🛴', 'nameHe': 'קורקינט', 'nameEn': 'Scooter', 'descHe': 'לוח עם גלגלים לנסיעה', 'descEn': 'A board with wheels for riding'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane', 'descHe': 'משפחה שטס באוויר', 'descEn': 'A vehicle that flies in the air'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter', 'descHe': 'משפחה עם להבים מסתובבים', 'descEn': 'A vehicle with rotating blades'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train', 'descHe': 'משפחה על פסי רכבת', 'descEn': 'A vehicle on railway tracks'},
-    {'emoji': '🚆', 'nameHe': 'רכבת קלה', 'nameEn': 'Light Rail', 'descHe': 'רכבת עירונית מהירה', 'descEn': 'A fast urban train'},
-    {'emoji': '🚊', 'nameHe': 'חשמלית', 'nameEn': 'Tram', 'descHe': 'רכבת על פסים ברחובות', 'descEn': 'A train on tracks in the streets'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat', 'descHe': 'כלי שיט קטן על המים', 'descEn': 'A small watercraft'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship', 'descHe': 'כלי שיט גדול על הים', 'descEn': 'A large watercraft on the sea'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat', 'descHe': 'סירה מהירה עם מנוע', 'descEn': 'A fast boat with an engine'},
+    {'emoji': '👨', 'nameHe': 'אבא', 'nameEn': 'Father', 'descHe': 'ההורה הגבר', 'descEn': 'The male parent'},
+    {'emoji': '👩', 'nameHe': 'אמא', 'nameEn': 'Mother', 'descHe': 'ההורה האישה', 'descEn': 'The female parent'},
+    {'emoji': '👦', 'nameHe': 'אח', 'nameEn': 'Brother', 'descHe': 'הבן של אמא ואבא', 'descEn': 'The son of mom and dad'},
+    {'emoji': '👧', 'nameHe': 'אחות', 'nameEn': 'Sister', 'descHe': 'הבת של אמא ואבא', 'descEn': 'The daughter of mom and dad'},
+    {'emoji': '👴', 'nameHe': 'סבא', 'nameEn': 'Grandfather', 'descHe': 'אבא של אמא או אבא', 'descEn': 'Father of mom or dad'},
+    {'emoji': '👵', 'nameHe': 'סבתא', 'nameEn': 'Grandmother', 'descHe': 'אמא של אמא או אבא', 'descEn': 'Mother of mom or dad'},
   ];
 
   bool _isHebrew = true;

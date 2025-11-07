@@ -16,18 +16,18 @@ class _BodyPartsMatchingGameState extends State<BodyPartsMatchingGame> {
   final Random _random = Random();
 
   final List<Map<String, String>> _allItems = [
-    {'emoji': '🚗', 'nameHe': 'מכונית', 'nameEn': 'Car'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat'},
+    {'emoji': '👃', 'nameHe': 'אף', 'nameEn': 'Nose'},
+    {'emoji': '👂', 'nameHe': 'אוזן', 'nameEn': 'Ear'},
+    {'emoji': '👁️', 'nameHe': 'עין', 'nameEn': 'Eye'},
+    {'emoji': '👄', 'nameHe': 'פה', 'nameEn': 'Mouth'},
+    {'emoji': '🦷', 'nameHe': 'שן', 'nameEn': 'Tooth'},
+    {'emoji': '✋', 'nameHe': 'יד', 'nameEn': 'Hand'},
+    {'emoji': '🦶', 'nameHe': 'רגל', 'nameEn': 'Foot'},
+    {'emoji': '💪', 'nameHe': 'זרוע', 'nameEn': 'Arm'},
+    {'emoji': '🧠', 'nameHe': 'מוח', 'nameEn': 'Brain'},
+    {'emoji': '❤️', 'nameHe': 'לב', 'nameEn': 'Heart'},
+    {'emoji': '🦴', 'nameHe': 'עצם', 'nameEn': 'Bone'},
+    {'emoji': '👅', 'nameHe': 'לשון', 'nameEn': 'Tongue'},
   ];
 
   List<Map<String, dynamic>> _options = [];
@@ -44,9 +44,9 @@ class _BodyPartsMatchingGameState extends State<BodyPartsMatchingGame> {
   void initState() {
     super.initState();
     _initTts();
+    _generateQuestion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _isHebrew = Localizations.localeOf(context).languageCode == 'he');
-      _generateQuestion();
       _speakQuestion();
     });
   }

@@ -15,27 +15,12 @@ class _ProfessionsLearningScreenState extends State<ProfessionsLearningScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, String>> _items = [
-    {'emoji': '👨‍⚕️', 'nameHe': 'רופא', 'nameEn': 'Doctor'},
-    {'emoji': '👨‍🚒', 'nameHe': 'כבאי', 'nameEn': 'Firefighter'},
-    {'emoji': '👮', 'nameHe': 'שוטר', 'nameEn': 'Police Officer'},
-    {'emoji': '👨‍🏫', 'nameHe': 'מורה', 'nameEn': 'Teacher'},
-    {'emoji': '👨‍🍳', 'nameHe': 'טבח', 'nameEn': 'Chef'},
-    {'emoji': '👨‍🌾', 'nameHe': 'חקלאי', 'nameEn': 'Farmer'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus', 'descHe': 'מקצועות גדול להרבה אנשים', 'descEn': 'A large vehicle for many people'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi', 'descHe': 'מכונית צהובה שנוסעת תמורת תשלום', 'descEn': 'A yellow car for hire'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV', 'descHe': 'רכב שטח גדול וחזק', 'descEn': 'A large and strong off-road vehicle'},
-    {'emoji': '🚐', 'nameHe': 'מיניבוס', 'nameEn': 'Van', 'descHe': 'רכב קטן להסעת נוסעים', 'descEn': 'A small vehicle for transporting passengers'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle', 'descHe': 'מקצועות על שני גלגלים', 'descEn': 'A two-wheeled vehicle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle', 'descHe': 'מקצועות שמניעים ברגליים', 'descEn': 'A vehicle powered by pedaling'},
-    {'emoji': '🛴', 'nameHe': 'קורקינט', 'nameEn': 'Scooter', 'descHe': 'לוח עם גלגלים לנסיעה', 'descEn': 'A board with wheels for riding'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane', 'descHe': 'מקצועות שטס באוויר', 'descEn': 'A vehicle that flies in the air'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter', 'descHe': 'מקצועות עם להבים מסתובבים', 'descEn': 'A vehicle with rotating blades'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train', 'descHe': 'מקצועות על פסי רכבת', 'descEn': 'A vehicle on railway tracks'},
-    {'emoji': '🚆', 'nameHe': 'רכבת קלה', 'nameEn': 'Light Rail', 'descHe': 'רכבת עירונית מהירה', 'descEn': 'A fast urban train'},
-    {'emoji': '🚊', 'nameHe': 'חשמלית', 'nameEn': 'Tram', 'descHe': 'רכבת על פסים ברחובות', 'descEn': 'A train on tracks in the streets'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat', 'descHe': 'כלי שיט קטן על המים', 'descEn': 'A small watercraft'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship', 'descHe': 'כלי שיט גדול על הים', 'descEn': 'A large watercraft on the sea'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat', 'descHe': 'סירה מהירה עם מנוע', 'descEn': 'A fast boat with an engine'},
+    {'emoji': '👨‍⚕️', 'nameHe': 'רופא', 'nameEn': 'Doctor', 'descHe': 'עוזר לאנשים חולים', 'descEn': 'Helps sick people'},
+    {'emoji': '👩‍🏫', 'nameHe': 'מורה', 'nameEn': 'Teacher', 'descHe': 'מלמד ילדים', 'descEn': 'Teaches children'},
+    {'emoji': '👨‍🚒', 'nameHe': 'כבאי', 'nameEn': 'Firefighter', 'descHe': 'מכבה שריפות', 'descEn': 'Puts out fires'},
+    {'emoji': '👮', 'nameHe': 'שוטר', 'nameEn': 'Police Officer', 'descHe': 'שומר על הביטחון', 'descEn': 'Keeps us safe'},
+    {'emoji': '👨‍🍳', 'nameHe': 'טבח', 'nameEn': 'Chef', 'descHe': 'מכין אוכל טעים', 'descEn': 'Cooks delicious food'},
+    {'emoji': '👷', 'nameHe': 'בנאי', 'nameEn': 'Builder', 'descHe': 'בונה בתים', 'descEn': 'Builds houses'},
   ];
 
   bool _isHebrew = true;

@@ -15,29 +15,14 @@ class _EmotionsLearningScreenState extends State<EmotionsLearningScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, String>> _items = [
-    {'emoji': '😊', 'nameHe': 'שמח', 'nameEn': 'Happy'},
-    {'emoji': '😢', 'nameHe': 'עצוב', 'nameEn': 'Sad'},
-    {'emoji': '😠', 'nameHe': 'כועס', 'nameEn': 'Angry'},
-    {'emoji': '😱', 'nameHe': 'מפוחד', 'nameEn': 'Scared'},
-    {'emoji': '😍', 'nameHe': 'מאוהב', 'nameEn': 'In Love'},
-    {'emoji': '😴', 'nameHe': 'עייף', 'nameEn': 'Tired'},
-    {'emoji': '🤗', 'nameHe': 'מחבק', 'nameEn': 'Hugging'},
-    {'emoji': '😂', 'nameHe': 'צוחק', 'nameEn': 'Laughing'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus', 'descHe': 'רגשות גדול להרבה אנשים', 'descEn': 'A large vehicle for many people'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi', 'descHe': 'מכונית צהובה שנוסעת תמורת תשלום', 'descEn': 'A yellow car for hire'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV', 'descHe': 'רכב שטח גדול וחזק', 'descEn': 'A large and strong off-road vehicle'},
-    {'emoji': '🚐', 'nameHe': 'מיניבוס', 'nameEn': 'Van', 'descHe': 'רכב קטן להסעת נוסעים', 'descEn': 'A small vehicle for transporting passengers'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle', 'descHe': 'רגשות על שני גלגלים', 'descEn': 'A two-wheeled vehicle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle', 'descHe': 'רגשות שמניעים ברגליים', 'descEn': 'A vehicle powered by pedaling'},
-    {'emoji': '🛴', 'nameHe': 'קורקינט', 'nameEn': 'Scooter', 'descHe': 'לוח עם גלגלים לנסיעה', 'descEn': 'A board with wheels for riding'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane', 'descHe': 'רגשות שטס באוויר', 'descEn': 'A vehicle that flies in the air'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter', 'descHe': 'רגשות עם להבים מסתובבים', 'descEn': 'A vehicle with rotating blades'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train', 'descHe': 'רגשות על פסי רכבת', 'descEn': 'A vehicle on railway tracks'},
-    {'emoji': '🚆', 'nameHe': 'רכבת קלה', 'nameEn': 'Light Rail', 'descHe': 'רכבת עירונית מהירה', 'descEn': 'A fast urban train'},
-    {'emoji': '🚊', 'nameHe': 'חשמלית', 'nameEn': 'Tram', 'descHe': 'רכבת על פסים ברחובות', 'descEn': 'A train on tracks in the streets'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat', 'descHe': 'כלי שיט קטן על המים', 'descEn': 'A small watercraft'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship', 'descHe': 'כלי שיט גדול על הים', 'descEn': 'A large watercraft on the sea'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat', 'descHe': 'סירה מהירה עם מנוע', 'descEn': 'A fast boat with an engine'},
+    {'emoji': '😊', 'nameHe': 'שמח', 'nameEn': 'Happy', 'descHe': 'מרגיש טוב ומחייך', 'descEn': 'Feeling good and smiling'},
+    {'emoji': '😢', 'nameHe': 'עצוב', 'nameEn': 'Sad', 'descHe': 'מרגיש עצוב ורוצה לבכות', 'descEn': 'Feeling sad and wanting to cry'},
+    {'emoji': '😠', 'nameHe': 'כועס', 'nameEn': 'Angry', 'descHe': 'מרגיש עצבני וכועס', 'descEn': 'Feeling upset and angry'},
+    {'emoji': '😨', 'nameHe': 'מפוחד', 'nameEn': 'Scared', 'descHe': 'מרגיש פחד', 'descEn': 'Feeling afraid'},
+    {'emoji': '😴', 'nameHe': 'עייף', 'nameEn': 'Tired', 'descHe': 'מרגיש עייף ורוצה לישון', 'descEn': 'Feeling tired and wanting to sleep'},
+    {'emoji': '🤗', 'nameHe': 'מאוהב', 'nameEn': 'Loving', 'descHe': 'מרגיש אהבה', 'descEn': 'Feeling love'},
+    {'emoji': '😮', 'nameHe': 'מופתע', 'nameEn': 'Surprised', 'descHe': 'מרגיש הפתעה', 'descEn': 'Feeling surprised'},
+    {'emoji': '🤔', 'nameHe': 'חושב', 'nameEn': 'Thinking', 'descHe': 'מרגיש שחושב על משהו', 'descEn': 'Feeling like thinking about something'},
   ];
 
   bool _isHebrew = true;

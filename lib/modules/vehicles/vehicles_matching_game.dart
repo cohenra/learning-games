@@ -44,9 +44,9 @@ class _VehiclesMatchingGameState extends State<VehiclesMatchingGame> {
   void initState() {
     super.initState();
     _initTts();
+    _generateQuestion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _isHebrew = Localizations.localeOf(context).languageCode == 'he');
-      _generateQuestion();
       _speakQuestion();
     });
   }

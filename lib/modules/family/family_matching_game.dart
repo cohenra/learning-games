@@ -16,18 +16,12 @@ class _FamilyMatchingGameState extends State<FamilyMatchingGame> {
   final Random _random = Random();
 
   final List<Map<String, String>> _allItems = [
-    {'emoji': '🚗', 'nameHe': 'מכונית', 'nameEn': 'Car'},
-    {'emoji': '🚌', 'nameHe': 'אוטובוס', 'nameEn': 'Bus'},
-    {'emoji': '🚕', 'nameHe': 'מונית', 'nameEn': 'Taxi'},
-    {'emoji': '🚙', 'nameHe': 'ג\'יפ', 'nameEn': 'SUV'},
-    {'emoji': '🏍️', 'nameHe': 'אופנוע', 'nameEn': 'Motorcycle'},
-    {'emoji': '🚲', 'nameHe': 'אופניים', 'nameEn': 'Bicycle'},
-    {'emoji': '✈️', 'nameHe': 'מטוס', 'nameEn': 'Airplane'},
-    {'emoji': '🚁', 'nameHe': 'מסוק', 'nameEn': 'Helicopter'},
-    {'emoji': '🚂', 'nameHe': 'רכבת', 'nameEn': 'Train'},
-    {'emoji': '⛵', 'nameHe': 'סירה', 'nameEn': 'Boat'},
-    {'emoji': '🚢', 'nameHe': 'אנייה', 'nameEn': 'Ship'},
-    {'emoji': '🚤', 'nameHe': 'סירת מנוע', 'nameEn': 'Speedboat'},
+    {'emoji': '👨', 'nameHe': 'אבא', 'nameEn': 'Father'},
+    {'emoji': '👩', 'nameHe': 'אמא', 'nameEn': 'Mother'},
+    {'emoji': '👦', 'nameHe': 'אח', 'nameEn': 'Brother'},
+    {'emoji': '👧', 'nameHe': 'אחות', 'nameEn': 'Sister'},
+    {'emoji': '👴', 'nameHe': 'סבא', 'nameEn': 'Grandfather'},
+    {'emoji': '👵', 'nameHe': 'סבתא', 'nameEn': 'Grandmother'},
   ];
 
   List<Map<String, dynamic>> _options = [];
@@ -44,9 +38,9 @@ class _FamilyMatchingGameState extends State<FamilyMatchingGame> {
   void initState() {
     super.initState();
     _initTts();
+    _generateQuestion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _isHebrew = Localizations.localeOf(context).languageCode == 'he');
-      _generateQuestion();
       _speakQuestion();
     });
   }
