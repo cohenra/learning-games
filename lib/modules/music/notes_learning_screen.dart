@@ -25,7 +25,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'C',
       'colorName': 'אדום',
       'colorNameEn': 'Red',
-      'ttsHe': 'דוֹ', // Phonetic with vowel mark
+      'ttsHe': 'דוֹ',
+      'ttsEn': 'Cee',
     },
     {
       'emoji': '🎶',
@@ -34,7 +35,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'D',
       'colorName': 'כתום',
       'colorNameEn': 'Orange',
-      'ttsHe': 'רֶה', // Phonetic with vowel mark
+      'ttsHe': 'רֶה',
+      'ttsEn': 'Dee',
     },
     {
       'emoji': '🎵',
@@ -43,7 +45,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'E',
       'colorName': 'צהוב',
       'colorNameEn': 'Yellow',
-      'ttsHe': 'מִי', // Phonetic with vowel mark
+      'ttsHe': 'מִי',
+      'ttsEn': 'Eee',
     },
     {
       'emoji': '🎶',
@@ -52,7 +55,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'F',
       'colorName': 'ירוק',
       'colorNameEn': 'Green',
-      'ttsHe': 'פָה', // Phonetic with vowel mark
+      'ttsHe': 'פָה',
+      'ttsEn': 'Eff',
     },
     {
       'emoji': '🎵',
@@ -61,7 +65,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'G',
       'colorName': 'כחול',
       'colorNameEn': 'Blue',
-      'ttsHe': 'סוֹל', // Phonetic with vowel mark
+      'ttsHe': 'סוֹל',
+      'ttsEn': 'Gee',
     },
     {
       'emoji': '🎶',
@@ -70,7 +75,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'A',
       'colorName': 'סגול',
       'colorNameEn': 'Purple',
-      'ttsHe': 'לָה', // Phonetic with vowel mark
+      'ttsHe': 'לָה',
+      'ttsEn': 'Ay',
     },
     {
       'emoji': '🎵',
@@ -79,7 +85,8 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
       'letter': 'B',
       'colorName': 'ורוד',
       'colorNameEn': 'Pink',
-      'ttsHe': 'סִי', // Phonetic with vowel mark
+      'ttsHe': 'סִי',
+      'ttsEn': 'Bee',
     },
   ];
 
@@ -117,7 +124,7 @@ class _NotesLearningScreenState extends State<NotesLearningScreen> {
   Future<void> _speakCurrent() async {
     final note = _notes[_currentIndex];
     final noteLetter = note['letter']!;
-    final text = _isHebrew ? note['ttsHe']! : note['nameEn']!;
+    final text = _isHebrew ? note['ttsHe']! : note['ttsEn']!;
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 
     // Play the musical note sound

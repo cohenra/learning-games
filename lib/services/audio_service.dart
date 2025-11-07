@@ -84,7 +84,7 @@ class AudioService {
   }
 
   /// Play a musical note (C, D, E, F, G, A, B)
-  Future<void> playNote(String note, {String? instrument}) async {
+  Future<void> playNote(String note, {String? instrument, double pitchModifier = 1.0}) async {
     await initialize();
 
     String key;
@@ -99,9 +99,11 @@ class AudioService {
     if (path != null) {
       try {
         await _player.stop();
+        // Set playback rate to change pitch (range: 0.5 to 2.0)
+        await _player.setPlaybackRate(pitchModifier.clamp(0.5, 2.0));
         // Use AssetSource with the path (already includes 'audio/')
         await _player.play(AssetSource(path));
-        print('Playing note: $note from $path'); // Debug
+        print('Playing note: $note from $path with pitch: $pitchModifier'); // Debug
       } catch (e) {
         print('Error playing note $note: $e');
       }

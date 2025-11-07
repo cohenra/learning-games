@@ -17,13 +17,13 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
   final Random _random = Random();
 
   final List<Map<String, dynamic>> _allNotes = [
-    {'nameHe': 'דו', 'nameEn': 'Do', 'letter': 'C', 'color': Colors.red, 'ttsHe': 'דוֹ'},
-    {'nameHe': 'רה', 'nameEn': 'Re', 'letter': 'D', 'color': Colors.orange, 'ttsHe': 'רֶה'},
-    {'nameHe': 'מי', 'nameEn': 'Mi', 'letter': 'E', 'color': Colors.yellow, 'ttsHe': 'מִי'},
-    {'nameHe': 'פה', 'nameEn': 'Fa', 'letter': 'F', 'color': Colors.green, 'ttsHe': 'פָה'},
-    {'nameHe': 'סול', 'nameEn': 'Sol', 'letter': 'G', 'color': Colors.blue, 'ttsHe': 'סוֹל'},
-    {'nameHe': 'לה', 'nameEn': 'La', 'letter': 'A', 'color': Colors.purple, 'ttsHe': 'לָה'},
-    {'nameHe': 'סי', 'nameEn': 'Si', 'letter': 'B', 'color': Colors.pink, 'ttsHe': 'סִי'},
+    {'nameHe': 'דו', 'nameEn': 'Do', 'letter': 'C', 'color': Colors.red, 'ttsHe': 'דוֹ', 'ttsEn': 'Cee'},
+    {'nameHe': 'רה', 'nameEn': 'Re', 'letter': 'D', 'color': Colors.orange, 'ttsHe': 'רֶה', 'ttsEn': 'Dee'},
+    {'nameHe': 'מי', 'nameEn': 'Mi', 'letter': 'E', 'color': Colors.yellow, 'ttsHe': 'מִי', 'ttsEn': 'Eee'},
+    {'nameHe': 'פה', 'nameEn': 'Fa', 'letter': 'F', 'color': Colors.green, 'ttsHe': 'פָה', 'ttsEn': 'Eff'},
+    {'nameHe': 'סול', 'nameEn': 'Sol', 'letter': 'G', 'color': Colors.blue, 'ttsHe': 'סוֹל', 'ttsEn': 'Gee'},
+    {'nameHe': 'לה', 'nameEn': 'La', 'letter': 'A', 'color': Colors.purple, 'ttsHe': 'לָה', 'ttsEn': 'Ay'},
+    {'nameHe': 'סי', 'nameEn': 'Si', 'letter': 'B', 'color': Colors.pink, 'ttsHe': 'סִי', 'ttsEn': 'Bee'},
   ];
 
   int _currentQuestion = 0;
@@ -78,7 +78,7 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
   }
 
   Future<void> _speakQuestion() async {
-    final noteName = _isHebrew ? _correctNote['ttsHe']! : _correctNote['nameEn']!;
+    final noteName = _isHebrew ? _correctNote['ttsHe']! : _correctNote['ttsEn']!;
     final question = _isHebrew ? 'איפה $noteName?' : 'Where is $noteName?';
     final lang = _isHebrew ? 'he-IL' : 'en-US';
 

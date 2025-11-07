@@ -168,8 +168,28 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
   void _nextRound() {
     setState(() {
       _generatePattern();
+      _userInput = [];
+      _showResult = false;
+      _isCorrect = null;
+      _isPlaying = false;
+      _isListening = false;
     });
-    _playPattern();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _playPattern();
+    });
+  }
+
+  void _tryAgain() {
+    setState(() {
+      _userInput = [];
+      _showResult = false;
+      _isCorrect = null;
+      _isPlaying = false;
+      _isListening = false;
+    });
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _playPattern();
+    });
   }
 
   @override
@@ -422,10 +442,10 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 4),
                               child: KidButton(
-                                text: _isHebrew ? 'שמע שוב' : 'Replay',
+                                text: _isHebrew ? 'נסה שוב' : 'Try Again',
                                 icon: Icons.replay,
-                                onPressed: _playPattern,
-                                color: Colors.blue,
+                                onPressed: _tryAgain,
+                                color: Colors.orange,
                                 height: 60,
                               ),
                             ),
@@ -435,7 +455,7 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with TickerProvider
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 child: KidButton(
-                                  text: _isHebrew ? 'הבא' : 'Next',
+                                  text: _isHebrew ? 'רמה הבאה' : 'Next Level',
                                   icon: Icons.arrow_forward,
                                   onPressed: _nextRound,
                                   color: Colors.green,

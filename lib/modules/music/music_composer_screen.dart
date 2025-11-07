@@ -27,8 +27,15 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
     {'nameHe': 'סי', 'nameEn': 'Si', 'letter': 'B', 'color': Colors.pink, 'pitch': 1.6},
   ];
 
-  // Note: We only use basic piano notes since other instrument sounds aren't available
-  final String _currentInstrument = 'piano';
+  // Available instruments with pitch modifiers (simulate different sounds)
+  final List<Map<String, dynamic>> _instruments = [
+    {'nameHe': 'פסנתר', 'nameEn': 'Piano', 'icon': '🎹', 'id': 'piano', 'pitchMod': 1.0},
+    {'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'icon': '🎸', 'id': 'guitar', 'pitchMod': 1.3},
+    {'nameHe': 'חליל', 'nameEn': 'Flute', 'icon': '🎶', 'id': 'flute', 'pitchMod': 1.6},
+    {'nameHe': 'צ\'לו', 'nameEn': 'Cello', 'icon': '🎻', 'id': 'cello', 'pitchMod': 0.7},
+  ];
+
+  int _selectedInstrument = 0;
   List<Map<String, dynamic>> _recordedNotes = [];
   final int _maxNotes = 20;
 
@@ -45,9 +52,10 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
 
   Future<void> _playNote(Map<String, dynamic> note) async {
     final noteLetter = note['letter'] as String;
+    final pitchMod = _instruments[_selectedInstrument]['pitchMod'] as double;
 
-    // Play the basic note (piano sound)
-    await _audioService.playNote(noteLetter);
+    // Play the note with instrument's pitch modifier
+    await _audioService.playNote(noteLetter, pitchModifier: pitchMod);
   }
 
   void _onNoteTap(int index) async {
@@ -158,21 +166,77 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                 ),
               ),
 
+              // Instrument selector
+              SizedBox(
+                height: 65,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                  itemCount: _instruments.length,
+                  itemBuilder: (context, index) {
+                    final instrument = _instruments[index];
+                    final isSelected = _selectedInstrument == index;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!_isPlaying) {
+                          setState(() {
+                            _selectedInstrument = index;
+                          });
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.purple : Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Colors.purple.shade300,
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              instrument['icon'],
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _isHebrew ? instrument['nameHe'] : instrument['nameEn'],
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : Colors.purple.shade700,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
               SizedBox(height: responsive.spacing(8)),
 
               // Recorded sequence display
               Container(
-                height: 90,
+                height: 78,
                 margin: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.purple.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -185,12 +249,12 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                           ? 'המוזיקה שלך ($_recordedNotes.length/$_maxNotes)'
                           : 'Your Music ($_recordedNotes.length/$_maxNotes)',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.purple.shade700,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Expanded(
                       child: _recordedNotes.isEmpty
                           ? Center(
@@ -199,7 +263,7 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                                     ? 'לחץ על התווים כדי ליצור מוזיקה!'
                                     : 'Tap notes to create music!',
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 10,
                                   color: Colors.grey.shade600,
                                 ),
                               ),
@@ -211,10 +275,10 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                                 final note = _recordedNotes[index];
                                 return Container(
                                   margin: const EdgeInsets.only(right: 4),
-                                  width: 38,
+                                  width: 35,
                                   decoration: BoxDecoration(
                                     color: note['color'],
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -222,7 +286,7 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ),
