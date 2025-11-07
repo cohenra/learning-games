@@ -125,7 +125,6 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
@@ -141,7 +140,6 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
@@ -157,7 +155,6 @@ class WorldAroundUsScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherMenuScreen())); },
                       isAvailable: true,
                     ),
                     _buildModuleCard(
