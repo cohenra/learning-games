@@ -84,17 +84,35 @@ class BasicSkillsScreen extends StatelessWidget {
 
               // כרטיסי מודולים
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: responsive.spacing(16),
-                    vertical: responsive.spacing(8),
-                  ),
-                  mainAxisSpacing: responsive.spacing(16),
-                  crossAxisSpacing: responsive.spacing(16),
-                  childAspectRatio: responsive.isPhone ? 1.0 : 1.2,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableHeight = constraints.maxHeight;
+                    final availableWidth = constraints.maxWidth;
+
+                    const padding = 16.0;
+                    const spacing = 16.0;
+                    const rowCount = 2; // 4 items in 2x2 grid
+
+                    // Calculate card dimensions
+                    final totalVerticalSpacing = spacing + (padding * 2);
+                    final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
+
+                    final totalHorizontalSpacing = spacing + (padding * 2);
+                    final cardWidth = (availableWidth - totalHorizontalSpacing) / 2;
+
+                    final aspectRatio = cardWidth / cardHeight;
+
+                    return GridView.count(
+                      crossAxisCount: 2,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: padding,
+                        vertical: padding / 2,
+                      ),
+                      mainAxisSpacing: spacing,
+                      crossAxisSpacing: spacing,
+                      childAspectRatio: aspectRatio,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
                     _buildModuleCard(
                       context: context,
                       title: l10n.numbers,
@@ -151,7 +169,9 @@ class BasicSkillsScreen extends StatelessWidget {
                         );
                       },
                     ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
               ),
 
