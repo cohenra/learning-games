@@ -11,7 +11,7 @@ class AudioService {
   final AudioPlayer _backgroundPlayer = AudioPlayer();
 
   bool _isInitialized = false;
-  final Map<String, bool> _availableAssets = {};
+  final Map<String, String> _assetPaths = {}; // Store actual file paths with extensions
 
   /// Initialize the audio service
   Future<void> initialize() async {
@@ -26,30 +26,44 @@ class AudioService {
     _isInitialized = true;
   }
 
-  /// Check which audio assets exist
+  /// Check which audio assets exist and store their paths
   Future<void> _checkAvailableAssets() async {
     final notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+    final extensions = ['wav', 'ogg', 'mp3'];
 
     // Check notes
     for (final note in notes) {
-      _availableAssets['notes/$note'] = await _assetExists('assets/audio/notes/$note.ogg') ||
-          await _assetExists('assets/audio/notes/$note.wav') ||
-          await _assetExists('assets/audio/notes/$note.mp3');
+      final key = 'notes/$note';
+      for (final ext in extensions) {
+        final path = 'assets/audio/notes/$note.$ext';
+        if (await _assetExists(path)) {
+          _assetPaths[key] = 'audio/notes/$note.$ext';
+          break;
+        }
+      }
     }
 
     // Check drum
-    _availableAssets['drums/hit'] = await _assetExists('assets/audio/drums/drum_hit.ogg') ||
-        await _assetExists('assets/audio/drums/drum_hit.wav') ||
-        await _assetExists('assets/audio/drums/drum_hit.mp3');
+    for (final ext in extensions) {
+      final path = 'assets/audio/drums/drum_hit.$ext';
+      if (await _assetExists(path)) {
+        _assetPaths['drums/hit'] = 'audio/drums/drum_hit.$ext';
+        break;
+      }
+    }
 
     // Check instruments
     final instruments = ['piano', 'guitar', 'flute', 'drum'];
     for (final instrument in instruments) {
       for (final note in notes) {
         final key = 'instruments/${instrument}_$note';
-        _availableAssets[key] = await _assetExists('assets/audio/instruments/${instrument}_$note.ogg') ||
-            await _assetExists('assets/audio/instruments/${instrument}_$note.wav') ||
-            await _assetExists('assets/audio/instruments/${instrument}_$note.mp3');
+        for (final ext in extensions) {
+          final path = 'assets/audio/instruments/${instrument}_$note.$ext';
+          if (await _assetExists(path)) {
+            _assetPaths[key] = 'audio/instruments/${instrument}_$note.$ext';
+            break;
+          }
+        }
       }
     }
   }
@@ -66,17 +80,7 @@ class AudioService {
 
   /// Get the full path for an audio asset
   String? _getAssetPath(String key) {
-    final extensions = ['ogg', 'wav', 'mp3'];
-
-    for (final ext in extensions) {
-      final path = 'audio/$key.$ext';
-      // Check if we've confirmed this asset exists
-      if (_availableAssets[key] == true) {
-        return path;
-      }
-    }
-
-    return null;
+    return _assetPaths[key];
   }
 
   /// Play a musical note (C, D, E, F, G, A, B)
@@ -145,17 +149,17 @@ class AudioService {
     } else {
       key = 'notes/${note.toLowerCase()}';
     }
-    return _availableAssets[key] == true;
+    return _assetPaths.containsKey(key);
   }
 
   /// Check if drum is available
   bool isDrumAvailable() {
-    return _availableAssets['drums/hit'] == true;
+    return _assetPaths.containsKey('drums/hit');
   }
 
   /// Check if any audio assets are available
   bool hasAnyAssets() {
-    return _availableAssets.values.any((available) => available);
+    return _assetPaths.isNotEmpty;
   }
 
   /// Dispose of resources

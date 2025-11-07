@@ -209,18 +209,25 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              instrument['icon'],
-                              style: const TextStyle(fontSize: 24),
+                            Flexible(
+                              child: Text(
+                                instrument['icon'],
+                                style: const TextStyle(fontSize: 22),
+                              ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _isHebrew ? instrument['nameHe'] : instrument['nameEn'],
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : Colors.purple.shade700,
+                            const SizedBox(height: 2),
+                            Flexible(
+                              child: Text(
+                                _isHebrew ? instrument['nameHe'] : instrument['nameEn'],
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : Colors.purple.shade700,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
