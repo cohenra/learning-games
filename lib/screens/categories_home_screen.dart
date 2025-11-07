@@ -268,27 +268,32 @@ class CategoriesHomeScreen extends StatelessWidget {
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(20),
-                        fontWeight: FontWeight.bold,
-                        color: color,
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(18),
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: responsive.spacing(4)),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(14),
-                        color: Colors.grey.shade600,
+                    SizedBox(height: responsive.spacing(2)),
+                    Flexible(
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(12),
+                          color: Colors.grey.shade600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
