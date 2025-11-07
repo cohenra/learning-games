@@ -14,6 +14,11 @@ class FruitsVegetablesMenuScreen extends StatelessWidget {
     final isHebrew = Localizations.localeOf(context).languageCode == 'he';
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(isHebrew ? 'פירות וירקות 🍎🥕' : 'Fruits & Vegetables 🍎🥕'),
+        centerTitle: true,
+        backgroundColor: Colors.orange,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -29,163 +34,136 @@ class FruitsVegetablesMenuScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                        color: Colors.green.shade700,
-                        size: 32,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Text(
-                        isHebrew ? 'פירות וירקות 🍎🥕' : 'Fruits & Vegetables 🍎🥕',
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(width: 48),
-                  ],
-                ),
-              ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // רשימת כל הכפתורים
+              final buttons = _getButtons(context, isHebrew);
 
-              // Menu buttons
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final availableHeight = constraints.maxHeight;
-                    final availableWidth = constraints.maxWidth;
+              // חישוב גובה זמין
+              final availableHeight = constraints.maxHeight;
+              final numButtons = buttons.length;
 
-                    const padding = 16.0;
-                    const spacing = 16.0;
-                    const rowCount = 1; // 2 items in 1 row
+              // רווחים: אייקון + כותרת + תיאור + כפתורים
+              const iconHeight = 60.0;
+              const titleHeight = 40.0;
+              const descriptionHeight = 60.0;
+              const topBottomPadding = 40.0;
 
-                    final totalVerticalSpacing = spacing + (padding * 2);
-                    final cardHeight = (availableHeight - totalVerticalSpacing) / rowCount;
+              final usedHeight = iconHeight + titleHeight + descriptionHeight + topBottomPadding;
+              final availableForButtons = availableHeight - usedHeight;
 
-                    final totalHorizontalSpacing = spacing + (padding * 2);
-                    final cardWidth = (availableWidth - totalHorizontalSpacing) / 2;
+              // חישוב גובה כפתור ורווח
+              final totalSpacing = (numButtons - 1) * 8.0;
+              final buttonHeight = ((availableForButtons - totalSpacing) / numButtons).clamp(50.0, responsive.buttonHeight);
 
-                    final aspectRatio = cardWidth / cardHeight;
-
-                    return GridView.count(
-                      padding: const EdgeInsets.all(padding),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: spacing,
-                      crossAxisSpacing: spacing,
-                      childAspectRatio: aspectRatio,
-                      physics: const NeverScrollableScrollPhysics(),
+              return SingleChildScrollView(
+                physics: numButtons <= 5 ? const NeverScrollableScrollPhysics() : null,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildMenuCard(
-                          context: context,
-                          icon: Icons.school,
-                          titleHe: 'זמן למידה',
-                          titleEn: 'Learning Time',
-                          emoji: '📚',
-                          color: Colors.green,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const FruitsVegetablesLearningScreen(),
-                              ),
-                            );
-                          },
+                        const SizedBox(height: 8),
+
+                        // אייקון
+                        Text(
+                          '🍎🥕',
+                          style: TextStyle(fontSize: responsive.emojiSize * 0.7),
                         ),
-                        _buildMenuCard(
-                          context: context,
-                          icon: Icons.extension,
-                          titleHe: 'משחק התאמה',
-                          titleEn: 'Matching Game',
-                          emoji: '🎮',
-                          color: Colors.orange,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const FruitsVegetablesMatchingGame(),
-                              ),
-                            );
-                          },
+                        const SizedBox(height: 8),
+
+                        // כותרת
+                        Text(
+                          isHebrew ? 'פירות וירקות' : 'Fruits & Vegetables',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize * 0.9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
                         ),
+                        const SizedBox(height: 8),
+
+                        // תיאור
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            isHebrew
+                                ? 'למדו על פירות וירקות שונים'
+                                : 'Learn about different fruits and vegetables',
+                            style: TextStyle(
+                              fontSize: responsive.subtitleSize * 0.85,
+                              color: Colors.grey.shade700,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // כפתורים
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var button in buttons)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                                  child: KidButton(
+                                    text: button['text']!,
+                                    icon: button['icon'] as IconData,
+                                    onPressed: button['onPressed'] as VoidCallback,
+                                    color: button['color'] as Color,
+                                    height: buttonHeight,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
                       ],
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMenuCard({
-    required BuildContext context,
-    required IconData icon,
-    required String titleHe,
-    required String titleEn,
-    required String emoji,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    final responsive = ResponsiveHelper(context);
-    final isHebrew = Localizations.localeOf(context).languageCode == 'he';
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.lerp(color, Colors.white, 0.3)!,
-              Color.lerp(color, Colors.black, 0.1)!,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+  List<Map<String, dynamic>> _getButtons(BuildContext context, bool isHebrew) {
+    return [
+      {
+        'text': isHebrew ? 'זמן למידה 📚' : 'Learning Time 📚',
+        'icon': Icons.school,
+        'color': Colors.green,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FruitsVegetablesLearningScreen(),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              emoji,
-              style: TextStyle(fontSize: responsive.fontSize(60)),
+          );
+        },
+      },
+      {
+        'text': isHebrew ? 'משחק התאמה 🎮' : 'Matching Game 🎮',
+        'icon': Icons.extension,
+        'color': Colors.orange,
+        'onPressed': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FruitsVegetablesMatchingGame(),
             ),
-            SizedBox(height: responsive.spacing(12)),
-            Text(
-              isHebrew ? titleHe : titleEn,
-              style: TextStyle(
-                fontSize: responsive.fontSize(24),
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        },
+      },
+    ];
   }
 }

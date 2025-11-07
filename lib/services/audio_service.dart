@@ -99,12 +99,15 @@ class AudioService {
     if (path != null) {
       try {
         await _player.stop();
+        // Use AssetSource with the path (already includes 'audio/')
         await _player.play(AssetSource(path));
+        print('Playing note: $note from $path'); // Debug
       } catch (e) {
         print('Error playing note $note: $e');
       }
     } else {
       print('Audio file not found for: $key');
+      print('Available assets: ${_assetPaths.keys.toList()}'); // Debug
     }
   }
 
@@ -118,11 +121,13 @@ class AudioService {
       try {
         await _player.stop();
         await _player.play(AssetSource(path));
+        print('Playing drum from: $path'); // Debug
       } catch (e) {
         print('Error playing drum: $e');
       }
     } else {
       print('Drum audio file not found');
+      print('Available assets: ${_assetPaths.keys.toList()}'); // Debug
     }
   }
 
