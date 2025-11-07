@@ -59,12 +59,14 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
   Future<void> _playNote(Map<String, dynamic> note) async {
     final instrument = _instruments[_selectedInstrument];
 
-    await _flutterTts.setVolume(instrument['volume']);
-    await _flutterTts.setSpeechRate(instrument['speechRate']);
+    await _flutterTts.setVolume(1.0);
+    await _flutterTts.setSpeechRate(instrument['speechRate'] * 2.0);
     await _flutterTts.setPitch(note['pitch']);
 
-    // Use "la" sound for musical note
-    await _flutterTts.speak('la');
+    // Use multiple sounds for better musical effect
+    final sounds = ['doo', 'dee', 'daa', 'doh', 'duu', 'dai', 'dow'];
+    final noteIndex = _notes.indexOf(note);
+    await _flutterTts.speak(sounds[noteIndex]);
   }
 
   void _onNoteTap(int index) async {

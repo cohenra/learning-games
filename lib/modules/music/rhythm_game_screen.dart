@@ -77,15 +77,18 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
       _isListening = false;
     });
 
+    // First speak the instruction
+    await _speak(_isHebrew ? 'הקשב לקצב' : 'Listen to the rhythm');
+    await Future.delayed(const Duration(milliseconds: 500));
+
     for (int i = 0; i < _pattern.length; i++) {
       if (_pattern[i]) {
         _animController.forward().then((_) => _animController.reverse());
-        _playDrumSound(); // Play drum sound
-        await Future.delayed(const Duration(milliseconds: 300));
+        await _playDrumSound(); // Play drum sound
+        await Future.delayed(const Duration(milliseconds: 500));
       } else {
-        await Future.delayed(const Duration(milliseconds: 300));
+        await Future.delayed(const Duration(milliseconds: 500));
       }
-      await Future.delayed(const Duration(milliseconds: 200));
     }
 
     setState(() {
@@ -93,15 +96,17 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
       _isListening = true;
     });
 
-    await Future.delayed(const Duration(milliseconds: 500));
-    _speak(_isHebrew ? 'עכשיו תורך!' : 'Now your turn!');
+    await Future.delayed(const Duration(milliseconds: 300));
+    await _speak(_isHebrew ? 'עכשיו תורך! לחץ על התוף או על ההפסקה' : 'Now your turn! Tap the drum or pause');
   }
 
   Future<void> _playDrumSound() async {
-    // Play a short drum sound using TTS with quick settings
-    await _flutterTts.setSpeechRate(2.0); // Very fast
-    await _flutterTts.setPitch(0.5); // Low pitch for drum effect
-    await _flutterTts.speak('boom');
+    // Play a drum sound using TTS with very specific settings
+    await _flutterTts.setVolume(1.0);
+    await _flutterTts.setSpeechRate(5.0); // Very very fast
+    await _flutterTts.setPitch(0.3); // Very low pitch for drum effect
+    await _flutterTts.speak('dum dum dum');
+    await Future.delayed(const Duration(milliseconds: 100));
     // Reset to normal
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setPitch(1.0);
@@ -334,55 +339,102 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                   ),
                 ),
 
-              SizedBox(height: responsive.spacing(40)),
+              SizedBox(height: responsive.spacing(20)),
 
-              // Drum button
+              // Drum and Pause buttons
               Expanded(
                 child: Center(
-                  child: GestureDetector(
-                    onTap: _onDrumTap,
-                    child: AnimatedBuilder(
-                      animation: _scaleAnimation,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _scaleAnimation.value,
-                          child: Container(
-                            width: 200,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.red.withOpacity(0.5),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Drum button
+                      GestureDetector(
+                        onTap: _onDrumTap,
+                        child: AnimatedBuilder(
+                          animation: _scaleAnimation,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: _isListening ? _scaleAnimation.value : 1.0,
+                              child: Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  color: _isListening ? Colors.red : Colors.red.shade300,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.red.withOpacity(0.5),
+                                      blurRadius: 20,
+                                      offset: Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '🥁',
+                                        style: TextStyle(fontSize: 60),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        _isHebrew ? 'תוף' : 'Drum',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      // Pause button
+                      GestureDetector(
+                        onTap: _onPauseTap,
+                        child: Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: _isListening ? Colors.grey.shade600 : Colors.grey.shade400,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.pause,
+                                  size: 60,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  _isHebrew ? 'הפסקה' : 'Pause',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ],
                             ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '🥁',
-                                    style: TextStyle(fontSize: 80),
-                                  ),
-                                  Text(
-                                    _isHebrew ? 'תוף' : 'Drum',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -392,15 +444,6 @@ class _RhythmGameScreenState extends State<RhythmGameScreen> with SingleTickerPr
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    if (_isListening)
-                      KidButton(
-                        text: _isHebrew ? 'הפסקה ⏸' : 'Pause ⏸',
-                        icon: Icons.pause,
-                        onPressed: _onPauseTap,
-                        color: Colors.grey,
-                        height: 60,
-                      ),
-                    SizedBox(height: 8),
                     if (!_isPlaying && !_isListening && !_showResult)
                       KidButton(
                         text: _isHebrew ? 'שמע קצב 🔊' : 'Play Rhythm 🔊',

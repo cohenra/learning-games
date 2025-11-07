@@ -409,6 +409,7 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
               flex: 3,
@@ -420,13 +421,13 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Flexible(
               flex: 1,
               child: Text(
                 _isHebrew ? option['nameHe']! : option['nameEn']!,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.purple.shade700,
                 ),
@@ -436,14 +437,18 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
               ),
             ),
             if (isSelected && _isCorrect!)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Icon(Icons.check_circle, color: Colors.green, size: 32),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.check_circle, color: Colors.green, size: 28),
+                ),
               ),
             if (isSelected && !_isCorrect!)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Icon(Icons.cancel, color: Colors.red, size: 32),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.cancel, color: Colors.red, size: 28),
+                ),
               ),
           ],
         ),

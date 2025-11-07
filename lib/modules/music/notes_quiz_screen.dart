@@ -400,52 +400,63 @@ class _NotesQuizScreenState extends State<NotesQuizScreen> {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Colored circle with note letter
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: option['color'],
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: option['color'].withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  option['letter']!,
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+            Flexible(
+              child: Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: option['color'],
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: option['color'].withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    option['letter']!,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              _isHebrew ? option['nameHe']! : option['nameEn']!,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color.lerp(option['color'], Colors.black, 0.4)!,
+            const SizedBox(height: 8),
+            Flexible(
+              child: Text(
+                _isHebrew ? option['nameHe']! : option['nameEn']!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color.lerp(option['color'], Colors.black, 0.4)!,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
             if (isSelected && _isCorrect!)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Icon(Icons.check_circle, color: Colors.green, size: 32),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.check_circle, color: Colors.green, size: 28),
+                ),
               ),
             if (isSelected && !_isCorrect!)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Icon(Icons.cancel, color: Colors.red, size: 32),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.cancel, color: Colors.red, size: 28),
+                ),
               ),
           ],
         ),
