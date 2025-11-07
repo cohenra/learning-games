@@ -25,42 +25,58 @@ class EmotionsMenuScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.amber.shade50, Colors.amber.shade50, Colors.lightBlue.shade50],
+            colors: [
+              Colors.amber.shade50,
+              Colors.yellow.shade50,
+              Colors.orange.shade50,
+            ],
           ),
         ),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final buttons = [
-                {'text': isHebrew ? 'זמן למידה 📚' : 'Learning Time 📚', 'icon': Icons.school, 'color': Colors.amber, 'screen': const EmotionsLearningScreen()},
-                {'text': isHebrew ? 'משחק התאמה 🎮' : 'Matching Game 🎮', 'icon': Icons.extension, 'color': Colors.amber, 'screen': const EmotionsMatchingGame()},
-              ];
-
-              final buttonHeight = ((constraints.maxHeight - 200) / buttons.length).clamp(50.0, 80.0);
+              final buttons = _getButtons(context, isHebrew);
+              final availableHeight = constraints.maxHeight;
+              final numButtons = buttons.length;
+              const iconHeight = 60.0;
+              const titleHeight = 40.0;
+              const descriptionHeight = 60.0;
+              const topBottomPadding = 40.0;
+              final usedHeight = iconHeight + titleHeight + descriptionHeight + topBottomPadding;
+              final availableForButtons = availableHeight - usedHeight;
+              final totalSpacing = (numButtons - 1) * 8.0;
+              final buttonHeight = ((availableForButtons - totalSpacing) / numButtons).clamp(50.0, responsive.buttonHeight);
 
               return SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
+                physics: numButtons <= 5 ? const NeverScrollableScrollPhysics() : null,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('😊😢', style: TextStyle(fontSize: responsive.emojiSize * 0.7)),
-                      const SizedBox(height: 8),
-                      Text(isHebrew ? 'רגשות' : 'Emotions', style: TextStyle(fontSize: responsive.titleSize * 0.9, fontWeight: FontWeight.bold, color: Colors.amber.shade700)),
-                      const SizedBox(height: 20),
-                      for (var button in buttons)
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text('😊😢', style: TextStyle(fontSize: responsive.emojiSize * 0.7)),
+                        const SizedBox(height: 8),
+                        Text(isHebrew ? 'רגשות' : 'Emotions', style: TextStyle(fontSize: responsive.titleSize * 0.9, fontWeight: FontWeight.bold, color: Colors.amber.shade700)),
+                        const SizedBox(height: 8),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                          child: KidButton(
-                            text: button['text'] as String,
-                            icon: button['icon'] as IconData,
-                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => button['screen'] as Widget)),
-                            color: button['color'] as Color,
-                            height: buttonHeight,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(isHebrew ? 'למדו על רגשות שונים' : 'Learn about different emotions', style: TextStyle(fontSize: responsive.subtitleSize * 0.85, color: Colors.grey.shade700), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
                         ),
-                    ],
+                        const SizedBox(height: 16),
+                        ...buttons.map((buttonData) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: responsive.safePadding,
+                              child: KidButton(text: buttonData['text'] as String, icon: buttonData['icon'] as IconData, onPressed: buttonData['onPressed'] as VoidCallback, color: buttonData['color'] as Color, width: responsive.width(80), height: buttonHeight),
+                            ),
+                          );
+                        }).toList(),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -69,5 +85,12 @@ class EmotionsMenuScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Map<String, dynamic>> _getButtons(BuildContext context, bool isHebrew) {
+    return [
+      {'text': isHebrew ? 'למידה 📚' : 'Learning 📚', 'icon': Icons.school, 'color': Colors.amber.shade500, 'onPressed': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EmotionsLearningScreen()))},
+      {'text': isHebrew ? 'משחק התאמה 🎮' : 'Matching Game 🎮', 'icon': Icons.gamepad, 'color': Colors.orange.shade500, 'onPressed': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EmotionsMatchingGame()))},
+    ];
   }
 }
