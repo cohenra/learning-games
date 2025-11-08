@@ -19,6 +19,7 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
   int _currentLevel = 0;
   bool _isHebrew = true;
   bool _showSuccess = false;
+  bool _showHint = false;
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
 
@@ -129,6 +130,13 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
         _showSuccess = true;
       });
       _speak(_isHebrew ? 'כל הכבוד! מעולה!' : 'Well done! Excellent!');
+
+      // Auto-advance to next level after 1.5 seconds
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted && _showSuccess) {
+          _nextLevel();
+        }
+      });
     }
   }
 
@@ -210,23 +218,32 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
   }
 
   bool _checkFishFins() {
-    // בדיקה שציירו בצדדים (סנפירים)
-    final centerY = _canvasSize.height / 2;
-    final leftSide = _canvasSize.width * 0.2;
-    final rightSide = _canvasSize.width * 0.8;
+    // בדיקה שציירו סנפירים למעלה ולמטה
+    final center = Offset(_canvasSize.width / 2, _canvasSize.height / 2);
+    final bodyHeight = 80.0;
+    final bodyWidth = 150.0;
 
-    int finPoints = 0;
+    int topFinPoints = 0;
+    int bottomFinPoints = 0;
+
     for (var point in drawnPoints) {
       if (point.dx < 0) continue;
 
-      // Count points on sides
-      if ((point.dx < leftSide || point.dx > rightSide) &&
-          (point.dy > centerY - 80 && point.dy < centerY + 80)) {
-        finPoints++;
+      // Check if point is near the fish body horizontally
+      if ((point.dx - center.dx).abs() < bodyWidth / 2) {
+        // Top fin - above the body
+        if (point.dy < center.dy - bodyHeight / 4) {
+          topFinPoints++;
+        }
+        // Bottom fin - below the body
+        if (point.dy > center.dy + bodyHeight / 4) {
+          bottomFinPoints++;
+        }
       }
     }
 
-    return finPoints > 25; // Need drawing on sides for fins
+    // Need drawing on both top and bottom for fins
+    return (topFinPoints > 15 && bottomFinPoints > 15) || (topFinPoints + bottomFinPoints > 40);
   }
 
   Future<void> _speak(String text) async {
@@ -256,6 +273,21 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
     setState(() {
       drawnPoints.clear();
       _showSuccess = false;
+    });
+  }
+
+  void _showHintTemporarily() {
+    setState(() {
+      _showHint = true;
+    });
+
+    // Hide hint after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showHint = false;
+        });
+      }
     });
   }
 
@@ -384,6 +416,16 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
                               ),
                               size: Size.infinite,
                             ),
+                            // Hint layer (dashed outline)
+                            if (_showHint)
+                              CustomPaint(
+                                painter: HintPainter(
+                                  challenge['type'] as String,
+                                  _canvasSize,
+                                  challenge['color'] as Color,
+                                ),
+                                size: Size.infinite,
+                              ),
                             // Drawing layer
                             GestureDetector(
                               onPanStart: (details) {
@@ -447,14 +489,26 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
               SizedBox(height: responsive.spacing(16)),
 
               // Buttons
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                child: Row(
-                  children: [
-                    if (!_showSuccess)
+              if (!_showSuccess)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                  child: Row(
+                    children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.only(right: 4),
+                          child: KidButton(
+                            text: _isHebrew ? 'רמז 💡' : 'Hint 💡',
+                            icon: Icons.lightbulb,
+                            onPressed: _showHintTemporarily,
+                            color: Colors.purple,
+                            height: 60,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 4),
                           child: KidButton(
                             text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
                             icon: Icons.delete,
@@ -464,19 +518,9 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
                           ),
                         ),
                       ),
-                    if (_showSuccess)
-                      Expanded(
-                        child: KidButton(
-                          text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
-                          icon: Icons.arrow_forward,
-                          onPressed: _nextLevel,
-                          color: Colors.green,
-                          height: 60,
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
               SizedBox(height: responsive.spacing(16)),
             ],
@@ -674,5 +718,163 @@ class SimpleDrawingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+/// ציור רמזים - קווים מקווקווים להראות מה צריך לצייר
+class HintPainter extends CustomPainter {
+  final String type;
+  final Size canvasSize;
+  final Color color;
+
+  HintPainter(this.type, this.canvasSize, this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0
+      ..color = color.withOpacity(0.7);
+
+    // Create dashed path effect
+    final dashWidth = 10.0;
+    final dashSpace = 5.0;
+
+    final center = Offset(size.width / 2, size.height / 2);
+
+    switch (type) {
+      case 'sun':
+        _drawSunRaysHint(canvas, center, paint, dashWidth, dashSpace);
+        break;
+      case 'flower':
+        _drawFlowerPetalsHint(canvas, center, paint, dashWidth, dashSpace);
+        break;
+      case 'house':
+        _drawHouseRoofHint(canvas, center, paint, dashWidth, dashSpace);
+        break;
+      case 'tree':
+        _drawTreeLeavesHint(canvas, center, paint, dashWidth, dashSpace);
+        break;
+      case 'fish':
+        _drawFishFinsHint(canvas, center, paint, dashWidth, dashSpace);
+        break;
+    }
+  }
+
+  void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint, double dashWidth, double dashSpace) {
+    final path = Path()
+      ..moveTo(start.dx, start.dy)
+      ..lineTo(end.dx, end.dy);
+
+    _drawDashedPath(canvas, path, paint, dashWidth, dashSpace);
+  }
+
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint, double dashWidth, double dashSpace) {
+    final metrics = path.computeMetrics();
+    for (var metric in metrics) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        final start = metric.getTangentForOffset(distance)!.position;
+        distance += dashWidth;
+        final end = metric.getTangentForOffset(distance.clamp(0, metric.length))!.position;
+        canvas.drawLine(start, end, paint);
+        distance += dashSpace;
+      }
+    }
+  }
+
+  void _drawSunRaysHint(Canvas canvas, Offset center, Paint paint, double dashWidth, double dashSpace) {
+    final radius = min(canvasSize.width, canvasSize.height) / 4;
+    final rayLength = radius * 0.6;
+
+    // Draw 8 rays around the sun
+    for (int i = 0; i < 8; i++) {
+      final angle = (i * 2 * pi / 8) - pi / 2; // Start from top
+      final startX = center.dx + radius * cos(angle);
+      final startY = center.dy + radius * sin(angle);
+      final endX = center.dx + (radius + rayLength) * cos(angle);
+      final endY = center.dy + (radius + rayLength) * sin(angle);
+
+      _drawDashedLine(
+        canvas,
+        Offset(startX, startY),
+        Offset(endX, endY),
+        paint,
+        dashWidth,
+        dashSpace,
+      );
+    }
+  }
+
+  void _drawFlowerPetalsHint(Canvas canvas, Offset center, Paint paint, double dashWidth, double dashSpace) {
+    final flowerCenter = Offset(center.dx, center.dy + 40);
+    final petalRadius = 35.0;
+    final petalDistance = 45.0;
+
+    // Draw 6 petals around center
+    for (int i = 0; i < 6; i++) {
+      final angle = (i * 2 * pi / 6);
+      final petalCenterX = flowerCenter.dx + petalDistance * cos(angle);
+      final petalCenterY = flowerCenter.dy + petalDistance * sin(angle);
+
+      final path = Path();
+      path.addOval(Rect.fromCenter(
+        center: Offset(petalCenterX, petalCenterY),
+        width: petalRadius * 2,
+        height: petalRadius * 2,
+      ));
+
+      _drawDashedPath(canvas, path, paint, dashWidth, dashSpace);
+    }
+  }
+
+  void _drawHouseRoofHint(Canvas canvas, Offset center, Paint paint, double dashWidth, double dashSpace) {
+    final roofWidth = min(canvasSize.width, canvasSize.height) * 0.5;
+    final roofHeight = roofWidth * 0.4;
+    final roofTop = center.dy - 20;
+
+    // Draw triangle roof
+    final path = Path();
+    path.moveTo(center.dx - roofWidth / 2, roofTop + roofHeight * 0.4);
+    path.lineTo(center.dx, roofTop - roofHeight * 0.3);
+    path.lineTo(center.dx + roofWidth / 2, roofTop + roofHeight * 0.4);
+    path.close();
+
+    _drawDashedPath(canvas, path, paint, dashWidth, dashSpace);
+  }
+
+  void _drawTreeLeavesHint(Canvas canvas, Offset center, Paint paint, double dashWidth, double dashSpace) {
+    // Draw cloud-like leaves outline
+    final path = Path();
+    path.addOval(Rect.fromCenter(
+      center: Offset(center.dx, center.dy - 20),
+      width: 130,
+      height: 100,
+    ));
+
+    _drawDashedPath(canvas, path, paint, dashWidth, dashSpace);
+  }
+
+  void _drawFishFinsHint(Canvas canvas, Offset center, Paint paint, double dashWidth, double dashSpace) {
+    // Top fin
+    final topFinPath = Path();
+    topFinPath.moveTo(center.dx - 20, center.dy - 40);
+    topFinPath.lineTo(center.dx, center.dy - 70);
+    topFinPath.lineTo(center.dx + 20, center.dy - 40);
+    topFinPath.close();
+    _drawDashedPath(canvas, topFinPath, paint, dashWidth, dashSpace);
+
+    // Bottom fin
+    final bottomFinPath = Path();
+    bottomFinPath.moveTo(center.dx - 20, center.dy + 40);
+    bottomFinPath.lineTo(center.dx, center.dy + 70);
+    bottomFinPath.lineTo(center.dx + 20, center.dy + 40);
+    bottomFinPath.close();
+    _drawDashedPath(canvas, bottomFinPath, paint, dashWidth, dashSpace);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }

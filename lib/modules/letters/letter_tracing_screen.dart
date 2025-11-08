@@ -67,10 +67,13 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   void _checkIfComplete() {
     if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
 
-    // Easier completion check - just need 25 valid points
+    // Count valid points and strokes (number of times finger was lifted)
     final validPoints = drawnPoints.where((p) => p.dx >= 0).length;
+    final strokes = drawnPoints.where((p) => p.dx < 0).length;
 
-    if (validPoints > 25 && !_showSuccess) {
+    // Require enough drawing AND enough strokes (for complex letters)
+    // Most letters need at least 2-3 strokes to complete properly
+    if (validPoints > 40 && strokes >= 2 && !_showSuccess) {
       setState(() {
         _showSuccess = true;
       });
@@ -454,7 +457,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   }
 }
 
-/// ציור אות המדריך - תמיד מציג את האות
+/// ציור אות המדריך - מציג לפי רמת קושי
 class GuideLetterPainter extends CustomPainter {
   final String letter;
   final String difficulty;
@@ -469,37 +472,47 @@ class GuideLetterPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final fontSize = min(size.width, size.height) * 0.7;
 
-    // Determine opacity based on difficulty
-    double opacity;
     if (difficulty == 'easy') {
-      opacity = 0.4; // Clear guide
+      // Easy: Clear transparent letter
+      final textStyle = TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: color.withOpacity(0.35),
+        fontFamily: isHebrew ? 'Rubik' : null,
+      );
+
+      final textSpan = TextSpan(text: letter, style: textStyle);
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: isHebrew ? TextDirection.rtl : TextDirection.ltr,
+      );
+
+      textPainter.layout();
+
+      final offset = Offset(
+        center.dx - textPainter.width / 2,
+        center.dy - textPainter.height / 2,
+      );
+
+      textPainter.paint(canvas, offset);
     } else if (difficulty == 'medium') {
-      opacity = 0.25; // Light guide
-    } else {
-      opacity = 0.15; // Faint guide (but still visible!)
+      // Medium: Guide dots around where the letter should be
+      final dotPaint = Paint()
+        ..color = color.withOpacity(0.6)
+        ..style = PaintingStyle.fill;
+
+      // Draw dots in a pattern around center
+      const numDots = 24;
+      final dotRadius = min(size.width, size.height) * 0.25;
+
+      for (int i = 0; i < numDots; i++) {
+        final angle = (i * 2 * pi / numDots);
+        final x = center.dx + dotRadius * cos(angle);
+        final y = center.dy + dotRadius * sin(angle);
+        canvas.drawCircle(Offset(x, y), 4, dotPaint);
+      }
     }
-
-    final textStyle = TextStyle(
-      fontSize: fontSize,
-      fontWeight: FontWeight.bold,
-      color: color.withOpacity(opacity),
-      fontFamily: isHebrew ? 'Rubik' : null,
-    );
-
-    final textSpan = TextSpan(text: letter, style: textStyle);
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: isHebrew ? TextDirection.rtl : TextDirection.ltr,
-    );
-
-    textPainter.layout();
-
-    final offset = Offset(
-      center.dx - textPainter.width / 2,
-      center.dy - textPainter.height / 2,
-    );
-
-    textPainter.paint(canvas, offset);
+    // Hard: No guide at all
   }
 
   @override

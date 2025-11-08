@@ -66,10 +66,13 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
   void _checkIfComplete() {
     if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
 
-    // Easier completion check - just need 25 valid points
+    // Count valid points and strokes (number of times finger was lifted)
     final validPoints = drawnPoints.where((p) => p.dx >= 0).length;
+    final strokes = drawnPoints.where((p) => p.dx < 0).length;
 
-    if (validPoints > 25 && !_showSuccess) {
+    // Require enough drawing AND at least 1 stroke completed
+    // Numbers typically need 1-2 strokes
+    if (validPoints > 35 && strokes >= 1 && !_showSuccess) {
       setState(() {
         _showSuccess = true;
       });
