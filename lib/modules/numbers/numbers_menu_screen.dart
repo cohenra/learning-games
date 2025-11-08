@@ -63,7 +63,7 @@ class NumbersMenuScreen extends StatelessWidget {
               final buttonHeight = ((availableForButtons - totalSpacing) / numRows).clamp(60.0, responsive.buttonHeight);
 
               return SingleChildScrollView(
-                physics: numButtons <= 5 ? const NeverScrollableScrollPhysics() : null,
+                physics: const NeverScrollableScrollPhysics(), // No scrolling needed with 2-column layout
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
