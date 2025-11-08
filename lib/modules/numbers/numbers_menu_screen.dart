@@ -61,7 +61,7 @@ class NumbersMenuScreen extends StatelessWidget {
               // חישוב גובה כפתור ורווח - מחושב לפי מספר שורות ולא מספר כפתורים
               final totalSpacing = (numRows - 1) * 8.0; // 8px בין שורות
               final calculatedHeight = ((availableForButtons - totalSpacing) / numRows);
-              final buttonHeight = calculatedHeight.clamp(50.0, min(responsive.buttonHeight, 120.0));
+              final buttonHeight = calculatedHeight.clamp(50.0, min(responsive.buttonHeight, 120.0)).toDouble();
 
               return SingleChildScrollView(
                 physics: const NeverScrollableScrollPhysics(), // No scrolling needed with 2-column layout
