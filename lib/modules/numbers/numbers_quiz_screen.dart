@@ -112,12 +112,10 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
   }
 
   void _nextQuestion() {
-    if (_currentQuestionIndex < _totalQuestions - 1) {
-      setState(() {
-        _currentQuestionIndex++;
-      });
-      _generateQuestion();
-    }
+    setState(() {
+      _currentQuestionIndex++;
+    });
+    _generateQuestion();
   }
 
   Color _getButtonColor(int option) {
