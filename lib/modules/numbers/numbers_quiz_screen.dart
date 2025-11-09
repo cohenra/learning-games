@@ -528,9 +528,8 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                             )
                           else
                             const SizedBox(height: 8),
-                        ],
-                      );
-                    }
+                      ],
+                    );
                   }
                 },
               ),
