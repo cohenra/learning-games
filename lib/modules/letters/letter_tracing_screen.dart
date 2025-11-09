@@ -228,46 +228,84 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
           ),
         ),
         child: SafeArea(
-          child: GridView.builder(
-            padding: EdgeInsets.all(responsive.spacing(16)),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              crossAxisSpacing: responsive.spacing(12),
-              mainAxisSpacing: responsive.spacing(12),
-              childAspectRatio: 1.0,
-            ),
-            itemCount: letters.length,
-            itemBuilder: (context, index) {
-              final letter = letters[index];
-              final color = _colors[index % _colors.length];
-
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedLetter = letter;
-                  });
-                  _speakInstruction(letter);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: color, width: 2),
-                  ),
-                  child: Center(
-                    child: Text(
-                      letter,
-                      style: TextStyle(
-                        fontSize: responsive.fontSize(40),
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                        fontFamily: _isHebrew ? 'Rubik' : null,
+          child: Column(
+            children: [
+              // Back button
+              Padding(
+                padding: EdgeInsets.all(responsive.spacing(12)),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
+                        color: Colors.blue.shade700,
+                        size: 32,
+                      ),
+                      onPressed: () => setState(() => _selectedDifficulty = ''),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _isHebrew ? 'בחר אות' : 'Choose a Letter',
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 48),
+                  ],
                 ),
-              );
-            },
+              ),
+              // Grid
+              Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: responsive.spacing(20),
+                    vertical: responsive.spacing(8),
+                  ),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    crossAxisSpacing: responsive.spacing(10),
+                    mainAxisSpacing: responsive.spacing(10),
+                    childAspectRatio: 1.1,
+                  ),
+                  itemCount: letters.length,
+                  itemBuilder: (context, index) {
+                    final letter = letters[index];
+                    final color = _colors[index % _colors.length];
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedLetter = letter;
+                        });
+                        _speakInstruction(letter);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: color, width: 2),
+                        ),
+                        child: Center(
+                          child: Text(
+                            letter,
+                            style: TextStyle(
+                              fontSize: responsive.fontSize(32),
+                              fontWeight: FontWeight.bold,
+                              color: color,
+                              fontFamily: _isHebrew ? 'Rubik' : null,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -529,14 +567,14 @@ class GuideLetterPainter extends CustomPainter {
 
       textPainter.paint(canvas, offset);
     } else if (difficulty == 'medium') {
-      // Medium: Outline with gaps - dashed letter outline
+      // Medium: Letter with dashed outline - draw dots around the letter shape
       final textStyle = TextStyle(
         fontSize: fontSize,
         fontWeight: FontWeight.bold,
         foreground: Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3
-          ..color = color.withOpacity(0.5),
+          ..strokeWidth = 4
+          ..color = color.withOpacity(0.6),
         fontFamily: isHebrew ? 'Rubik' : null,
       );
 
@@ -553,43 +591,44 @@ class GuideLetterPainter extends CustomPainter {
         center.dy - textPainter.height / 2,
       );
 
-      // Draw the outline with gaps by using a custom path
-      // We'll draw segments with gaps
-      canvas.save();
-      canvas.translate(offset.dx, offset.dy);
+      // Draw dots along the letter outline to create dashed effect
+      final dotPaint = Paint()
+        ..color = color.withOpacity(0.6)
+        ..style = PaintingStyle.fill;
 
-      // Create a path from the text and draw it with dashes
-      final path = _createTextPath(textPainter);
-      _drawDashedPath(canvas, path, Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..color = color.withOpacity(0.5), 10, 8);
+      // Create a pattern of dots around the letter perimeter
+      // We'll sample points around the text bounds and draw dots
+      final bounds = Rect.fromLTWH(offset.dx, offset.dy, textPainter.width, textPainter.height);
+      final numDots = 40; // Number of dots to draw around perimeter
 
-      canvas.restore();
+      // Draw dots along the outline
+      for (int i = 0; i < numDots; i++) {
+        final t = i / numDots;
+        final perimeter = (bounds.width + bounds.height) * 2;
+        final distance = t * perimeter;
+
+        Offset dotPosition;
+        if (distance < bounds.width) {
+          // Top edge
+          dotPosition = Offset(bounds.left + distance, bounds.top);
+        } else if (distance < bounds.width + bounds.height) {
+          // Right edge
+          dotPosition = Offset(bounds.right, bounds.top + (distance - bounds.width));
+        } else if (distance < bounds.width * 2 + bounds.height) {
+          // Bottom edge
+          dotPosition = Offset(bounds.right - (distance - bounds.width - bounds.height), bounds.bottom);
+        } else {
+          // Left edge
+          dotPosition = Offset(bounds.left, bounds.bottom - (distance - bounds.width * 2 - bounds.height));
+        }
+
+        canvas.drawCircle(dotPosition, 3, dotPaint);
+      }
+
+      // Also draw the letter outline very faintly
+      textPainter.paint(canvas, offset);
     }
     // Hard: No guide at all
-  }
-
-  Path _createTextPath(TextPainter textPainter) {
-    // This is a simplified approach - just drawing a rectangular outline
-    // For actual text outline, we would need more complex path extraction
-    final path = Path();
-    path.addRect(Rect.fromLTWH(0, 0, textPainter.width, textPainter.height));
-    return path;
-  }
-
-  void _drawDashedPath(Canvas canvas, Path path, Paint paint, double dashLength, double dashSpace) {
-    final metrics = path.computeMetrics();
-    for (var metric in metrics) {
-      double distance = 0.0;
-      while (distance < metric.length) {
-        final start = metric.getTangentForOffset(distance)!.position;
-        distance += dashLength;
-        final end = metric.getTangentForOffset(distance.clamp(0, metric.length))!.position;
-        canvas.drawLine(start, end, paint);
-        distance += dashSpace;
-      }
-    }
   }
 
   @override
