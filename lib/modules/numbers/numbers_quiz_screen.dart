@@ -495,7 +495,6 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                                       ),
                                     );
                                   }).toList(),
-                                ),
                               ),
                             ),
                           ),
