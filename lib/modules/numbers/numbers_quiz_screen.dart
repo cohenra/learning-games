@@ -358,114 +358,100 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                       ),
                     );
                   } else {
-                    // Phone: allow scrolling
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: IntrinsicHeight(
-                          child: Column(
+                    // Phone: fit content properly
+                    return Column(
+                      children: [
+                        // התקדמות
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // התקדמות
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: responsive.spacing(20),
-                                  vertical: responsive.spacing(8)
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${l10n.question} ${_currentQuestionIndex + 1}',
-                                      style: TextStyle(
-                                        fontSize: responsive.subtitleSize,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: List.generate(
-                                        _score > 10 ? 10 : _score,
-                                        (index) => Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(2)),
-                                          child: Text('⭐', style: TextStyle(fontSize: responsive.fontSize(16))),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              SizedBox(height: responsive.spacing(8)),
-
-                              // שאלה
                               Text(
-                                l10n.howMany,
+                                '${l10n.question} ${_currentQuestionIndex + 1}',
                                 style: TextStyle(
-                                  fontSize: responsive.questionTextSize,
+                                  fontSize: responsive.fontSize(18),
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue.shade700,
                                 ),
                               ),
-
-                              SizedBox(height: responsive.spacing(12)),
-
-                              // נקודות המייצגות את המספר
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxHeight: responsive.height(25),
+                              Row(
+                                children: List.generate(
+                                  _score > 10 ? 10 : _score,
+                                  (index) => const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 1),
+                                    child: Text('⭐', style: TextStyle(fontSize: 14)),
                                   ),
-                                  child: Center(
-                                    child: Wrap(
-                                      alignment: WrapAlignment.center,
-                                      spacing: responsive.spacing(10),
-                                      runSpacing: responsive.spacing(10),
-                                      children: List.generate(
-                                        _correctAnswer,
-                                        (index) => Container(
-                                          width: responsive.iconSize(40),
-                                          height: responsive.iconSize(40),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.blue.shade400,
-                                                Colors.blue.shade600,
-                                              ],
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.blue.shade200,
-                                                blurRadius: responsive.spacing(8),
-                                                offset: Offset(0, responsive.spacing(4)),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // שאלה
+                        Text(
+                          l10n.howMany,
+                          style: TextStyle(
+                            fontSize: responsive.fontSize(22),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // נקודות המייצגות את המספר
+                        Flexible(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Center(
+                              child: Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: List.generate(
+                                  _correctAnswer,
+                                  (index) => Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade600,
+                                        ],
                                       ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.blue.shade200,
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
+                            ),
+                          ),
+                        ),
 
-                              SizedBox(height: responsive.spacing(16)),
+                        const SizedBox(height: 12),
 
-                              // אפשרויות תשובה
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: responsive.spacing(20),
-                                  vertical: responsive.spacing(8)
-                                ),
-                                child: GridView.count(
-                                  shrinkWrap: true,
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: responsive.spacing(8),
-                                  crossAxisSpacing: responsive.spacing(8),
-                                  childAspectRatio: 1.5,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  children: _options.map((option) {
+                        // אפשרויות תשובה
+                        Flexible(
+                          flex: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: GridView.count(
+                              shrinkWrap: true,
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 1.5,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: _options.map((option) {
                                     return GestureDetector(
                                       onTap: () => _handleAnswer(option),
                                       child: AnimatedContainer(
@@ -511,45 +497,41 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
                                   }).toList(),
                                 ),
                               ),
+                            ),
+                          ),
 
-                              SizedBox(height: responsive.spacing(16)),
+                          const SizedBox(height: 12),
 
-                              // כפתור סיום
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: responsive.horizontalSpacing,
-                                  vertical: responsive.spacing(8)
-                                ),
-                                child: KidButton(
-                                  text: isHebrew ? 'סיום 🏁' : 'Finish 🏁',
-                                  icon: Icons.check_circle,
-                                  onPressed: _showFinalScore,
-                                  color: Colors.red,
-                                  height: 60,
-                                  width: responsive.width(50),
+                          // כפתור סיום
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: KidButton(
+                              text: isHebrew ? 'סיום 🏁' : 'Finish 🏁',
+                              icon: Icons.check_circle,
+                              onPressed: _showFinalScore,
+                              color: Colors.red,
+                              height: 56,
+                            ),
+                          ),
+
+                          // הודעת נכון
+                          if (_isCorrect == true)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                l10n.correct,
+                                style: TextStyle(
+                                  fontSize: responsive.fontSize(20),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green.shade700,
                                 ),
                               ),
-
-                              // הודעת נכון (ללא כפתורים - עובר אוטומטית)
-                              if (_isCorrect == true)
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: responsive.spacing(16)),
-                                  child: Text(
-                                    l10n.correct,
-                                    style: TextStyle(
-                                      fontSize: responsive.questionTextSize,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green.shade700,
-                                    ),
-                                  ),
-                                )
-                              else
-                                SizedBox(height: responsive.spacing(16)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                            )
+                          else
+                            const SizedBox(height: 8),
+                        ],
+                      );
+                    }
                   }
                 },
               ),

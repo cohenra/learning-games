@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 import '../../widgets/reward_animation.dart';
 import '../../utils/responsive_helper.dart';
 
@@ -199,6 +200,11 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
         title: Text(_isHebrew ? 'חידון 🎮' : 'Quiz 🎮'),
         centerTitle: true,
         backgroundColor: Colors.green,
+        leading: KidBackButton(
+          onPressed: () => Navigator.pop(context),
+          color: Colors.green.shade600,
+          isHebrew: _isHebrew,
+        ),
       ),
       body: Container(
         width: double.infinity,

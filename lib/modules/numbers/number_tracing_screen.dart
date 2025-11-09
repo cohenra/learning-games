@@ -145,10 +145,12 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
             children: [
-              Text(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
                 '✍️',
                 style: TextStyle(fontSize: responsive.iconSize(80)),
               ),
@@ -197,7 +199,20 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
               ),
             ],
           ),
+          // Back button
+          Positioned(
+            top: 8,
+            left: 8,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              iconSize: 32,
+              color: Colors.orange.shade700,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+        ],
         ),
+      ),
       ),
     );
   }
@@ -224,83 +239,48 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Back button
-              Padding(
-                padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                        color: Colors.orange.shade700,
-                        size: 32,
-                      ),
-                      onPressed: () => setState(() => _selectedDifficulty = ''),
-                    ),
-                    Expanded(
-                      child: Text(
-                        _isHebrew ? 'בחר מספר' : 'Choose a Number',
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(width: 48),
-                  ],
-                ),
-              ),
-              // Grid
-              Expanded(
-                child: GridView.builder(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: responsive.spacing(20),
-                    vertical: responsive.spacing(8),
-                  ),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: responsive.spacing(10),
-                    mainAxisSpacing: responsive.spacing(10),
-                    childAspectRatio: 1.1,
-                  ),
-                  itemCount: _allNumbers.length,
-                  itemBuilder: (context, index) {
-                    final number = _allNumbers[index];
-                    final color = _numberColors[number]!;
+          child: GridView.builder(
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.spacing(20),
+              vertical: responsive.spacing(8),
+            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: responsive.spacing(10),
+              mainAxisSpacing: responsive.spacing(10),
+              childAspectRatio: 1.1,
+            ),
+            itemCount: _allNumbers.length,
+            itemBuilder: (context, index) {
+              final number = _allNumbers[index];
+              final color = _numberColors[number]!;
 
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedNumber = number;
-                        });
-                        _speakInstruction(number);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: color, width: 2),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$number',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(36),
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                        ),
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedNumber = number;
+                  });
+                  _speakInstruction(number);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: color, width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$number',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(36),
+                        fontWeight: FontWeight.bold,
+                        color: color,
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -557,14 +537,14 @@ class GuideNumberPainter extends CustomPainter {
 
       textPainter.paint(canvas, offset);
     } else if (difficulty == 'medium') {
-      // Medium: Number with dashed outline - draw dots around the number shape
+      // Medium: Draw the number outline as dots following its shape
       final textStyle = TextStyle(
         fontSize: fontSize,
         fontWeight: FontWeight.bold,
         foreground: Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 4
-          ..color = color.withOpacity(0.6),
+          ..strokeWidth = 8
+          ..color = color,
       );
 
       final textSpan = TextSpan(text: number, style: textStyle);
@@ -580,42 +560,32 @@ class GuideNumberPainter extends CustomPainter {
         center.dy - textPainter.height / 2,
       );
 
-      // Draw dots along the number outline to create dashed effect
+      // Create dots by drawing the outline multiple times with circular clips
+      // This creates a dotted pattern that follows the number's shape
       final dotPaint = Paint()
-        ..color = color.withOpacity(0.6)
+        ..color = color
         ..style = PaintingStyle.fill;
 
-      // Create a pattern of dots around the number perimeter
-      // We'll sample points around the text bounds and draw dots
-      final bounds = Rect.fromLTWH(offset.dx, offset.dy, textPainter.width, textPainter.height);
-      final numDots = 40; // Number of dots to draw around perimeter
+      // Draw dots in a grid pattern that intersects with the number
+      final dotSpacing = 20.0; // Large gap between dots
+      final dotRadius = 4.0;
 
-      // Draw dots along the outline
-      for (int i = 0; i < numDots; i++) {
-        final t = i / numDots;
-        final perimeter = (bounds.width + bounds.height) * 2;
-        final distance = t * perimeter;
+      for (double y = -20.0; y < textPainter.height + 20; y += dotSpacing) {
+        for (double x = -20.0; x < textPainter.width + 20; x += dotSpacing) {
+          // For each potential dot position, check if it's near the number outline
+          // We do this by drawing a small area and checking
+          canvas.save();
 
-        Offset dotPosition;
-        if (distance < bounds.width) {
-          // Top edge
-          dotPosition = Offset(bounds.left + distance, bounds.top);
-        } else if (distance < bounds.width + bounds.height) {
-          // Right edge
-          dotPosition = Offset(bounds.right, bounds.top + (distance - bounds.width));
-        } else if (distance < bounds.width * 2 + bounds.height) {
-          // Bottom edge
-          dotPosition = Offset(bounds.right - (distance - bounds.width - bounds.height), bounds.bottom);
-        } else {
-          // Left edge
-          dotPosition = Offset(bounds.left, bounds.bottom - (distance - bounds.width * 2 - bounds.height));
+          // Clip to a small circle
+          final dotCenter = Offset(offset.dx + x, offset.dy + y);
+          canvas.clipRect(Rect.fromCircle(center: dotCenter, radius: dotRadius + 2));
+
+          // Draw the text outline - if it intersects with our circle, the dot will show
+          textPainter.paint(canvas, offset);
+
+          canvas.restore();
         }
-
-        canvas.drawCircle(dotPosition, 3, dotPaint);
       }
-
-      // Also draw the number outline very faintly
-      textPainter.paint(canvas, offset);
     }
     // Hard: No guide at all
   }
