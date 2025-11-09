@@ -20,7 +20,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   String? _selectedLetter; // null means show grid
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
-  bool _showSuccess = false;
+  bool _showCheck = false; // Show the letter temporarily when Check button is pressed
 
   // All Hebrew letters
   final List<String> _hebrewLetters = [
@@ -64,30 +64,6 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     await _flutterTts.speak(text);
   }
 
-  void _checkIfComplete() {
-    if (_canvasSize == Size.zero || drawnPoints.isEmpty) return;
-
-    // Count valid points and strokes (number of times finger was lifted)
-    final validPoints = drawnPoints.where((p) => p.dx >= 0).length;
-    final strokes = drawnPoints.where((p) => p.dx < 0).length;
-
-    // Require enough drawing AND enough strokes (for complex letters)
-    // Most letters need at least 2-3 strokes to complete properly
-    if (validPoints > 40 && strokes >= 2 && !_showSuccess) {
-      setState(() {
-        _showSuccess = true;
-      });
-      _speak(_isHebrew ? 'כל הכבוד!' : 'Well done!');
-
-      // Auto-advance to next letter after 1.5 seconds
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted && _showSuccess) {
-          _goToNextLetter();
-        }
-      });
-    }
-  }
-
   void _goToNextLetter() {
     final letters = _isHebrew ? _hebrewLetters : _englishLetters;
     final currentIndex = letters.indexOf(_selectedLetter!);
@@ -97,22 +73,32 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
       setState(() {
         _selectedLetter = nextLetter;
         drawnPoints.clear();
-        _showSuccess = false;
+        _showCheck = false;
       });
       _speakInstruction(nextLetter);
     } else {
       // Completed all letters - go back to grid
-      _speak(_isHebrew ? 'סיימת את כל האותיות! מעולה!' : 'You completed all letters! Excellent!');
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _selectedLetter = null;
-            drawnPoints.clear();
-            _showSuccess = false;
-          });
-        }
+      setState(() {
+        _selectedLetter = null;
+        drawnPoints.clear();
+        _showCheck = false;
       });
     }
+  }
+
+  void _showCheckTemporarily() {
+    setState(() {
+      _showCheck = true;
+    });
+
+    // Hide check after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showCheck = false;
+        });
+      }
+    });
   }
 
   Future<void> _speak(String text) async {
@@ -124,7 +110,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   void _clearDrawing() {
     setState(() {
       drawnPoints.clear();
-      _showSuccess = false;
+      _showCheck = false;
     });
   }
 
@@ -321,7 +307,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                       onPressed: () => setState(() {
                         _selectedLetter = null;
                         drawnPoints.clear();
-                        _showSuccess = false;
+                        _showCheck = false;
                       }),
                     ),
                     Expanded(
@@ -392,38 +378,22 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                                 setState(() {
                                   drawnPoints.add(const Offset(-1, -1));
                                 });
-                                _checkIfComplete();
                               },
                               child: CustomPaint(
                                 painter: DrawingPainter(drawnPoints, color),
                                 size: Size.infinite,
                               ),
                             ),
-                            // Success overlay
-                            if (_showSuccess)
-                              Container(
-                                color: Colors.green.withOpacity(0.3),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.check_circle,
-                                        color: Colors.green,
-                                        size: 100,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        _isHebrew ? 'מצוין!' : 'Excellent!',
-                                        style: TextStyle(
-                                          fontSize: responsive.fontSize(32),
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            // Check overlay - shows the letter when Check button is pressed
+                            if (_showCheck)
+                              CustomPaint(
+                                painter: CheckLetterPainter(
+                                  _selectedLetter!,
+                                  _canvasSize,
+                                  color,
+                                  _isHebrew,
                                 ),
+                                size: Size.infinite,
                               ),
                           ],
                         );
@@ -435,18 +405,81 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
 
               SizedBox(height: responsive.spacing(16)),
 
-              // Clear button (only when not showing success)
-              if (!_showSuccess)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-                  child: KidButton(
-                    text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
-                    icon: Icons.delete,
-                    onPressed: _clearDrawing,
-                    color: Colors.orange,
-                    height: 60,
-                  ),
-                ),
+              // Action buttons
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                child: _selectedDifficulty == 'easy'
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: KidButton(
+                                text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
+                                icon: Icons.delete,
+                                onPressed: _clearDrawing,
+                                color: Colors.orange,
+                                height: 60,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: KidButton(
+                                text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
+                                icon: Icons.arrow_forward,
+                                onPressed: _goToNextLetter,
+                                color: Colors.green,
+                                height: 60,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          // Clear button row
+                          KidButton(
+                            text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
+                            icon: Icons.delete,
+                            onPressed: _clearDrawing,
+                            color: Colors.orange,
+                            height: 60,
+                          ),
+                          const SizedBox(height: 12),
+                          // Check and Next buttons row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: KidButton(
+                                    text: _isHebrew ? 'בדיקה 🔍' : 'Check 🔍',
+                                    icon: Icons.visibility,
+                                    onPressed: _showCheckTemporarily,
+                                    color: Colors.purple,
+                                    height: 60,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: KidButton(
+                                    text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
+                                    icon: Icons.arrow_forward,
+                                    onPressed: _goToNextLetter,
+                                    color: Colors.green,
+                                    height: 60,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+              ),
 
               SizedBox(height: responsive.spacing(16)),
             ],
@@ -496,23 +529,117 @@ class GuideLetterPainter extends CustomPainter {
 
       textPainter.paint(canvas, offset);
     } else if (difficulty == 'medium') {
-      // Medium: Guide dots around where the letter should be
-      final dotPaint = Paint()
-        ..color = color.withOpacity(0.6)
-        ..style = PaintingStyle.fill;
+      // Medium: Outline with gaps - dashed letter outline
+      final textStyle = TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        foreground: Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..color = color.withOpacity(0.5),
+        fontFamily: isHebrew ? 'Rubik' : null,
+      );
 
-      // Draw dots in a pattern around center
-      const numDots = 24;
-      final dotRadius = min(size.width, size.height) * 0.25;
+      final textSpan = TextSpan(text: letter, style: textStyle);
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: isHebrew ? TextDirection.rtl : TextDirection.ltr,
+      );
 
-      for (int i = 0; i < numDots; i++) {
-        final angle = (i * 2 * pi / numDots);
-        final x = center.dx + dotRadius * cos(angle);
-        final y = center.dy + dotRadius * sin(angle);
-        canvas.drawCircle(Offset(x, y), 4, dotPaint);
-      }
+      textPainter.layout();
+
+      final offset = Offset(
+        center.dx - textPainter.width / 2,
+        center.dy - textPainter.height / 2,
+      );
+
+      // Draw the outline with gaps by using a custom path
+      // We'll draw segments with gaps
+      canvas.save();
+      canvas.translate(offset.dx, offset.dy);
+
+      // Create a path from the text and draw it with dashes
+      final path = _createTextPath(textPainter);
+      _drawDashedPath(canvas, path, Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..color = color.withOpacity(0.5), 10, 8);
+
+      canvas.restore();
     }
     // Hard: No guide at all
+  }
+
+  Path _createTextPath(TextPainter textPainter) {
+    // This is a simplified approach - just drawing a rectangular outline
+    // For actual text outline, we would need more complex path extraction
+    final path = Path();
+    path.addRect(Rect.fromLTWH(0, 0, textPainter.width, textPainter.height));
+    return path;
+  }
+
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint, double dashLength, double dashSpace) {
+    final metrics = path.computeMetrics();
+    for (var metric in metrics) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        final start = metric.getTangentForOffset(distance)!.position;
+        distance += dashLength;
+        final end = metric.getTangentForOffset(distance.clamp(0, metric.length))!.position;
+        canvas.drawLine(start, end, paint);
+        distance += dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+/// ציור האות בבדיקה - מציג את האות המלאה לזמן קצר
+class CheckLetterPainter extends CustomPainter {
+  final String letter;
+  final Size canvasSize;
+  final Color color;
+  final bool isHebrew;
+
+  CheckLetterPainter(this.letter, this.canvasSize, this.color, this.isHebrew);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final fontSize = min(size.width, size.height) * 0.7;
+
+    // Draw semi-transparent overlay
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint()..color = Colors.white.withOpacity(0.7),
+    );
+
+    // Draw the letter
+    final textStyle = TextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.bold,
+      color: color.withOpacity(0.8),
+      fontFamily: isHebrew ? 'Rubik' : null,
+    );
+
+    final textSpan = TextSpan(text: letter, style: textStyle);
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: isHebrew ? TextDirection.rtl : TextDirection.ltr,
+    );
+
+    textPainter.layout();
+
+    final offset = Offset(
+      center.dx - textPainter.width / 2,
+      center.dy - textPainter.height / 2,
+    );
+
+    textPainter.paint(canvas, offset);
   }
 
   @override

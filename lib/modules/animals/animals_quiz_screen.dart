@@ -15,9 +15,9 @@ class AnimalsQuizScreen extends StatefulWidget {
 }
 
 class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
-  final int _totalQuestions = 10;
   int _currentQuestionIndex = 0;
   int _score = 0;
+  int _correctAnswers = 0;
   int? _selectedAnswer;
   bool? _isCorrect;
   bool _showReward = false;
@@ -107,6 +107,7 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
 
       if (_isCorrect!) {
         _score += 10;
+        _correctAnswers++;
         _showReward = true;
       }
     });
@@ -118,26 +119,20 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
       appProvider.speak(_isHebrew ? 'לא נכון, נסה שוב' : 'Wrong, try again');
     }
 
-    // המשך לשאלה הבאה אחרי עיכוב
+    // המשך לשאלה הבאה אחרי עיכוב (ללא הגבלה)
     if (_isCorrect!) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          if (_currentQuestionIndex < _totalQuestions - 1) {
-            setState(() {
-              _currentQuestionIndex++;
-            });
-            _generateQuestion();
-          } else {
-            _showFinalScore();
-          }
+          setState(() {
+            _currentQuestionIndex++;
+          });
+          _generateQuestion();
         }
       });
     }
   }
 
   void _showFinalScore() {
-    final percentage = ((_score / (_totalQuestions * 10)) * 100).round();
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -156,44 +151,39 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              _isHebrew ? 'הניקוד שלך:' : 'Your score:',
+              _isHebrew ? 'תשובות נכונות:' : 'Correct answers:',
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              '$_score/${_totalQuestions * 10}',
-              style: TextStyle(
+              '$_correctAnswers',
+              style: const TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: percentage >= 70 ? Colors.green : Colors.orange,
+                color: Colors.green,
               ),
             ),
+            const SizedBox(height: 10),
             Text(
-              '$percentage%',
-              style: TextStyle(
-                fontSize: 24,
-                color: percentage >= 70 ? Colors.green : Colors.orange,
+              _isHebrew ? 'כוכבים:' : 'Stars:',
+              style: const TextStyle(fontSize: 18),
+            ),
+            Text(
+              '⭐ $_score',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-            child: Text(_isHebrew ? 'סיום' : 'Exit'),
-          ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              setState(() {
-                _currentQuestionIndex = 0;
-                _score = 0;
-              });
-              _generateQuestion();
+              Navigator.of(context).pop();
             },
-            child: Text(_isHebrew ? 'שחק שוב' : 'Play Again'),
+            child: Text(_isHebrew ? 'חזרה לתפריט' : 'Back to Menu'),
           ),
         ],
       ),
@@ -236,7 +226,7 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${_currentQuestionIndex + 1}/$_totalQuestions',
+                          _isHebrew ? 'שאלה ${_currentQuestionIndex + 1}' : 'Question ${_currentQuestionIndex + 1}',
                           style: TextStyle(
                             fontSize: responsive.fontSize(24),
                             fontWeight: FontWeight.bold,
@@ -314,16 +304,37 @@ class _AnimalsQuizScreenState extends State<AnimalsQuizScreen> {
                     ),
                   ),
 
-                  // Repeat question button
+                  // Action buttons
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: KidButton(
-                      text: _isHebrew ? 'שמע שוב 🔊' : 'Hear Again 🔊',
-                      icon: Icons.volume_up,
-                      onPressed: _speakQuestion,
-                      color: Colors.blue,
-                      width: responsive.width(80),
-                      height: 60,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: KidButton(
+                              text: _isHebrew ? 'שמע שוב 🔊' : 'Hear Again 🔊',
+                              icon: Icons.volume_up,
+                              onPressed: _speakQuestion,
+                              color: Colors.blue,
+                              height: 60,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: KidButton(
+                              text: _isHebrew ? 'סיום 🏁' : 'Finish 🏁',
+                              icon: Icons.check_circle,
+                              onPressed: _showFinalScore,
+                              color: Colors.red,
+                              height: 60,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -33,6 +33,7 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
 
   int _currentQuestion = 0;
   int _score = 0;
+  int _correctAnswers = 0;
   bool _answered = false;
   int? _selectedAnswer;
   bool? _isCorrect;
@@ -104,91 +105,74 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
       _isCorrect = index == _correctAnswerIndex;
       if (_isCorrect!) {
         _score++;
+        _correctAnswers++;
       }
     });
 
     Future.delayed(const Duration(milliseconds: 1500), () {
-      if (_currentQuestion < 9) {
-        setState(() {
-          _currentQuestion++;
-          _answered = false;
-          _selectedAnswer = null;
-          _isCorrect = null;
-        });
-        _generateQuestion();
-        _speakQuestion();
-      } else {
-        _showResults();
-      }
+      setState(() {
+        _currentQuestion++;
+        _answered = false;
+        _selectedAnswer = null;
+        _isCorrect = null;
+      });
+      _generateQuestion();
+      _speakQuestion();
     });
   }
 
-  void _showResults() {
-    final percentage = (_score / 10 * 100).round();
-    String message = '';
-    String emoji = '';
-
-    if (percentage >= 80) {
-      message = _isHebrew ? 'מעולה! אתה מוזיקאי אמיתי!' : 'Excellent! You\'re a true musician!';
-      emoji = '🎵';
-    } else if (percentage >= 60) {
-      message = _isHebrew ? 'טוב מאוד! המשך ללמוד!' : 'Very good! Keep learning!';
-      emoji = '🎼';
-    } else {
-      message = _isHebrew ? 'נסה שוב! תרגול עושה את השלמות!' : 'Try again! Practice makes perfect!';
-      emoji = '🎶';
-    }
-
+  void _showFinalScore() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text(
-          _isHebrew ? 'סיימת!' : 'Finished!',
+          _isHebrew ? '🎉 כל הכבוד! 🎉' : '🎉 Well Done! 🎉',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 28),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              emoji,
-              style: TextStyle(fontSize: 80),
+              _isHebrew ? 'סיימת את החידון!' : 'You finished the quiz!',
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
-              '$_score/10',
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.purple),
+              _isHebrew ? 'תשובות נכונות:' : 'Correct answers:',
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 16),
             Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
+              '$_correctAnswers',
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _isHebrew ? 'כוכבים:' : 'Stars:',
+              style: const TextStyle(fontSize: 18),
+            ),
+            Text(
+              '⭐ $_score',
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _currentQuestion = 0;
-                _score = 0;
-                _answered = false;
-                _selectedAnswer = null;
-                _isCorrect = null;
-              });
-              _generateQuestion();
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
-            child: Text(_isHebrew ? 'שחק שוב' : 'Play Again', style: TextStyle(fontSize: 18)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text(_isHebrew ? 'חזור לתפריט' : 'Back to Menu', style: TextStyle(fontSize: 18)),
+            child: Text(_isHebrew ? 'חזרה לתפריט' : 'Back to Menu'),
           ),
         ],
       ),
@@ -260,7 +244,7 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${_isHebrew ? 'שאלה' : 'Question'} ${_currentQuestion + 1}/10',
+                      _isHebrew ? 'שאלה ${_currentQuestion + 1}' : 'Question ${_currentQuestion + 1}',
                       style: TextStyle(
                         fontSize: responsive.fontSize(18),
                         fontWeight: FontWeight.bold,
@@ -353,15 +337,37 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
                 ),
               ),
 
-              // Repeat question button
+              // Buttons - Hear again and Finish
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: KidButton(
-                  text: _isHebrew ? 'שמע שוב את השאלה 🔊' : 'Hear Question Again 🔊',
-                  icon: Icons.volume_up,
-                  onPressed: _speakQuestion,
-                  color: Colors.green,
-                  height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: KidButton(
+                          text: _isHebrew ? 'שמע שוב 🔊' : 'Hear Again 🔊',
+                          icon: Icons.volume_up,
+                          onPressed: _speakQuestion,
+                          color: Colors.green,
+                          height: 60,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: KidButton(
+                          text: _isHebrew ? 'סיום 🏁' : 'Finish 🏁',
+                          icon: Icons.check_circle,
+                          onPressed: _showFinalScore,
+                          color: Colors.red,
+                          height: 60,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
