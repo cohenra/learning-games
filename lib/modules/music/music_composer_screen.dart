@@ -373,7 +373,6 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       _isHebrew
@@ -386,7 +385,7 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Expanded(
+                    Flexible(
                       child: _recordedNotes.isEmpty
                           ? Center(
                               child: Text(
