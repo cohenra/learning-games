@@ -147,58 +147,63 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
         child: SafeArea(
           child: Stack(
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                '✍️',
-                style: TextStyle(fontSize: responsive.iconSize(80)),
-              ),
-              SizedBox(height: responsive.spacing(20)),
-              Text(
-                _isHebrew ? 'תרגול כתיבת מספרים' : 'Number Tracing',
-                style: TextStyle(
-                  fontSize: responsive.titleSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.orange.shade700,
+              Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '✍️',
+                        style: TextStyle(fontSize: responsive.iconSize(80)),
+                      ),
+                      SizedBox(height: responsive.spacing(20)),
+                      Text(
+                        _isHebrew ? 'תרגול כתיבת מספרים' : 'Number Tracing',
+                        style: TextStyle(
+                          fontSize: responsive.titleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange.shade700,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: responsive.spacing(40)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                        child: KidButton(
+                          text: _isHebrew ? 'קל - עם מדריך ברור ✨' : 'Easy - With Clear Guide ✨',
+                          icon: Icons.star,
+                          onPressed: () => setState(() => _selectedDifficulty = 'easy'),
+                          color: Colors.green,
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                        child: KidButton(
+                          text: _isHebrew ? 'בינוני - עם מדריך קל 💫' : 'Medium - With Light Guide 💫',
+                          icon: Icons.star_half,
+                          onPressed: () => setState(() => _selectedDifficulty = 'medium'),
+                          color: Colors.orange,
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
+                      SizedBox(height: responsive.verticalSpacing),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                        child: KidButton(
+                          text: _isHebrew ? 'קשה - בלי מדריך 🌟' : 'Hard - Without Guide 🌟',
+                          icon: Icons.star_border,
+                          onPressed: () => setState(() => _selectedDifficulty = 'hard'),
+                          color: Colors.red,
+                          height: responsive.buttonHeight,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
-              SizedBox(height: responsive.spacing(40)),
-              Padding(
-                padding: responsive.safePadding,
-                child: KidButton(
-                  text: _isHebrew ? 'קל - עם מדריך ברור ✨' : 'Easy - With Clear Guide ✨',
-                  icon: Icons.star,
-                  onPressed: () => setState(() => _selectedDifficulty = 'easy'),
-                  color: Colors.green,
-                  height: responsive.buttonHeight,
-                ),
-              ),
-              SizedBox(height: responsive.verticalSpacing),
-              Padding(
-                padding: responsive.safePadding,
-                child: KidButton(
-                  text: _isHebrew ? 'בינוני - עם מדריך קל 💫' : 'Medium - With Light Guide 💫',
-                  icon: Icons.star_half,
-                  onPressed: () => setState(() => _selectedDifficulty = 'medium'),
-                  color: Colors.orange,
-                  height: responsive.buttonHeight,
-                ),
-              ),
-              SizedBox(height: responsive.verticalSpacing),
-              Padding(
-                padding: responsive.safePadding,
-                child: KidButton(
-                  text: _isHebrew ? 'קשה - בלי מדריך 🌟' : 'Hard - Without Guide 🌟',
-                  icon: Icons.star_border,
-                  onPressed: () => setState(() => _selectedDifficulty = 'hard'),
-                  color: Colors.red,
-                  height: responsive.buttonHeight,
-                ),
-              ),
-            ],
-          ),
           // Back button
           Positioned(
             top: 8,

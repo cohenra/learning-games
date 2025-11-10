@@ -27,7 +27,7 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
     {'nameHe': 'סול', 'nameEn': 'G4', 'letter': 'G', 'color': const Color(0xFF4D96FF), 'frequency': 392.00, 'pitch': 1.2},
     {'nameHe': 'לה', 'nameEn': 'A4', 'letter': 'A', 'color': const Color(0xFF9D4EDD), 'frequency': 440.00, 'pitch': 1.4},
     {'nameHe': 'סי', 'nameEn': 'B4', 'letter': 'B', 'color': const Color(0xFFFF6BCB), 'frequency': 493.88, 'pitch': 1.6},
-    {'nameHe': 'דו גבוה', 'nameEn': 'C5', 'letter': 'C\'', 'color': const Color(0xFFE63946), 'frequency': 523.25, 'pitch': 1.8},
+    {'nameHe': 'דו גבוה', 'nameEn': 'C5', 'letter': 'C5', 'color': const Color(0xFFE63946), 'frequency': 523.25, 'pitch': 1.8},
   ];
 
   // 4 instruments matching React code - Piano (sine), Flute (sine), Guitar (triangle), Drum (square)
@@ -61,10 +61,18 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
 
   Future<void> _playNote(Map<String, dynamic> note) async {
     final noteLetter = note['letter'] as String;
+    final instrumentId = _instruments[_selectedInstrument]['id'] as String;
     final pitchMod = _instruments[_selectedInstrument]['pitchMod'] as double;
 
-    // Play the note with instrument's pitch modifier
-    await _audioService.playNote(noteLetter, pitchModifier: pitchMod);
+    // Clean the note letter (C5 -> C, etc.)
+    final cleanNote = noteLetter.replaceAll(RegExp(r'[0-9]'), '');
+
+    // Play the note with the selected instrument
+    await _audioService.playNote(
+      cleanNote,
+      instrument: instrumentId,
+      pitchModifier: pitchMod,
+    );
   }
 
   void _onNoteTap(int index) async {
@@ -72,10 +80,14 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
 
     final note = _notes[index];
 
-    // Add to recorded sequence if not at max
+    // Add to recorded sequence if not at max (store only essential data)
     if (_recordedNotes.length < _maxNotes) {
       setState(() {
-        _recordedNotes.add({...note});
+        _recordedNotes.add({
+          'letter': note['letter'],
+          'color': note['color'],
+          'pitch': note['pitch'],
+        });
       });
     }
 
@@ -135,10 +147,14 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
       for (final noteLetter in melody) {
         // Find the note in our notes list
         final note = _notes.firstWhere(
-          (n) => n['letter'] == noteLetter || n['letter'] == noteLetter.replaceAll("'", ""),
+          (n) => n['letter'] == noteLetter || n['letter'].toString().startsWith(noteLetter),
           orElse: () => _notes[0],
         );
-        _recordedNotes.add({...note});
+        _recordedNotes.add({
+          'letter': note['letter'],
+          'color': note['color'],
+          'pitch': note['pitch'],
+        });
       }
     });
   }
