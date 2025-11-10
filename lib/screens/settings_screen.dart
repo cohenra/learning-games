@@ -330,6 +330,8 @@ class SettingsScreen extends StatelessWidget {
         return isHebrew ? 'מוזיקה' : 'Music';
       case 'drawing':
         return isHebrew ? 'ציור' : 'Drawing';
+      case 'maze':
+        return l10n.mazeTitle;
 
       default:
         return key;

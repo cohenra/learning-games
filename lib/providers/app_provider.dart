@@ -9,7 +9,7 @@ class AppProvider with ChangeNotifier {
   bool _musicEnabled = true;
   final FlutterTts _flutterTts = FlutterTts();
 
-  // התקדמות למודולים - כל 14 המודולים
+  // התקדמות למודולים - כל 15 המודולים
   Map<String, ModuleProgress> _progress = {
     // מיומנויות בסיסיות
     'numbers': ModuleProgress(),
@@ -32,6 +32,7 @@ class AppProvider with ChangeNotifier {
     // יצירתי ומהנה
     'music': ModuleProgress(),
     'drawing': ModuleProgress(),
+    'maze': ModuleProgress(),
   };
 
   // Getters

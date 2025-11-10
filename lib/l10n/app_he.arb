@@ -186,5 +186,26 @@
       }
     }
   },
-  "whichShape": "איזו צורה?"
+  "whichShape": "איזו צורה?",
+
+  "mazeTitle": "מבוך הידע",
+  "mazeDescription": "פתרו שאלות והגיעו ליעד!",
+  "mazeEasy": "קל",
+  "mazeMedium": "בינוני",
+  "mazeHard": "קשה",
+  "mazeSelectDifficulty": "בחרו רמת קושי",
+  "mazeStart": "התחל משחק",
+  "mazeQuestion": "שאלה",
+  "mazeUnlockDirection": "פתחו את הדרך",
+  "mazeDirectionLocked": "נעול - ענו על השאלה!",
+  "mazeReachedGoal": "הגעתם ליעד!",
+  "mazeTimeElapsed": "זמן שחלף",
+  "mazeQuestionsAnswered": "שאלות שנענו",
+  "mazeMoveUp": "לך למעלה ↑",
+  "mazeMoveDown": "לך למטה ↓",
+  "mazeMoveLeft": "לך שמאלה ←",
+  "mazeMoveRight": "לך ימינה →",
+  "mazeStars": "כוכבים",
+  "mazeCorrectAnswers": "תשובות נכונות",
+  "mazeAccuracy": "דיוק"
 }

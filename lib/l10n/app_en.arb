@@ -186,5 +186,26 @@
       }
     }
   },
-  "whichShape": "Which shape?"
+  "whichShape": "Which shape?",
+
+  "mazeTitle": "Knowledge Maze",
+  "mazeDescription": "Solve questions and reach the goal!",
+  "mazeEasy": "Easy",
+  "mazeMedium": "Medium",
+  "mazeHard": "Hard",
+  "mazeSelectDifficulty": "Choose Difficulty",
+  "mazeStart": "Start Game",
+  "mazeQuestion": "Question",
+  "mazeUnlockDirection": "Unlock the Path",
+  "mazeDirectionLocked": "Locked - Answer the question!",
+  "mazeReachedGoal": "You Reached the Goal!",
+  "mazeTimeElapsed": "Time Elapsed",
+  "mazeQuestionsAnswered": "Questions Answered",
+  "mazeMoveUp": "Go Up ↑",
+  "mazeMoveDown": "Go Down ↓",
+  "mazeMoveLeft": "Go Left ←",
+  "mazeMoveRight": "Go Right →",
+  "mazeStars": "Stars",
+  "mazeCorrectAnswers": "Correct Answers",
+  "mazeAccuracy": "Accuracy"
 }
