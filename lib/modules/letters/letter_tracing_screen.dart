@@ -3,6 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
 import '../../utils/responsive_helper.dart';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 
 /// מסך תרגול כתיבת אותיות - גרסה משופרת
 class LetterTracingScreen extends StatefulWidget {
