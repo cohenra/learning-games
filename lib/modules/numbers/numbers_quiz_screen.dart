@@ -226,7 +226,7 @@ class _NumbersQuizScreenState extends State<NumbersQuizScreen> {
 
                       // נקודות המייצגות את המספר
                       SizedBox(
-                        height: responsive.height(30),
+                        height: responsive.height(10),
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
                           child: Center(
