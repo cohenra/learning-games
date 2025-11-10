@@ -103,14 +103,11 @@ class AudioService {
         await _player.setPlaybackRate(pitchModifier.clamp(0.5, 2.0));
         // Use AssetSource with the path (already includes 'audio/')
         await _player.play(AssetSource(path));
-        print('Playing note: $note from $path with pitch: $pitchModifier'); // Debug
       } catch (e) {
-        print('Error playing note $note: $e');
+        // Silent failure - audio is not critical for app functionality
       }
-    } else {
-      print('Audio file not found for: $key');
-      print('Available assets: ${_assetPaths.keys.toList()}'); // Debug
     }
+    // Silent failure if asset not found - checked via isNoteAvailable()
   }
 
   /// Play drum sound
@@ -123,14 +120,11 @@ class AudioService {
       try {
         await _player.stop();
         await _player.play(AssetSource(path));
-        print('Playing drum from: $path'); // Debug
       } catch (e) {
-        print('Error playing drum: $e');
+        // Silent failure - audio is not critical for app functionality
       }
-    } else {
-      print('Drum audio file not found');
-      print('Available assets: ${_assetPaths.keys.toList()}'); // Debug
     }
+    // Silent failure if asset not found - checked via isDrumAvailable()
   }
 
   /// Play a sequence of notes

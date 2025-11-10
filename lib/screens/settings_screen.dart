@@ -292,7 +292,10 @@ class SettingsScreen extends StatelessWidget {
   }
 
   String _getModuleName(String key, AppLocalizations l10n) {
+    final isHebrew = l10n.localeName == 'he';
+
     switch (key) {
+      // מיומנויות בסיסיות
       case 'numbers':
         return l10n.numbers;
       case 'letters':
@@ -301,6 +304,33 @@ class SettingsScreen extends StatelessWidget {
         return l10n.colors;
       case 'shapes':
         return l10n.shapes;
+
+      // העולם סביבנו
+      case 'animals':
+        return isHebrew ? 'בעלי חיים' : 'Animals';
+      case 'vehicles':
+        return isHebrew ? 'כלי תחבורה' : 'Vehicles';
+      case 'weather':
+        return isHebrew ? 'מזג אוויר' : 'Weather';
+      case 'fruits_vegetables':
+        return isHebrew ? 'פירות וירקות' : 'Fruits & Vegetables';
+      case 'body_parts':
+        return isHebrew ? 'חלקי הגוף' : 'Body Parts';
+
+      // אנשים ורגשות
+      case 'family':
+        return isHebrew ? 'משפחה' : 'Family';
+      case 'emotions':
+        return isHebrew ? 'רגשות' : 'Emotions';
+      case 'professions':
+        return isHebrew ? 'מקצועות' : 'Professions';
+
+      // יצירתי ומהנה
+      case 'music':
+        return isHebrew ? 'מוזיקה' : 'Music';
+      case 'drawing':
+        return isHebrew ? 'ציור' : 'Drawing';
+
       default:
         return key;
     }

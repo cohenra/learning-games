@@ -9,12 +9,29 @@ class AppProvider with ChangeNotifier {
   bool _musicEnabled = true;
   final FlutterTts _flutterTts = FlutterTts();
 
-  // התקדמות למודולים
+  // התקדמות למודולים - כל 14 המודולים
   Map<String, ModuleProgress> _progress = {
+    // מיומנויות בסיסיות
     'numbers': ModuleProgress(),
     'letters': ModuleProgress(),
     'colors': ModuleProgress(),
     'shapes': ModuleProgress(),
+
+    // העולם סביבנו
+    'animals': ModuleProgress(),
+    'vehicles': ModuleProgress(),
+    'weather': ModuleProgress(),
+    'fruits_vegetables': ModuleProgress(),
+    'body_parts': ModuleProgress(),
+
+    // אנשים ורגשות
+    'family': ModuleProgress(),
+    'emotions': ModuleProgress(),
+    'professions': ModuleProgress(),
+
+    // יצירתי ומהנה
+    'music': ModuleProgress(),
+    'drawing': ModuleProgress(),
   };
 
   // Getters
