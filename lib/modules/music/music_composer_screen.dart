@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 import '../../utils/responsive_helper.dart';
 import '../../services/audio_service.dart';
 
@@ -15,29 +16,37 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
   final AudioService _audioService = AudioService();
   bool _isHebrew = true;
   bool _isPlaying = false;
+  double _tempo = 120; // BPM (beats per minute)
 
-  // List of notes with their properties
+  // 8 notes from C4 to C5 with exact frequencies from React code
   final List<Map<String, dynamic>> _notes = [
-    {'nameHe': 'דו', 'nameEn': 'Do', 'letter': 'C', 'color': Colors.red, 'pitch': 0.7},
-    {'nameHe': 'רה', 'nameEn': 'Re', 'letter': 'D', 'color': Colors.orange, 'pitch': 0.8},
-    {'nameHe': 'מי', 'nameEn': 'Mi', 'letter': 'E', 'color': Colors.yellow.shade700, 'pitch': 0.9},
-    {'nameHe': 'פה', 'nameEn': 'Fa', 'letter': 'F', 'color': Colors.green, 'pitch': 1.0},
-    {'nameHe': 'סול', 'nameEn': 'Sol', 'letter': 'G', 'color': Colors.blue, 'pitch': 1.2},
-    {'nameHe': 'לה', 'nameEn': 'La', 'letter': 'A', 'color': Colors.purple, 'pitch': 1.4},
-    {'nameHe': 'סי', 'nameEn': 'Si', 'letter': 'B', 'color': Colors.pink, 'pitch': 1.6},
+    {'nameHe': 'דו', 'nameEn': 'C4', 'letter': 'C', 'color': const Color(0xFFFF6B6B), 'frequency': 261.63, 'pitch': 0.7},
+    {'nameHe': 'רה', 'nameEn': 'D4', 'letter': 'D', 'color': const Color(0xFFFFA500), 'frequency': 293.66, 'pitch': 0.8},
+    {'nameHe': 'מי', 'nameEn': 'E4', 'letter': 'E', 'color': const Color(0xFFFFD93D), 'frequency': 329.63, 'pitch': 0.9},
+    {'nameHe': 'פה', 'nameEn': 'F4', 'letter': 'F', 'color': const Color(0xFF6BCB77), 'frequency': 349.23, 'pitch': 1.0},
+    {'nameHe': 'סול', 'nameEn': 'G4', 'letter': 'G', 'color': const Color(0xFF4D96FF), 'frequency': 392.00, 'pitch': 1.2},
+    {'nameHe': 'לה', 'nameEn': 'A4', 'letter': 'A', 'color': const Color(0xFF9D4EDD), 'frequency': 440.00, 'pitch': 1.4},
+    {'nameHe': 'סי', 'nameEn': 'B4', 'letter': 'B', 'color': const Color(0xFFFF6BCB), 'frequency': 493.88, 'pitch': 1.6},
+    {'nameHe': 'דו גבוה', 'nameEn': 'C5', 'letter': 'C\'', 'color': const Color(0xFFE63946), 'frequency': 523.25, 'pitch': 1.8},
   ];
 
-  // Available instruments with pitch modifiers (simulate different sounds)
+  // 4 instruments matching React code - Piano (sine), Flute (sine), Guitar (triangle), Drum (square)
   final List<Map<String, dynamic>> _instruments = [
-    {'nameHe': 'פסנתר', 'nameEn': 'Piano', 'icon': '🎹', 'id': 'piano', 'pitchMod': 1.0},
-    {'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'icon': '🎸', 'id': 'guitar', 'pitchMod': 1.3},
-    {'nameHe': 'חליל', 'nameEn': 'Flute', 'icon': '🎶', 'id': 'flute', 'pitchMod': 1.6},
-    {'nameHe': 'צ\'לו', 'nameEn': 'Cello', 'icon': '🎻', 'id': 'cello', 'pitchMod': 0.7},
+    {'nameHe': 'פסנתר', 'nameEn': 'Piano', 'icon': '🎹', 'id': 'piano', 'pitchMod': 1.0, 'wave': 'sine'},
+    {'nameHe': 'חליל', 'nameEn': 'Flute', 'icon': '🎶', 'id': 'flute', 'pitchMod': 1.6, 'wave': 'sine'},
+    {'nameHe': 'גיטרה', 'nameEn': 'Guitar', 'icon': '🎸', 'id': 'guitar', 'pitchMod': 1.3, 'wave': 'triangle'},
+    {'nameHe': 'תופים', 'nameEn': 'Drum', 'icon': '🥁', 'id': 'drum', 'pitchMod': 0.8, 'wave': 'square'},
   ];
 
   int _selectedInstrument = 0;
   List<Map<String, dynamic>> _recordedNotes = [];
-  final int _maxNotes = 20;
+  final int _maxNotes = 30; // Increased max notes
+
+  // Example melodies
+  final Map<String, List<String>> _exampleMelodies = {
+    'twinkle': ['C', 'C', 'G', 'G', 'A', 'A', 'G', 'F', 'F', 'E', 'E', 'D', 'D', 'C'],
+    'happy': ['C', 'C', 'D', 'E', 'D', 'C', 'E', 'D', 'D', 'C'],
+  };
 
   @override
   void initState() {
@@ -81,11 +90,16 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
       _isPlaying = true;
     });
 
+    // Calculate delay based on tempo (BPM)
+    // 60 BPM = 1 beat per second = 1000ms
+    // delay = 60000 / BPM
+    final delayMs = (60000 / _tempo).round();
+
     for (int i = 0; i < _recordedNotes.length; i++) {
       if (!_isPlaying) break; // Allow stopping
 
       await _playNote(_recordedNotes[i]);
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future.delayed(Duration(milliseconds: delayMs));
     }
 
     setState(() {
@@ -101,11 +115,57 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
     });
   }
 
+  void _removeLastNote() {
+    if (_isPlaying || _recordedNotes.isEmpty) return;
+
+    setState(() {
+      _recordedNotes.removeLast();
+    });
+  }
+
+  void _loadExampleMelody(String melodyKey) {
+    if (_isPlaying) return;
+
+    final melody = _exampleMelodies[melodyKey];
+    if (melody == null) return;
+
+    setState(() {
+      _recordedNotes.clear();
+
+      for (final noteLetter in melody) {
+        // Find the note in our notes list
+        final note = _notes.firstWhere(
+          (n) => n['letter'] == noteLetter || n['letter'] == noteLetter.replaceAll("'", ""),
+          orElse: () => _notes[0],
+        );
+        _recordedNotes.add({...note});
+      }
+    });
+  }
+
   void _stopPlaying() {
     setState(() {
       _isPlaying = false;
     });
     _audioService.stop();
+  }
+
+  Widget _buildExampleButton(String melodyKey, String label) {
+    return ElevatedButton(
+      onPressed: _isPlaying ? null : () => _loadExampleMelody(melodyKey),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.purple.shade100,
+        foregroundColor: Colors.purple.shade900,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
   }
 
   @override
@@ -140,28 +200,33 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
               // Header
               Padding(
                 padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
+                child: Stack(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                        color: Colors.purple.shade700,
-                        size: 32,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Text(
-                        _isHebrew ? 'יוצר מוזיקה' : 'Music Composer',
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple.shade700,
+                    // Centered title
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 60),
+                        child: Text(
+                          _isHebrew ? 'יוצר מוזיקה 🎵' : 'Music Composer 🎵',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple.shade700,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: 48),
+                    // Back button
+                    Positioned(
+                      right: _isHebrew ? 0 : null,
+                      left: _isHebrew ? null : 0,
+                      child: KidBackButton(
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.purple.shade600,
+                        isHebrew: _isHebrew,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -219,6 +284,56 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
                       ),
                     );
                   },
+                ),
+              ),
+
+              SizedBox(height: responsive.spacing(8)),
+
+              // Tempo control
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+                child: Row(
+                  children: [
+                    Text(
+                      _isHebrew ? 'מהירות: ${_tempo.round()} BPM' : 'Tempo: ${_tempo.round()} BPM',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple.shade700,
+                      ),
+                    ),
+                    Expanded(
+                      child: Slider(
+                        value: _tempo,
+                        min: 60,
+                        max: 180,
+                        divisions: 12,
+                        activeColor: Colors.purple,
+                        inactiveColor: Colors.purple.shade100,
+                        onChanged: _isPlaying
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _tempo = value;
+                                });
+                              },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Example melodies
+              SizedBox(
+                height: 50,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+                  children: [
+                    _buildExampleButton('twinkle', _isHebrew ? 'נצנץ נצנץ ⭐' : 'Twinkle ⭐'),
+                    const SizedBox(width: 8),
+                    _buildExampleButton('happy', _isHebrew ? 'שמח 😊' : 'Happy 😊'),
+                  ],
                 ),
               ),
 
@@ -364,33 +479,44 @@ class _MusicComposerScreenState extends State<MusicComposerScreen> {
               // Control buttons
               Padding(
                 padding: EdgeInsets.all(responsive.spacing(16)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: Column(
                   children: [
-                    // Clear button
-                    Expanded(
-                      child: KidButton(
-                        text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
-                        icon: Icons.delete,
-                        onPressed: _recordedNotes.isEmpty ? null : _clearSequence,
-                        color: Colors.red.shade400,
-                        height: 60,
-                      ),
+                    // First row: Remove last and Clear
+                    Row(
+                      children: [
+                        Expanded(
+                          child: KidButton(
+                            text: _isHebrew ? 'הסר אחרון ⬅️' : 'Remove Last ⬅️',
+                            icon: Icons.backspace,
+                            onPressed: _recordedNotes.isEmpty ? null : _removeLastNote,
+                            color: Colors.orange.shade400,
+                            height: 55,
+                          ),
+                        ),
+                        SizedBox(width: responsive.spacing(8)),
+                        Expanded(
+                          child: KidButton(
+                            text: _isHebrew ? 'נקה הכל 🗑️' : 'Clear All 🗑️',
+                            icon: Icons.delete_forever,
+                            onPressed: _recordedNotes.isEmpty ? null : _clearSequence,
+                            color: Colors.red.shade400,
+                            height: 55,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: responsive.spacing(12)),
-                    // Play/Stop button
-                    Expanded(
-                      child: KidButton(
-                        text: _isPlaying
-                            ? (_isHebrew ? 'עצור ⏹️' : 'Stop ⏹️')
-                            : (_isHebrew ? 'נגן ▶️' : 'Play ▶️'),
-                        icon: _isPlaying ? Icons.stop : Icons.play_arrow,
-                        onPressed: _recordedNotes.isEmpty
-                            ? null
-                            : (_isPlaying ? _stopPlaying : _playSequence),
-                        color: _isPlaying ? Colors.orange : Colors.green,
-                        height: 60,
-                      ),
+                    SizedBox(height: responsive.spacing(8)),
+                    // Second row: Play/Stop button (full width)
+                    KidButton(
+                      text: _isPlaying
+                          ? (_isHebrew ? 'עצור ⏹️' : 'Stop ⏹️')
+                          : (_isHebrew ? 'נגן ▶️' : 'Play ▶️'),
+                      icon: _isPlaying ? Icons.stop : Icons.play_arrow,
+                      onPressed: _recordedNotes.isEmpty
+                          ? null
+                          : (_isPlaying ? _stopPlaying : _playSequence),
+                      color: _isPlaying ? Colors.orange : Colors.green,
+                      height: 65,
                     ),
                   ],
                 ),
