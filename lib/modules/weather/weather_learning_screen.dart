@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 import '../../utils/responsive_helper.dart';
 
 class WeatherLearningScreen extends StatefulWidget {
@@ -81,11 +82,31 @@ class _WeatherLearningScreenState extends State<WeatherLearningScreen> {
             children: [
               Padding(
                 padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
+                child: Stack(
                   children: [
-                    IconButton(icon: Icon(_isHebrew ? Icons.arrow_forward : Icons.arrow_back, color: Colors.teal.shade700, size: 32), onPressed: () => Navigator.pop(context)),
-                    Expanded(child: Text(_isHebrew ? 'זמן למידה' : 'Learning Time', style: TextStyle(fontSize: responsive.titleSize, fontWeight: FontWeight.bold, color: Colors.teal.shade700), textAlign: TextAlign.center)),
-                    SizedBox(width: 48),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 60),
+                        child: Text(
+                          _isHebrew ? 'זמן למידה' : 'Learning Time',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal.shade700,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: _isHebrew ? 0 : null,
+                      left: _isHebrew ? null : 0,
+                      child: KidBackButton(
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.teal.shade600,
+                        isHebrew: _isHebrew,
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -202,12 +202,12 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
           // Back button
           Positioned(
             top: 8,
-            left: 8,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              iconSize: 32,
-              color: Colors.orange.shade700,
+            right: _isHebrew ? 8 : null,
+            left: _isHebrew ? null : 8,
+            child: KidBackButton(
               onPressed: () => Navigator.pop(context),
+              color: Colors.orange.shade600,
+              isHebrew: _isHebrew,
             ),
           ),
         ],
@@ -308,32 +308,40 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
               // Header
               Padding(
                 padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
+                child: Stack(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                        color: Colors.orange.shade700,
-                        size: 32,
-                      ),
-                      onPressed: () => setState(() {
-                        _selectedNumber = null;
-                        drawnPoints.clear();
-                        _showCheck = false;
-                      }),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${_isHebrew ? 'כתוב את המספר' : 'Write the number'} $number',
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade700,
+                    // Centered title
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 60),
+                        child: Text(
+                          '${_isHebrew ? 'כתוב את המספר' : 'Write the number'} $number',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade700,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 48),
+                    // Back button positioned based on language
+                    Positioned(
+                      right: _isHebrew ? 0 : null,
+                      left: _isHebrew ? null : 0,
+                      child: IconButton(
+                        icon: Icon(
+                          _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
+                          color: Colors.orange.shade700,
+                          size: 32,
+                        ),
+                        onPressed: () => setState(() {
+                          _selectedNumber = null;
+                          drawnPoints.clear();
+                          _showCheck = false;
+                        }),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -423,7 +431,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
                               child: KidButton(
                                 text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
                                 icon: Icons.delete,
@@ -433,9 +441,10 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
                               child: KidButton(
                                 text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
                                 icon: Icons.arrow_forward,
@@ -463,7 +472,7 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
                                   child: KidButton(
                                     text: _isHebrew ? 'בדיקה 🔍' : 'Check 🔍',
                                     icon: Icons.visibility,
@@ -473,9 +482,10 @@ class _NumberTracingScreenState extends State<NumberTracingScreen> {
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(left: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
                                   child: KidButton(
                                     text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
                                     icon: Icons.arrow_forward,

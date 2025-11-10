@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 import '../../widgets/reward_animation.dart';
 import '../../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -255,6 +256,11 @@ class _ShapesQuizScreenState extends State<ShapesQuizScreen> {
         title: Text(l10n.quizMode),
         centerTitle: true,
         backgroundColor: Colors.purple,
+        leading: KidBackButton(
+          onPressed: () => Navigator.pop(context),
+          color: Colors.purple.shade600,
+          isHebrew: isHebrew,
+        ),
       ),
       body: Stack(
         children: [

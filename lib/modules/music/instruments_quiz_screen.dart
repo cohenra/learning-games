@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
 import '../../widgets/kid_button.dart';
+import '../../widgets/kid_back_button.dart';
 import '../../utils/responsive_helper.dart';
 
 /// מסך חידון כלי נגינה
@@ -211,28 +212,33 @@ class _InstrumentsQuizScreenState extends State<InstrumentsQuizScreen> {
               // Header
               Padding(
                 padding: EdgeInsets.all(responsive.spacing(12)),
-                child: Row(
+                child: Stack(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        _isHebrew ? Icons.arrow_forward : Icons.arrow_back,
-                        color: Colors.purple.shade700,
-                        size: 32,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Text(
-                        _isHebrew ? 'חידון כלי נגינה' : 'Instruments Quiz',
-                        style: TextStyle(
-                          fontSize: responsive.titleSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple.shade700,
+                    // Centered title
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 60),
+                        child: Text(
+                          _isHebrew ? 'חידון כלי נגינה' : 'Instruments Quiz',
+                          style: TextStyle(
+                            fontSize: responsive.titleSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple.shade700,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: 48),
+                    // Back button positioned based on language
+                    Positioned(
+                      right: _isHebrew ? 0 : null,
+                      left: _isHebrew ? null : 0,
+                      child: KidBackButton(
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.purple.shade600,
+                        isHebrew: _isHebrew,
+                      ),
+                    ),
                   ],
                 ),
               ),
