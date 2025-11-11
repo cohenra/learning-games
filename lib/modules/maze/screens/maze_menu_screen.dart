@@ -131,7 +131,7 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // תיאור
                   Padding(
@@ -139,20 +139,20 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
                     child: Text(
                       l10n.mazeDescription,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 16),
 
                   // בחירת רמת קושי
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
@@ -164,79 +164,81 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
                           ),
                         ],
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.mazeSelectDifficulty,
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[800],
-                            ),
-                          ),
-
-                          const SizedBox(height: 40),
-
-                          // כפתורי רמות קושי
-                          _buildDifficultyButton(
-                            difficulty: MazeDifficulty.easy,
-                            label: l10n.mazeEasy,
-                            icon: Icons.sentiment_very_satisfied,
-                            color: Colors.green,
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          _buildDifficultyButton(
-                            difficulty: MazeDifficulty.medium,
-                            label: l10n.mazeMedium,
-                            icon: Icons.sentiment_satisfied,
-                            color: Colors.orange,
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          _buildDifficultyButton(
-                            difficulty: MazeDifficulty.hard,
-                            label: l10n.mazeHard,
-                            icon: Icons.sentiment_neutral,
-                            color: Colors.red,
-                          ),
-
-                          const SizedBox(height: 40),
-
-                          // כפתור התחלה
-                          ElevatedButton(
-                            onPressed: _startGame,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue[600],
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 48,
-                                vertical: 20,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              l10n.mazeSelectDifficulty,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[800],
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 8,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.play_arrow, size: 32),
-                                const SizedBox(width: 12),
-                                Text(
-                                  l10n.mazeStart,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+
+                            const SizedBox(height: 20),
+
+                            // כפתורי רמות קושי
+                            _buildDifficultyButton(
+                              difficulty: MazeDifficulty.easy,
+                              label: l10n.mazeEasy,
+                              icon: Icons.sentiment_very_satisfied,
+                              color: Colors.green,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            _buildDifficultyButton(
+                              difficulty: MazeDifficulty.medium,
+                              label: l10n.mazeMedium,
+                              icon: Icons.sentiment_satisfied,
+                              color: Colors.orange,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            _buildDifficultyButton(
+                              difficulty: MazeDifficulty.hard,
+                              label: l10n.mazeHard,
+                              icon: Icons.sentiment_neutral,
+                              color: Colors.red,
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            // כפתור התחלה
+                            ElevatedButton(
+                              onPressed: _startGame,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue[600],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 16,
                                 ),
-                              ],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.play_arrow, size: 28),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    l10n.mazeStart,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -266,7 +268,7 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
       borderRadius: BorderRadius.circular(16),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.2) : Colors.grey[100],
           borderRadius: BorderRadius.circular(16),
@@ -287,18 +289,18 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: isSelected ? color : Colors.grey[400],
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                size: 32,
+                size: 26,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,16 +308,16 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: isSelected ? color : Colors.grey[700],
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     '${_getMazeSize(difficulty)}x${_getMazeSize(difficulty)} • ${_getJunctionCount(difficulty)} צמתים',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.grey[600],
                     ),
                   ),
@@ -326,7 +328,7 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
               Icon(
                 Icons.check_circle,
                 color: color,
-                size: 32,
+                size: 28,
               ),
           ],
         ),
