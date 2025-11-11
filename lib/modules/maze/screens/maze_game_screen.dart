@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/app_provider.dart';
 import '../../../widgets/kid_back_button.dart';
@@ -140,7 +140,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
       _currentJunction!.unlockDirection(_pendingDirection!);
 
       // עדכן ניקוד
-      _playerState.answerQuestion(isCorrect: true);
+      _playerState.recordAnswer(true);
 
       // בצע את התנועה
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -150,7 +150,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
         }
       });
     } else {
-      _playerState.answerQuestion(isCorrect: false);
+      _playerState.recordAnswer(false);
     }
 
     setState(() {
@@ -174,8 +174,12 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
 
     // עדכן התקדמות
     final appProvider = context.read<AppProvider>();
-    appProvider.updateModuleProgress('maze', completed: true);
-    appProvider.addStars('maze', _playerState.starsEarned);
+    appProvider.markModuleCompleted('maze');
+
+    // הוסף כוכבים
+    for (int i = 0; i < _playerState.starsEarned; i++) {
+      appProvider.addStar('maze');
+    }
 
     _showVictoryDialog();
   }
@@ -549,6 +553,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
                   _pendingDirection != null)
                 QuestionOverlay(
                   question: _currentJunction!.getQuestion(_pendingDirection!)!,
+                  isHebrew: l10n.localeName == 'he',
                   onAnswered: _handleQuestionAnswered,
                   onClose: _closeQuestion,
                 ),

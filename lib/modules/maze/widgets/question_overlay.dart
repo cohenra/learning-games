@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/maze_question.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:learning_fun/generated/app_localizations.dart';
 
 /// אוברליי שאלה עם אנימציות
 class QuestionOverlay extends StatefulWidget {
   final MazeQuestion question;
+  final bool isHebrew;
   final Function(bool isCorrect, String selectedAnswer) onAnswered;
   final VoidCallback onClose;
 
   const QuestionOverlay({
     super.key,
     required this.question,
+    required this.isHebrew,
     required this.onAnswered,
     required this.onClose,
   });
@@ -69,12 +71,12 @@ class _QuestionOverlayState extends State<QuestionOverlay>
     super.dispose();
   }
 
-  void _handleAnswer(String answer) {
+  void _handleAnswer(String answerValue) {
     if (_showingResult) return;
 
     setState(() {
-      _selectedAnswer = answer;
-      _isCorrect = answer == widget.question.correctAnswer;
+      _selectedAnswer = answerValue;
+      _isCorrect = answerValue == widget.question.correctAnswer.value;
       _showingResult = true;
     });
 
@@ -82,7 +84,7 @@ class _QuestionOverlayState extends State<QuestionOverlay>
       // אנימציית הצלחה
       _slideController.reverse();
       Future.delayed(const Duration(milliseconds: 400), () {
-        widget.onAnswered(true, answer);
+        widget.onAnswered(true, answerValue);
       });
     } else {
       // אנימציית טעות - רעידה
@@ -169,7 +171,7 @@ class _QuestionOverlayState extends State<QuestionOverlay>
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      widget.question.question,
+                      widget.isHebrew ? widget.question.questionText : widget.question.questionTextEn,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -200,8 +202,8 @@ class _QuestionOverlayState extends State<QuestionOverlay>
     );
   }
 
-  Widget _buildAnswerButton(String answer) {
-    final isSelected = _selectedAnswer == answer;
+  Widget _buildAnswerButton(MazeAnswer answer) {
+    final isSelected = _selectedAnswer == answer.value;
     final showResult = _showingResult && isSelected;
 
     Color backgroundColor;
@@ -226,7 +228,7 @@ class _QuestionOverlayState extends State<QuestionOverlay>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: _showingResult ? null : () => _handleAnswer(answer),
+          onTap: _showingResult ? null : () => _handleAnswer(answer.value),
           borderRadius: BorderRadius.circular(16),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -251,7 +253,7 @@ class _QuestionOverlayState extends State<QuestionOverlay>
               children: [
                 Expanded(
                   child: Text(
-                    answer,
+                    answer.getDisplayText(widget.isHebrew),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight:
