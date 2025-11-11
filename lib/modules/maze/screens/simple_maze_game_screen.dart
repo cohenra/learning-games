@@ -491,6 +491,54 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
     );
   }
 
+  Widget _buildAnswerContent(String answer) {
+    if (_currentQuestion == null) {
+      return Text(
+        answer,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
+      );
+    }
+
+    // שאלת צבע - הצג ריבוע צבעוני
+    if (_currentQuestion!.type == QuestionType.color &&
+        _currentQuestion!.colorMap != null) {
+      final color = _currentQuestion!.colorMap![answer];
+      return Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!, width: 2),
+        ),
+      );
+    }
+
+    // שאלת צורה - הצג איקון גדול
+    if (_currentQuestion!.type == QuestionType.shape &&
+        _currentQuestion!.shapeMap != null) {
+      final icon = _currentQuestion!.shapeMap![answer];
+      return Icon(
+        icon,
+        size: 60,
+        color: Colors.blue[700],
+      );
+    }
+
+    // שאלה טקסטואלית רגילה
+    return Text(
+      answer,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
   Widget _buildQuestionOverlay() {
     return Container(
       color: Colors.black54,
@@ -608,14 +656,7 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
                             width: borderWidth,
                           ),
                         ),
-                        child: Text(
-                          answer,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        child: _buildAnswerContent(answer),
                       ),
                     ),
                   ),

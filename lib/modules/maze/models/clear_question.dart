@@ -1,4 +1,7 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
+
+enum QuestionType { text, color, shape }
 
 /// שאלה ברורה עם הנחיה ספציפית
 class ClearQuestion {
@@ -8,6 +11,9 @@ class ClearQuestion {
   final String spokenTextEn; // מה להגיד ב-TTS באנגלית
   final List<String> answers;
   final String correctAnswer;
+  final QuestionType type; // סוג השאלה
+  final Map<String, Color>? colorMap; // מיפוי צבעים לתשובות
+  final Map<String, IconData>? shapeMap; // מיפוי צורות לתשובות
 
   ClearQuestion({
     required this.questionText,
@@ -16,12 +22,15 @@ class ClearQuestion {
     required this.spokenTextEn,
     required this.answers,
     required this.correctAnswer,
+    this.type = QuestionType.text,
+    this.colorMap,
+    this.shapeMap,
   });
 
   /// יצירת שאלה אקראית ברורה
   static ClearQuestion generate({bool isHebrew = true}) {
     final random = Random();
-    final type = random.nextInt(4);
+    final type = random.nextInt(5);
 
     switch (type) {
       case 0:
@@ -31,6 +40,8 @@ class ClearQuestion {
       case 2:
         return _generateColorQuestion();
       case 3:
+        return _generateShapeQuestion();
+      case 4:
       default:
         return _generateMathQuestion();
     }
@@ -140,7 +151,7 @@ class ClearQuestion {
   }
 
   static ClearQuestion _generateColorQuestion() {
-    final colors = {
+    final colorNames = {
       'אדום': 'Red',
       'כחול': 'Blue',
       'ירוק': 'Green',
@@ -149,19 +160,33 @@ class ClearQuestion {
       'סגול': 'Purple',
     };
 
+    final colorValues = {
+      'אדום': Colors.red,
+      'כחול': Colors.blue,
+      'ירוק': Colors.green,
+      'צהוב': Colors.yellow,
+      'כתום': Colors.orange,
+      'סגול': Colors.purple,
+    };
+
     final random = Random();
-    final colorsList = colors.keys.toList();
+    final colorsList = colorNames.keys.toList();
     final targetColor = colorsList[random.nextInt(colorsList.length)];
-    final targetColorEn = colors[targetColor]!;
+    final targetColorEn = colorNames[targetColor]!;
 
     final wrongColors =
         colorsList.where((c) => c != targetColor).toList()..shuffle();
-    final wrongColorsEn = wrongColors.map((c) => colors[c]!).toList();
 
     final answers = [
       targetColor,
       ...wrongColors.take(3),
     ]..shuffle();
+
+    // צור מיפוי צבעים לתשובות
+    final colorMap = <String, Color>{};
+    for (final answer in answers) {
+      colorMap[answer] = colorValues[answer]!;
+    }
 
     return ClearQuestion(
       questionText: 'בחר את הצבע $targetColor',
@@ -170,6 +195,58 @@ class ClearQuestion {
       spokenTextEn: 'Choose the color $targetColorEn',
       answers: answers,
       correctAnswer: targetColor,
+      type: QuestionType.color,
+      colorMap: colorMap,
+    );
+  }
+
+  static ClearQuestion _generateShapeQuestion() {
+    final shapeNames = {
+      'עיגול': 'Circle',
+      'ריבוע': 'Square',
+      'משולש': 'Triangle',
+      'כוכב': 'Star',
+      'לב': 'Heart',
+      'יהלום': 'Diamond',
+    };
+
+    final shapeIcons = {
+      'עיגול': Icons.circle,
+      'ריבוע': Icons.square,
+      'משולש': Icons.change_history,
+      'כוכב': Icons.star,
+      'לב': Icons.favorite,
+      'יהלום': Icons.diamond,
+    };
+
+    final random = Random();
+    final shapesList = shapeNames.keys.toList();
+    final targetShape = shapesList[random.nextInt(shapesList.length)];
+    final targetShapeEn = shapeNames[targetShape]!;
+
+    final wrongShapes =
+        shapesList.where((s) => s != targetShape).toList()..shuffle();
+
+    final answers = [
+      targetShape,
+      ...wrongShapes.take(3),
+    ]..shuffle();
+
+    // צור מיפוי צורות לתשובות
+    final shapeMap = <String, IconData>{};
+    for (final answer in answers) {
+      shapeMap[answer] = shapeIcons[answer]!;
+    }
+
+    return ClearQuestion(
+      questionText: 'בחר את הצורה $targetShape',
+      questionTextEn: 'Choose the shape $targetShapeEn',
+      spokenText: 'בחר את הצורה $targetShape',
+      spokenTextEn: 'Choose the shape $targetShapeEn',
+      answers: answers,
+      correctAnswer: targetShape,
+      type: QuestionType.shape,
+      shapeMap: shapeMap,
     );
   }
 

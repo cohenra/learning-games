@@ -1,3 +1,5 @@
+import 'dart:math';
+
 enum MazeDifficulty { easy, medium, hard }
 
 /// מבוך פשוט וקטן שנכנס למסך
@@ -10,27 +12,64 @@ class SimpleMaze {
   late final List<QuestionJunction> junctions;
 
   SimpleMaze({MazeDifficulty difficulty = MazeDifficulty.easy}) {
+    final random = Random();
     switch (difficulty) {
       case MazeDifficulty.easy:
-        _initEasyMaze();
+        // בחר אחד מ-3 מבוכים שונים
+        final mazeIndex = random.nextInt(3);
+        switch (mazeIndex) {
+          case 0:
+            _initEasyMaze1();
+            break;
+          case 1:
+            _initEasyMaze2();
+            break;
+          case 2:
+            _initEasyMaze3();
+            break;
+        }
         break;
       case MazeDifficulty.medium:
-        _initMediumMaze();
+        // בחר אחד מ-3 מבוכים שונים
+        final mazeIndex = random.nextInt(3);
+        switch (mazeIndex) {
+          case 0:
+            _initMediumMaze1();
+            break;
+          case 1:
+            _initMediumMaze2();
+            break;
+          case 2:
+            _initMediumMaze3();
+            break;
+        }
         break;
       case MazeDifficulty.hard:
-        _initHardMaze();
+        // בחר אחד מ-3 מבוכים שונים
+        final mazeIndex = random.nextInt(3);
+        switch (mazeIndex) {
+          case 0:
+            _initHardMaze1();
+            break;
+          case 1:
+            _initHardMaze2();
+            break;
+          case 2:
+            _initHardMaze3();
+            break;
+        }
         break;
     }
   }
 
-  void _initEasyMaze() {
-    // מבוך 7x7 קטן וקל (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+  // מבוכים קלים - 7x7 עם 2 שאלות
+  void _initEasyMaze1() {
     grid = [
       ['1', '1', '1', '1', '1', '1', '1'],
-      ['1', 'S', '0', '0', '1', '0', '1'],
-      ['1', '0', '1', 'Q', '0', '0', '1'],
-      ['1', '0', '0', '0', '1', '0', '1'],
-      ['1', '1', '1', '0', '1', '0', '1'],
+      ['1', 'S', '0', 'Q', '1', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '1'],
+      ['1', '1', '1', '0', '1', 'Q', '1'],
       ['1', '0', '0', '0', '0', 'E', '1'],
       ['1', '1', '1', '1', '1', '1', '1'],
     ];
@@ -39,21 +78,62 @@ class SimpleMaze {
     endRow = 5;
     endCol = 5;
     junctions = [
-      QuestionJunction(row: 2, col: 3, isUnlocked: false),
+      QuestionJunction(row: 1, col: 3, isUnlocked: false),
+      QuestionJunction(row: 4, col: 5, isUnlocked: false),
     ];
   }
 
-  void _initMediumMaze() {
-    // מבוך 9x9 בינוני (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+  void _initEasyMaze2() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '0', '0', '1'],
+      ['1', '1', '1', 'Q', '1', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '1', '1', '1', '1'],
+      ['1', '0', 'Q', '0', '0', 'E', '1'],
+      ['1', '1', '1', '1', '1', '1', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 5;
+    endCol = 5;
+    junctions = [
+      QuestionJunction(row: 2, col: 3, isUnlocked: false),
+      QuestionJunction(row: 5, col: 2, isUnlocked: false),
+    ];
+  }
+
+  void _initEasyMaze3() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1'],
+      ['1', 'Q', '1', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', 'Q', '1'],
+      ['1', '0', '1', '0', '0', 'E', '1'],
+      ['1', '1', '1', '1', '1', '1', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 5;
+    endCol = 5;
+    junctions = [
+      QuestionJunction(row: 3, col: 1, isUnlocked: false),
+      QuestionJunction(row: 4, col: 5, isUnlocked: false),
+    ];
+  }
+
+  // מבוכים בינוניים - 9x9 עם 4 שאלות
+  void _initMediumMaze1() {
     grid = [
       ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
-      ['1', 'S', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', 'S', '0', 'Q', '1', '0', '0', '0', '1'],
       ['1', '0', '1', '0', '1', '0', '1', 'Q', '1'],
       ['1', '0', '1', '0', '0', '0', '1', '0', '1'],
-      ['1', '0', '1', '1', '1', 'Q', '0', '0', '1'],
-      ['1', '0', '0', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '1', 'Q', '0', '0', '1'],
       ['1', '1', '1', '0', '1', '0', '1', '0', '1'],
-      ['1', '0', '0', '0', '1', '0', '0', 'E', '1'],
+      ['1', '0', '0', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', 'Q', '1', '0', '0', 'E', '1'],
       ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
     ];
     startRow = 1;
@@ -61,34 +141,143 @@ class SimpleMaze {
     endRow = 7;
     endCol = 7;
     junctions = [
+      QuestionJunction(row: 1, col: 3, isUnlocked: false),
       QuestionJunction(row: 2, col: 7, isUnlocked: false),
       QuestionJunction(row: 4, col: 5, isUnlocked: false),
+      QuestionJunction(row: 7, col: 3, isUnlocked: false),
     ];
   }
 
-  void _initHardMaze() {
-    // מבוך 11x11 מורכב וקשה (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+  void _initMediumMaze2() {
     grid = [
-      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-      ['1', 'S', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
-      ['1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1'],
-      ['1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1'],
-      ['1', '0', '1', '1', '1', 'Q', '1', '0', '1', 'Q', '1'],
-      ['1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1'],
-      ['1', '1', '1', '0', '1', '1', '1', 'Q', '1', '0', '1'],
-      ['1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
-      ['1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1'],
-      ['1', '0', '0', '0', '0', '0', '0', '0', 'E', '0', '1'],
-      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '0', '0', 'Q', '0', '1'],
+      ['1', '1', '1', '0', '1', '1', '1', '0', '1'],
+      ['1', '0', 'Q', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', '1', '1', 'Q', '1', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '1', '1', 'Q', '1'],
+      ['1', '1', '1', '1', '1', '0', '0', 'E', '1'],
     ];
     startRow = 1;
     startCol = 1;
-    endRow = 9;
-    endCol = 8;
+    endRow = 8;
+    endCol = 7;
     junctions = [
+      QuestionJunction(row: 1, col: 6, isUnlocked: false),
+      QuestionJunction(row: 3, col: 2, isUnlocked: false),
+      QuestionJunction(row: 5, col: 5, isUnlocked: false),
+      QuestionJunction(row: 7, col: 7, isUnlocked: false),
+    ];
+  }
+
+  void _initMediumMaze3() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', '0', 'Q', '1'],
+      ['1', '0', '1', '0', '1', '0', '1', '0', '1'],
+      ['1', 'Q', '1', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '1', 'Q', '1', '1', '1', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '1', 'Q', '1'],
+      ['1', '1', '1', '1', '1', '1', '0', 'E', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 8;
+    endCol = 7;
+    junctions = [
+      QuestionJunction(row: 1, col: 7, isUnlocked: false),
+      QuestionJunction(row: 3, col: 1, isUnlocked: false),
+      QuestionJunction(row: 5, col: 3, isUnlocked: false),
+      QuestionJunction(row: 7, col: 7, isUnlocked: false),
+    ];
+  }
+
+  // מבוכים קשים - 11x11 עם 6 שאלות
+  void _initHardMaze1() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', 'Q', '1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1', '1', '1', 'Q', '1'],
+      ['1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', 'Q', '0', '0', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '0', '1', '0', '1', '0', '1'],
+      ['1', '0', 'Q', '0', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '1', '1', '1', 'Q', '1', '1', '1', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '1', '1', '0', '1', 'Q', '1'],
+      ['1', '1', '1', '1', '1', '0', '0', '0', '0', 'E', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 10;
+    endCol = 9;
+    junctions = [
+      QuestionJunction(row: 1, col: 3, isUnlocked: false),
+      QuestionJunction(row: 2, col: 9, isUnlocked: false),
       QuestionJunction(row: 4, col: 5, isUnlocked: false),
+      QuestionJunction(row: 6, col: 2, isUnlocked: false),
+      QuestionJunction(row: 7, col: 5, isUnlocked: false),
+      QuestionJunction(row: 9, col: 9, isUnlocked: false),
+    ];
+  }
+
+  void _initHardMaze2() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '0', 'Q', '0', '0', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1'],
+      ['1', '0', 'Q', '0', '1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '1', '1', '1', 'Q', '1'],
+      ['1', '0', '1', '1', '1', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', 'Q', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', '0', '1', '1', '1', 'Q', '1', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '1', '1', '1', 'Q', '1'],
+      ['1', '1', '1', '1', '1', '1', '0', '0', '0', 'E', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 10;
+    endCol = 9;
+    junctions = [
+      QuestionJunction(row: 1, col: 5, isUnlocked: false),
+      QuestionJunction(row: 3, col: 2, isUnlocked: false),
       QuestionJunction(row: 4, col: 9, isUnlocked: false),
-      QuestionJunction(row: 6, col: 7, isUnlocked: false),
+      QuestionJunction(row: 6, col: 4, isUnlocked: false),
+      QuestionJunction(row: 7, col: 7, isUnlocked: false),
+      QuestionJunction(row: 9, col: 9, isUnlocked: false),
+    ];
+  }
+
+  void _initHardMaze3() {
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', 'Q', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1', '1', '1', 'Q', '1'],
+      ['1', 'Q', '1', '0', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', 'Q', '1', '1', '1', '0', '1', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '1', 'Q', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '0', '0', '1', 'Q', '1'],
+      ['1', '1', '1', '1', '1', '1', '1', '1', '0', 'E', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 10;
+    endCol = 9;
+    junctions = [
+      QuestionJunction(row: 1, col: 6, isUnlocked: false),
+      QuestionJunction(row: 2, col: 9, isUnlocked: false),
+      QuestionJunction(row: 3, col: 1, isUnlocked: false),
+      QuestionJunction(row: 5, col: 3, isUnlocked: false),
+      QuestionJunction(row: 7, col: 7, isUnlocked: false),
+      QuestionJunction(row: 9, col: 9, isUnlocked: false),
     ];
   }
 
