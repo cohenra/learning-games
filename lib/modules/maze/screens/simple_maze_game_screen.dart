@@ -446,28 +446,31 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
 
                   // המבוך - מרכז המסך
                   Expanded(
-                    child: Center(
-                      child: GestureDetector(
-                        onPanEnd: _handleSwipe,
-                        child: Container(
-                          width: gridSize * cellSize,
-                          height: gridSize * cellSize,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 3),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                spreadRadius: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Center(
+                        child: GestureDetector(
+                          onPanEnd: _handleSwipe,
+                          child: Container(
+                            width: gridSize * cellSize,
+                            height: gridSize * cellSize,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: CustomPaint(
+                              painter: MazePainter(
+                                maze: _maze,
+                                playerRow: _playerRow,
+                                playerCol: _playerCol,
+                                cellSize: cellSize,
                               ),
-                            ],
-                          ),
-                          child: CustomPaint(
-                            painter: MazePainter(
-                              maze: _maze,
-                              playerRow: _playerRow,
-                              playerCol: _playerCol,
-                              cellSize: cellSize,
                             ),
                           ),
                         ),
