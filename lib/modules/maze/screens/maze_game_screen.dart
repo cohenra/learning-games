@@ -146,11 +146,14 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
       // עדכן ניקוד
       _playerState.recordAnswer(true);
 
+      // שמור את הכיוון לפני שמאפסים
+      final direction = _pendingDirection!;
+      final nextPos = _playerState.currentPosition.move(direction);
+
       // בצע את התנועה
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          final nextPos = _playerState.currentPosition.move(_pendingDirection!);
-          _playerState.moveTo(nextPos, _pendingDirection!);
+          _playerState.moveTo(nextPos, direction);
         }
       });
     } else {
