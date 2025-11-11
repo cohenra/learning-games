@@ -425,6 +425,25 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
                     ),
                   ),
 
+                  // הנחיה - למעלה בלי רקע
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.swipe, size: 18, color: Colors.black54),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.mazeSwipeToMove,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   // המבוך - מרכז המסך
                   Expanded(
                     child: Center(
@@ -452,29 +471,6 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-
-                  // הוראות
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.swipe, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.mazeSwipeToMove,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
                       ),
                     ),
                   ),
