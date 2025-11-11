@@ -36,11 +36,15 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
   bool _showingQuestion = false;
   Direction? _pendingDirection;
   MazeJunction? _currentJunction;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _initializeGame();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initializeGame();
+      _initialized = true;
+    }
   }
 
   void _initializeGame() {
