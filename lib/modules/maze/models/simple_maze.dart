@@ -1,34 +1,96 @@
+enum MazeDifficulty { easy, medium, hard }
+
 /// מבוך פשוט וקטן שנכנס למסך
 class SimpleMaze {
-  // מבוך 5x5 קבוע (1 = קיר, 0 = דרך)
-  // S = התחלה, E = סיוף, Q = שאלה
-  final List<List<String>> grid = [
-    ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-    ['1', 'S', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
-    ['1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1'],
-    ['1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1'],
-    ['1', '0', '1', '1', '1', 'Q', '1', '0', '1', '0', '1'],
-    ['1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1'],
-    ['1', '1', '1', '0', '1', '1', '1', 'Q', '1', '0', '1'],
-    ['1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
-    ['1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1'],
-    ['1', '0', '0', '0', '0', '0', '0', '0', 'E', '0', '1'],
-    ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-  ];
+  late final List<List<String>> grid;
+  late final int startRow;
+  late final int startCol;
+  late final int endRow;
+  late final int endCol;
+  late final List<QuestionJunction> junctions;
 
-  // נקודת התחלה
-  final int startRow = 1;
-  final int startCol = 1;
+  SimpleMaze({MazeDifficulty difficulty = MazeDifficulty.easy}) {
+    switch (difficulty) {
+      case MazeDifficulty.easy:
+        _initEasyMaze();
+        break;
+      case MazeDifficulty.medium:
+        _initMediumMaze();
+        break;
+      case MazeDifficulty.hard:
+        _initHardMaze();
+        break;
+    }
+  }
 
-  // נקודת סיום
-  final int endRow = 9;
-  final int endCol = 8;
+  void _initEasyMaze() {
+    // מבוך 7x7 קטן וקל (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', 'Q', '0', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '0', 'E', '1'],
+      ['1', '1', '1', '1', '1', '1', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 5;
+    endCol = 5;
+    junctions = [
+      QuestionJunction(row: 2, col: 3, isUnlocked: false),
+    ];
+  }
 
-  // צמתי שאלות
-  final List<QuestionJunction> junctions = [
-    QuestionJunction(row: 4, col: 5, isUnlocked: false),
-    QuestionJunction(row: 6, col: 7, isUnlocked: false),
-  ];
+  void _initMediumMaze() {
+    // מבוך 9x9 בינוני (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1', 'Q', '1'],
+      ['1', '0', '1', '0', '0', '0', '1', '0', '1'],
+      ['1', '0', '1', '1', '1', 'Q', '0', '0', '1'],
+      ['1', '0', '0', '0', '0', '0', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '0', '1', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '0', 'E', '1'],
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 7;
+    endCol = 7;
+    junctions = [
+      QuestionJunction(row: 2, col: 7, isUnlocked: false),
+      QuestionJunction(row: 4, col: 5, isUnlocked: false),
+    ];
+  }
+
+  void _initHardMaze() {
+    // מבוך 11x11 מורכב וקשה (1 = קיר, 0 = דרך, S = התחלה, E = סיוף, Q = שאלה)
+    grid = [
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+      ['1', 'S', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1'],
+      ['1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1'],
+      ['1', '0', '1', '1', '1', 'Q', '1', '0', '1', 'Q', '1'],
+      ['1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1'],
+      ['1', '1', '1', '0', '1', '1', '1', 'Q', '1', '0', '1'],
+      ['1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1'],
+      ['1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1'],
+      ['1', '0', '0', '0', '0', '0', '0', '0', 'E', '0', '1'],
+      ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+    ];
+    startRow = 1;
+    startCol = 1;
+    endRow = 9;
+    endCol = 8;
+    junctions = [
+      QuestionJunction(row: 4, col: 5, isUnlocked: false),
+      QuestionJunction(row: 4, col: 9, isUnlocked: false),
+      QuestionJunction(row: 6, col: 7, isUnlocked: false),
+    ];
+  }
 
   bool isWall(int row, int col) {
     if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) {

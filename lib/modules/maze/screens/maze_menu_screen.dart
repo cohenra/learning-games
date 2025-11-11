@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
 import '../../../widgets/kid_back_button.dart';
+import '../models/simple_maze.dart';
 import 'simple_maze_game_screen.dart';
-
-enum MazeDifficulty {
-  easy,
-  medium,
-  hard,
-}
 
 /// מסך תפריט משחק המבוך
 class MazeMenuScreen extends StatefulWidget {
@@ -56,7 +51,9 @@ class _MazeMenuScreenState extends State<MazeMenuScreen>
   void _startGame() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const SimpleMazeGameScreen(),
+        builder: (context) => SimpleMazeGameScreen(
+          difficulty: _selectedDifficulty,
+        ),
       ),
     );
   }

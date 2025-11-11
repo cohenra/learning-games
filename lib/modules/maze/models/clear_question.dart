@@ -37,32 +37,50 @@ class ClearQuestion {
   }
 
   static ClearQuestion _generateLetterQuestion() {
-    final letters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח'];
-    final lettersEn = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-    final random = Random();
+    final letterNames = {
+      'א': 'אלף',
+      'ב': 'בית',
+      'ג': 'גימל',
+      'ד': 'דלת',
+      'ה': 'הא',
+      'ו': 'ואו',
+      'ז': 'זיין',
+      'ח': 'חית',
+    };
 
+    final lettersEn = {
+      'A': 'A',
+      'B': 'B',
+      'C': 'C',
+      'D': 'D',
+      'E': 'E',
+      'F': 'F',
+      'G': 'G',
+      'H': 'H',
+    };
+
+    final random = Random();
+    final letters = letterNames.keys.toList();
     final targetLetter = letters[random.nextInt(letters.length)];
-    final targetLetterEn = lettersEn[random.nextInt(lettersEn.length)];
+    final targetLetterName = letterNames[targetLetter]!;
+
+    final lettersEnList = lettersEn.keys.toList();
+    final targetLetterEn = lettersEnList[random.nextInt(lettersEnList.length)];
 
     final wrongLetters =
         letters.where((l) => l != targetLetter).toList()..shuffle();
     final wrongLettersEn =
-        lettersEn.where((l) => l != targetLetterEn).toList()..shuffle();
+        lettersEnList.where((l) => l != targetLetterEn).toList()..shuffle();
 
     final answers = [
       targetLetter,
       ...wrongLetters.take(3),
     ]..shuffle();
 
-    final answersEn = [
-      targetLetterEn,
-      ...wrongLettersEn.take(3),
-    ]..shuffle();
-
     return ClearQuestion(
-      questionText: 'בחר את האות $targetLetter',
+      questionText: 'בחר את האות $targetLetterName',
       questionTextEn: 'Choose the letter $targetLetterEn',
-      spokenText: 'בחר את האות $targetLetter',
+      spokenText: 'בחר את האות $targetLetterName',
       spokenTextEn: 'Choose the letter $targetLetterEn',
       answers: answers,
       correctAnswer: targetLetter,
@@ -70,8 +88,36 @@ class ClearQuestion {
   }
 
   static ClearQuestion _generateNumberQuestion() {
+    final numberWords = {
+      1: 'אחת',
+      2: 'שתיים',
+      3: 'שלוש',
+      4: 'ארבע',
+      5: 'חמש',
+      6: 'שש',
+      7: 'שבע',
+      8: 'שמונה',
+      9: 'תשע',
+      10: 'עשר',
+    };
+
+    final numberWordsEn = {
+      1: 'One',
+      2: 'Two',
+      3: 'Three',
+      4: 'Four',
+      5: 'Five',
+      6: 'Six',
+      7: 'Seven',
+      8: 'Eight',
+      9: 'Nine',
+      10: 'Ten',
+    };
+
     final random = Random();
     final targetNumber = random.nextInt(10) + 1;
+    final targetWord = numberWords[targetNumber]!;
+    final targetWordEn = numberWordsEn[targetNumber]!;
 
     final wrongNumbers = List.generate(10, (i) => i + 1)
         .where((n) => n != targetNumber)
@@ -84,10 +130,10 @@ class ClearQuestion {
     ]..shuffle();
 
     return ClearQuestion(
-      questionText: 'בחר את המספר $targetNumber',
-      questionTextEn: 'Choose the number $targetNumber',
-      spokenText: 'בחר את המספר $targetNumber',
-      spokenTextEn: 'Choose the number $targetNumber',
+      questionText: 'בחר את המספר $targetWord',
+      questionTextEn: 'Choose the number $targetWordEn',
+      spokenText: 'בחר את המספר $targetWord',
+      spokenTextEn: 'Choose the number $targetWordEn',
       answers: answers,
       correctAnswer: targetNumber.toString(),
     );

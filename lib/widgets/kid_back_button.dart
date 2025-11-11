@@ -60,7 +60,7 @@ class _KidBackButtonState extends State<KidBackButton>
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
-      onTap: widget.onPressed,
+      onTap: widget.onPressed ?? () => Navigator.of(context).pop(),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {

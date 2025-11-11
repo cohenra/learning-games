@@ -10,7 +10,12 @@ import '../widgets/maze_painter.dart';
 
 /// מסך משחק המבוך החדש - פשוט וברור
 class SimpleMazeGameScreen extends StatefulWidget {
-  const SimpleMazeGameScreen({super.key});
+  final MazeDifficulty difficulty;
+
+  const SimpleMazeGameScreen({
+    super.key,
+    this.difficulty = MazeDifficulty.easy,
+  });
 
   @override
   State<SimpleMazeGameScreen> createState() => _SimpleMazeGameScreenState();
@@ -26,6 +31,8 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
   bool _showingQuestion = false;
   ClearQuestion? _currentQuestion;
   QuestionJunction? _pendingJunction;
+  String? _selectedAnswer;
+  bool? _isCorrect;
 
   int _starsEarned = 0;
   int _questionsAnswered = 0;
@@ -42,7 +49,7 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
   }
 
   void _initializeGame() {
-    _maze = SimpleMaze();
+    _maze = SimpleMaze(difficulty: widget.difficulty);
     _playerRow = _maze.startRow;
     _playerCol = _maze.startCol;
 
@@ -118,12 +125,6 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
       if (_maze.isEnd(newRow, newCol)) {
         _handleVictory();
       }
-
-      // הפעל TTS - "הולך"
-      _speak("הולך");
-    } else {
-      // נתקל בקיר - צליל או TTS
-      _speak("אופס! יש קיר");
     }
   }
 
@@ -146,11 +147,13 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
   }
 
   void _handleAnswer(String answer) {
-    if (_currentQuestion == null) return;
+    if (_currentQuestion == null || _selectedAnswer != null) return;
 
     final isCorrect = answer == _currentQuestion!.correctAnswer;
 
     setState(() {
+      _selectedAnswer = answer;
+      _isCorrect = isCorrect;
       _questionsAnswered++;
       if (isCorrect) {
         _correctAnswers++;
@@ -165,12 +168,14 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
       // הקרא "מעולה!"
       _speak("מעולה!");
 
-      // סגור את השאלה והמשך
-      Future.delayed(const Duration(milliseconds: 800), () {
+      // המשך אחרי 1.5 שניות
+      Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           setState(() {
             _showingQuestion = false;
             _currentQuestion = null;
+            _selectedAnswer = null;
+            _isCorrect = null;
 
             // התקדם לצומת
             if (_pendingJunction != null) {
@@ -184,6 +189,16 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
     } else {
       // טעות! נסה שוב
       _speak("נסה שוב!");
+
+      // אפס את הבחירה אחרי שנייה
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) {
+          setState(() {
+            _selectedAnswer = null;
+            _isCorrect = null;
+          });
+        }
+      });
     }
   }
 
@@ -524,13 +539,31 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  _currentQuestion!.questionText,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
+                child: Column(
+                  children: [
+                    Text(
+                      _currentQuestion!.questionText,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    // כפתור השמעה חוזרת
+                    IconButton(
+                      onPressed: () {
+                        final l10n = AppLocalizations.of(context)!;
+                        final isHebrew = l10n.localeName == 'he';
+                        _speak(isHebrew
+                            ? _currentQuestion!.spokenText
+                            : _currentQuestion!.spokenTextEn);
+                      },
+                      icon: const Icon(Icons.volume_up, size: 32),
+                      color: Colors.blue[700],
+                      tooltip: 'השמע שאלה',
+                    ),
+                  ],
                 ),
               ),
 
@@ -538,20 +571,42 @@ class _SimpleMazeGameScreenState extends State<SimpleMazeGameScreen> {
 
               // תשובות
               ..._currentQuestion!.answers.map((answer) {
+                // קבע צבע גבול לפי מצב התשובה
+                Color borderColor = Colors.blue[300]!;
+                double borderWidth = 2;
+                Color? backgroundColor;
+
+                if (_selectedAnswer == answer) {
+                  if (_isCorrect == true) {
+                    borderColor = Colors.green[600]!;
+                    borderWidth = 3;
+                    backgroundColor = Colors.green[50];
+                  } else if (_isCorrect == false) {
+                    borderColor = Colors.red[600]!;
+                    borderWidth = 3;
+                    backgroundColor = Colors.red[50];
+                  }
+                }
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () => _handleAnswer(answer),
+                      onTap: _selectedAnswer == null
+                          ? () => _handleAnswer(answer)
+                          : null,
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: backgroundColor ?? Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.blue[300]!, width: 2),
+                          border: Border.all(
+                            color: borderColor,
+                            width: borderWidth,
+                          ),
                         ),
                         child: Text(
                           answer,
