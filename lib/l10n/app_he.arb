@@ -207,5 +207,6 @@
   "mazeMoveRight": "לך ימינה →",
   "mazeStars": "כוכבים",
   "mazeCorrectAnswers": "תשובות נכונות",
-  "mazeAccuracy": "דיוק"
+  "mazeAccuracy": "דיוק",
+  "mazeSwipeToMove": "גררו להזזת הדמות"
 }
