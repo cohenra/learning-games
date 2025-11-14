@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// לוח כפל אינטראקטיבי - גרסה מינימלית לבדיקה
 class MultiplicationTableScreen extends StatefulWidget {
@@ -13,6 +14,20 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
   int _maxNumber = 5;
 
   @override
+  void initState() {
+    super.initState();
+    // Hide system UI (navigation bar)
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    // Restore system UI when leaving
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -21,69 +36,86 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
       ),
       body: Container(
         color: Colors.blue.shade50,
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            const Text(
-              'לוח הכפל',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _maxNumber = 5;
-                    });
-                  },
-                  child: const Text('1-5'),
+                // Difficulty buttons on the left
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildDifficultyButton('1-5', 5),
+                    const SizedBox(height: 12),
+                    _buildDifficultyButton('1-10', 10),
+                    const SizedBox(height: 12),
+                    _buildDifficultyButton('1-12', 12),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _maxNumber = 10;
-                    });
-                  },
-                  child: const Text('1-10'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _maxNumber = 12;
-                    });
-                  },
-                  child: const Text('1-12'),
+                const SizedBox(width: 16),
+                // Table on the right
+                Expanded(
+                  child: Center(
+                    child: _buildTable(),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: _buildTable(),
-              ),
-            ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultyButton(String label, int maxNum) {
+    final isSelected = _maxNumber == maxNum;
+    return SizedBox(
+      width: 60,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            _maxNumber = maxNum;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isSelected ? Colors.blue : Colors.white,
+          foregroundColor: isSelected ? Colors.white : Colors.blue,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.blue, width: 2),
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTable() {
-    // Calculate cell size based on screen width and number of cells
-    final screenWidth = MediaQuery.of(context).size.width;
+    // Calculate cell size based on available space
+    final size = MediaQuery.of(context).size;
+    final availableWidth = size.width - 160; // margins + buttons
+    final availableHeight = size.height - 150; // app bar + padding
+
     final totalCells = _maxNumber + 1; // +1 for header column
-    final availableWidth = screenWidth - 40; // margins
-    double cellSize = (availableWidth / totalCells).clamp(30.0, 50.0);
+
+    // Calculate max cell size that fits both width and height
+    double cellSizeFromWidth = availableWidth / totalCells;
+    double cellSizeFromHeight = availableHeight / totalCells;
+    double cellSize = (cellSizeFromWidth < cellSizeFromHeight
+        ? cellSizeFromWidth
+        : cellSizeFromHeight).clamp(25.0, 45.0);
 
     // Adjust font size based on cell size
-    double fontSize = cellSize * 0.32;
+    double fontSize = (cellSize * 0.35).clamp(10.0, 16.0);
 
     return Container(
       margin: const EdgeInsets.all(16),
