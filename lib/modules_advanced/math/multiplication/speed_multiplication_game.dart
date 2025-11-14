@@ -437,7 +437,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
       children: [
         // Header with timer and score
         Container(
-          padding: EdgeInsets.all(responsive.spacing(16)),
+          padding: EdgeInsets.all(responsive.spacing(12)),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -476,23 +476,22 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(40)),
+        SizedBox(height: responsive.spacing(20)),
 
         // Question
         Text(
           '$_num1 ✖️ $_num2 = ?',
           style: TextStyle(
-            fontSize: responsive.fontSize(48),
+            fontSize: responsive.fontSize(40),
             fontWeight: FontWeight.bold,
             color: Colors.orange.shade700,
           ),
         ),
 
-        SizedBox(height: responsive.spacing(40)),
+        SizedBox(height: responsive.spacing(16)),
 
         // Answer options
-        Flexible(
-          flex: 2,
+        Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: responsive.spacing(20),
@@ -501,8 +500,8 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
             child: GridView.count(
               shrinkWrap: true,
               crossAxisCount: 2,
-              mainAxisSpacing: responsive.spacing(12),
-              crossAxisSpacing: responsive.spacing(12),
+              mainAxisSpacing: responsive.spacing(10),
+              crossAxisSpacing: responsive.spacing(10),
               childAspectRatio: responsive.quizButtonAspectRatio,
               physics: const NeverScrollableScrollPhysics(),
               children: _answerOptions.map((option) {
@@ -561,7 +560,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(20)),
+        SizedBox(height: responsive.spacing(12)),
       ],
     );
   }

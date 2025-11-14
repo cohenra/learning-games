@@ -294,9 +294,9 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
                   child: GridView.count(
                     shrinkWrap: true,
                     crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.5,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 2.8,
                     children: options.map((option) {
                       return GestureDetector(
                         onTap: () {
@@ -348,14 +348,17 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
                             ],
                           ),
                           child: Center(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                '$option',
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '$option',
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
