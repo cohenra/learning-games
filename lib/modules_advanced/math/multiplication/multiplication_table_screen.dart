@@ -66,12 +66,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
             const SizedBox(height: 20),
             Expanded(
               child: Center(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SingleChildScrollView(
-                    child: _buildTable(),
-                  ),
-                ),
+                child: _buildTable(),
               ),
             ),
           ],
@@ -81,6 +76,15 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
   }
 
   Widget _buildTable() {
+    // Calculate cell size based on screen width and number of cells
+    final screenWidth = MediaQuery.of(context).size.width;
+    final totalCells = _maxNumber + 1; // +1 for header column
+    final availableWidth = screenWidth - 40; // margins
+    double cellSize = (availableWidth / totalCells).clamp(30.0, 50.0);
+
+    // Adjust font size based on cell size
+    double fontSize = cellSize * 0.32;
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -93,18 +97,18 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
           // Header row
           Row(
             children: [
-              _buildCell('✖️', isHeader: true),
+              _buildCell('✖️', cellSize, fontSize, isHeader: true),
               for (int col = 1; col <= _maxNumber; col++)
-                _buildCell('$col', isHeader: true),
+                _buildCell('$col', cellSize, fontSize, isHeader: true),
             ],
           ),
           // Data rows
           for (int row = 1; row <= _maxNumber; row++)
             Row(
               children: [
-                _buildCell('$row', isHeader: true),
+                _buildCell('$row', cellSize, fontSize, isHeader: true),
                 for (int col = 1; col <= _maxNumber; col++)
-                  _buildCell('${row * col}'),
+                  _buildCell('${row * col}', cellSize, fontSize),
               ],
             ),
         ],
@@ -112,10 +116,10 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
     );
   }
 
-  Widget _buildCell(String text, {bool isHeader = false}) {
+  Widget _buildCell(String text, double size, double fontSize, {bool isHeader = false}) {
     return Container(
-      width: 50,
-      height: 50,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: isHeader ? Colors.blue.shade100 : Colors.white,
         border: Border.all(color: Colors.grey.shade300),
@@ -124,7 +128,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: fontSize,
             fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
           ),
         ),
