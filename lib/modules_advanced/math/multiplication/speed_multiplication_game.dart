@@ -264,7 +264,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(12)),
+        SizedBox(height: responsive.spacing(8)),
 
         // Instructions
         Padding(
@@ -279,7 +279,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                     ? 'ענה על כמה שיותר שאלות נכונות'
                     : 'Answer as many correctly as you can',
               ),
-              SizedBox(height: responsive.spacing(8)),
+              SizedBox(height: responsive.spacing(6)),
               _buildInfoCard(
                 responsive,
                 icon: '⏱️',
@@ -288,7 +288,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                     ? 'כמה מהר אתה יכול לענות?'
                     : 'How fast can you answer?',
               ),
-              SizedBox(height: responsive.spacing(8)),
+              SizedBox(height: responsive.spacing(6)),
               _buildInfoCard(
                 responsive,
                 icon: '🏆',
@@ -301,7 +301,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(12)),
+        SizedBox(height: responsive.spacing(8)),
 
         // Difficulty selector
         Padding(
@@ -336,7 +336,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(16)),
+        SizedBox(height: responsive.spacing(12)),
 
         // Start button
         Padding(
@@ -350,7 +350,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(16)),
+        SizedBox(height: responsive.spacing(6)),
       ],
     );
   }
