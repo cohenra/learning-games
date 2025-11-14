@@ -245,7 +245,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
               ),
 
               // Question Overlay
-              if (_showQuestion)
+              if (_showQuestion && _selectedRow != null && _selectedCol != null)
                 _buildQuestionOverlay(responsive),
 
               // Reward animation
@@ -407,7 +407,10 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
       color: Colors.black.withOpacity(0.7),
       child: Center(
         child: ScaleTransition(
-          scale: _animationController,
+          scale: CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOut,
+          ),
           child: Container(
             margin: EdgeInsets.all(responsive.spacing(20)),
             padding: EdgeInsets.all(responsive.spacing(24)),

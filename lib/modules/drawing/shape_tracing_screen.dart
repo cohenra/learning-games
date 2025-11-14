@@ -104,7 +104,6 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
       setState(() {
         _showSuccess = true;
       });
-      _speak(_isHebrew ? 'מצוין! יפה מאוד!' : 'Great! Very nice!');
       // Removed auto-advance - user must click Next button like in numbers/letters
     }
   }
@@ -132,10 +131,8 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
       });
       _speakInstruction();
     } else {
-      _speak(_isHebrew ? 'סיימת את כל הרמות! מעולה!' : 'You completed all levels! Excellent!');
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context);
-      });
+      // All levels completed - return to previous screen
+      Navigator.pop(context);
     }
   }
 

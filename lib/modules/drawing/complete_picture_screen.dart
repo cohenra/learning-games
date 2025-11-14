@@ -130,7 +130,6 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
       setState(() {
         _showSuccess = true;
       });
-      _speak(_isHebrew ? 'כל הכבוד! מעולה!' : 'Well done! Excellent!');
 
       // Auto-advance to next level after 1.5 seconds
       Future.delayed(const Duration(milliseconds: 1500), () {
