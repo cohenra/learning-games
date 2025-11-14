@@ -4,6 +4,8 @@ import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
 import 'multiplication_table_screen.dart';
 import 'speed_multiplication_game.dart';
+import 'chocolate_factory_game.dart';
+import 'garden_builder_game.dart';
 
 /// מסך תפריט לוח הכפל - גילאי 7-12
 class MultiplicationMenuScreen extends StatefulWidget {
@@ -172,14 +174,44 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                           },
                         ),
                         SizedBox(height: responsive.verticalSpacing),
-                        _buildComingSoonCard(
+                        _buildGameCard(
                           context,
                           responsive,
-                          icon: '🎯',
-                          title: _isHebrew ? 'אתגרי כפל' : 'Multiplication Challenges',
+                          icon: '🍫',
+                          title: _isHebrew ? 'מפעל השוקולד' : 'Chocolate Factory',
                           description: _isHebrew
-                              ? 'בקרוב...'
-                              : 'Coming soon...',
+                              ? 'צור לוחות שוקולד ולמד כפל!'
+                              : 'Create chocolate bars and learn!',
+                          color: Colors.brown,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ChocolateFactoryGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: responsive.verticalSpacing),
+                        _buildGameCard(
+                          context,
+                          responsive,
+                          icon: '🌻',
+                          title: _isHebrew ? 'בונה הגינה' : 'Garden Builder',
+                          description: _isHebrew
+                              ? 'שתול פרחים ולמד כפל!'
+                              : 'Plant flowers and learn!',
+                          color: Colors.green,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const GardenBuilderGame(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

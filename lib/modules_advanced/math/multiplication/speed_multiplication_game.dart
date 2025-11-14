@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
 import 'dart:math';
@@ -39,6 +40,8 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
   @override
   void initState() {
     super.initState();
+    // Hide system UI (navigation bar)
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _initTts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
@@ -184,6 +187,8 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
   void dispose() {
     _timer?.cancel();
     _flutterTts.stop();
+    // Restore system UI when leaving
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
