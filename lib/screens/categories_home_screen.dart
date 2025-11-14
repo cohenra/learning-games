@@ -5,6 +5,7 @@ import '../screens/basic_skills_screen.dart';
 import '../screens/world_around_us_screen.dart';
 import '../screens/people_feelings_screen.dart';
 import '../screens/creative_fun_screen.dart';
+import '../screens/advanced_learning_screen.dart';
 import '../screens/settings_screen.dart';
 import '../utils/responsive_helper.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -84,7 +85,7 @@ class CategoriesHomeScreen extends StatelessWidget {
 
                     const settingsHeight = 80.0;
                     const spacing = 16.0;
-                    const numCategories = 4;
+                    const numCategories = 5;
 
                     final availableForCards = availableHeight - settingsHeight;
                     final totalSpacing = (numCategories - 1) * spacing + (spacing * 2);
@@ -172,6 +173,25 @@ class CategoriesHomeScreen extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => const CreativeFunScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: spacing),
+                                _buildCategoryCard(
+                                  context: context,
+                                  title: isHebrew ? 'למידה מתקדמת 🎓' : 'Advanced Learning 🎓',
+                                  subtitle: isHebrew
+                                      ? 'מתמטיקה, מדעים ועוד - גילאי 7-12'
+                                      : 'Math, Science & More - Ages 7-12',
+                                  icon: '🎓',
+                                  color: Colors.indigo,
+                                  height: cardHeight,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const AdvancedLearningScreen(),
                                       ),
                                     );
                                   },
