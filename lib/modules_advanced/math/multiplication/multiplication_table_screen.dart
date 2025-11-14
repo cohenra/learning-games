@@ -29,6 +29,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
   Map<String, bool> _completedCells = {}; // Track completed cells
 
   late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -37,6 +38,10 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -407,10 +412,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
       color: Colors.black.withOpacity(0.7),
       child: Center(
         child: ScaleTransition(
-          scale: CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOut,
-          ),
+          scale: _scaleAnimation,
           child: Container(
             margin: EdgeInsets.all(responsive.spacing(20)),
             padding: EdgeInsets.all(responsive.spacing(24)),
