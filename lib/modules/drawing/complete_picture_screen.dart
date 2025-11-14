@@ -22,6 +22,7 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
   bool _showHint = false;
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
+  int? _activePointerId; // Track the active finger for single-touch drawing
 
   // רשימת אתגרים - כל אתגר מכיל תיאור של מה צריך להשלים
   final List<Map<String, dynamic>> _challenges = [
@@ -258,6 +259,7 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
         _currentLevel++;
         drawnPoints.clear();
         _showSuccess = false;
+        _activePointerId = null; // Reset active pointer
       });
       _speakInstruction();
     } else {
@@ -273,6 +275,7 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
     setState(() {
       drawnPoints.clear();
       _showSuccess = false;
+      _activePointerId = null; // Reset active pointer
     });
   }
 
@@ -426,23 +429,34 @@ class _CompletePictureScreenState extends State<CompletePictureScreen> {
                                 ),
                                 size: Size.infinite,
                               ),
-                            // Drawing layer
-                            GestureDetector(
-                              onPanStart: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                            // Drawing layer - Single touch only
+                            Listener(
+                              onPointerDown: (details) {
+                                // Only start drawing if no finger is currently active
+                                if (_activePointerId == null) {
+                                  setState(() {
+                                    _activePointerId = details.pointer;
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanUpdate: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                              onPointerMove: (details) {
+                                // Only draw if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanEnd: (details) {
-                                setState(() {
-                                  drawnPoints.add(const Offset(-1, -1)); // Separator
-                                });
-                                _checkIfComplete();
+                              onPointerUp: (details) {
+                                // Only end drawing if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(const Offset(-1, -1)); // Separator
+                                    _activePointerId = null;
+                                  });
+                                  _checkIfComplete();
+                                }
                               },
                               child: CustomPaint(
                                 painter: SimpleDrawingPainter(

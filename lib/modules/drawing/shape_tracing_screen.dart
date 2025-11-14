@@ -20,6 +20,7 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
   bool _showSuccess = false;
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
+  int? _activePointerId; // Track the active finger for single-touch drawing
 
   // רמות המשחק - כל רמה עם קושי שונה
   final List<Map<String, dynamic>> _levels = [
@@ -104,6 +105,7 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
         _showSuccess = true;
       });
       _speak(_isHebrew ? 'מצוין! יפה מאוד!' : 'Great! Very nice!');
+      // Removed auto-advance - user must click Next button like in numbers/letters
     }
   }
 
@@ -126,6 +128,7 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
         _currentLevel++;
         drawnPoints.clear();
         _showSuccess = false;
+        _activePointerId = null; // Reset active pointer
       });
       _speakInstruction();
     } else {
@@ -140,6 +143,7 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
     setState(() {
       drawnPoints.clear();
       _showSuccess = false;
+      _activePointerId = null; // Reset active pointer
     });
   }
 
@@ -285,23 +289,34 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
                               ),
                               size: Size.infinite,
                             ),
-                            // Drawing layer
-                            GestureDetector(
-                              onPanStart: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                            // Drawing layer - Single touch only
+                            Listener(
+                              onPointerDown: (details) {
+                                // Only start drawing if no finger is currently active
+                                if (_activePointerId == null) {
+                                  setState(() {
+                                    _activePointerId = details.pointer;
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanUpdate: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                              onPointerMove: (details) {
+                                // Only draw if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanEnd: (details) {
-                                setState(() {
-                                  drawnPoints.add(const Offset(-1, -1)); // Separator
-                                });
-                                _checkIfComplete();
+                              onPointerUp: (details) {
+                                // Only end drawing if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(const Offset(-1, -1)); // Separator
+                                    _activePointerId = null;
+                                  });
+                                  _checkIfComplete();
+                                }
                               },
                               child: CustomPaint(
                                 painter: DrawingPainter(
@@ -347,26 +362,27 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
 
               SizedBox(height: responsive.spacing(16)),
 
-              // Buttons
+              // Buttons - Always show Clear and Next (like numbers/letters)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
                 child: Row(
                   children: [
-                    if (!_showSuccess)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: KidButton(
-                            text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
-                            icon: Icons.delete,
-                            onPressed: _clearDrawing,
-                            color: Colors.orange,
-                            height: 60,
-                          ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: KidButton(
+                          text: _isHebrew ? 'נקה 🗑️' : 'Clear 🗑️',
+                          icon: Icons.delete,
+                          onPressed: _clearDrawing,
+                          color: Colors.orange,
+                          height: 60,
                         ),
                       ),
-                    if (_showSuccess)
-                      Expanded(
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: KidButton(
                           text: _isHebrew ? 'הבא ➡️' : 'Next ➡️',
                           icon: Icons.arrow_forward,
@@ -375,6 +391,7 @@ class _ShapeTracingScreenState extends State<ShapeTracingScreen> {
                           height: 60,
                         ),
                       ),
+                    ),
                   ],
                 ),
               ),

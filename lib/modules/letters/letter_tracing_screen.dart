@@ -22,6 +22,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
   List<Offset> drawnPoints = [];
   Size _canvasSize = Size.zero;
   bool _showCheck = false; // Show the letter temporarily when Check button is pressed
+  int? _activePointerId; // Track the active finger for single-touch drawing
 
   // All Hebrew letters
   final List<String> _hebrewLetters = [
@@ -75,6 +76,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
         _selectedLetter = nextLetter;
         drawnPoints.clear();
         _showCheck = false;
+        _activePointerId = null; // Reset active pointer
       });
       _speakInstruction(nextLetter);
     } else {
@@ -83,6 +85,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
         _selectedLetter = null;
         drawnPoints.clear();
         _showCheck = false;
+        _activePointerId = null; // Reset active pointer
       });
     }
   }
@@ -112,6 +115,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
     setState(() {
       drawnPoints.clear();
       _showCheck = false;
+      _activePointerId = null; // Reset active pointer
     });
   }
 
@@ -351,6 +355,7 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                           _selectedLetter = null;
                           drawnPoints.clear();
                           _showCheck = false;
+                          _activePointerId = null;
                         }),
                       ),
                     ),
@@ -394,22 +399,33 @@ class _LetterTracingScreenState extends State<LetterTracingScreen> {
                               ),
                               size: Size.infinite,
                             ),
-                            // Drawing layer
-                            GestureDetector(
-                              onPanStart: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                            // Drawing layer - Single touch only
+                            Listener(
+                              onPointerDown: (details) {
+                                // Only start drawing if no finger is currently active
+                                if (_activePointerId == null) {
+                                  setState(() {
+                                    _activePointerId = details.pointer;
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanUpdate: (details) {
-                                setState(() {
-                                  drawnPoints.add(details.localPosition);
-                                });
+                              onPointerMove: (details) {
+                                // Only draw if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(details.localPosition);
+                                  });
+                                }
                               },
-                              onPanEnd: (details) {
-                                setState(() {
-                                  drawnPoints.add(const Offset(-1, -1));
-                                });
+                              onPointerUp: (details) {
+                                // Only end drawing if this is the active finger
+                                if (_activePointerId == details.pointer) {
+                                  setState(() {
+                                    drawnPoints.add(const Offset(-1, -1));
+                                    _activePointerId = null;
+                                  });
+                                }
                               },
                               child: CustomPaint(
                                 painter: DrawingPainter(drawnPoints, color),

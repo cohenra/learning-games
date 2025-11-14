@@ -15,6 +15,7 @@ class _FreeDrawingScreenState extends State<FreeDrawingScreen> {
   Color selectedColor = Colors.red;
   double strokeWidth = 5.0;
   bool _isHebrew = true;
+  int? _activePointerId; // Track the active finger for single-touch drawing
 
   final List<Color> colors = [
     Colors.red,
@@ -81,6 +82,7 @@ class _FreeDrawingScreenState extends State<FreeDrawingScreen> {
                       onPressed: () {
                         setState(() {
                           drawingPoints.clear();
+                          _activePointerId = null;
                         });
                       },
                       tooltip: _isHebrew ? 'נקה הכל' : 'Clear All',
@@ -177,37 +179,48 @@ class _FreeDrawingScreenState extends State<FreeDrawingScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: GestureDetector(
-                      onPanStart: (details) {
-                        setState(() {
-                          drawingPoints.add(
-                            DrawingPoint(
-                              details.localPosition,
-                              Paint()
-                                ..color = selectedColor
-                                ..strokeWidth = strokeWidth
-                                ..strokeCap = StrokeCap.round,
-                            ),
-                          );
-                        });
+                    child: Listener(
+                      onPointerDown: (details) {
+                        // Only start drawing if no finger is currently active
+                        if (_activePointerId == null) {
+                          setState(() {
+                            _activePointerId = details.pointer;
+                            drawingPoints.add(
+                              DrawingPoint(
+                                details.localPosition,
+                                Paint()
+                                  ..color = selectedColor
+                                  ..strokeWidth = strokeWidth
+                                  ..strokeCap = StrokeCap.round,
+                              ),
+                            );
+                          });
+                        }
                       },
-                      onPanUpdate: (details) {
-                        setState(() {
-                          drawingPoints.add(
-                            DrawingPoint(
-                              details.localPosition,
-                              Paint()
-                                ..color = selectedColor
-                                ..strokeWidth = strokeWidth
-                                ..strokeCap = StrokeCap.round,
-                            ),
-                          );
-                        });
+                      onPointerMove: (details) {
+                        // Only draw if this is the active finger
+                        if (_activePointerId == details.pointer) {
+                          setState(() {
+                            drawingPoints.add(
+                              DrawingPoint(
+                                details.localPosition,
+                                Paint()
+                                  ..color = selectedColor
+                                  ..strokeWidth = strokeWidth
+                                  ..strokeCap = StrokeCap.round,
+                              ),
+                            );
+                          });
+                        }
                       },
-                      onPanEnd: (details) {
-                        setState(() {
-                          drawingPoints.add(DrawingPoint(null, Paint()));
-                        });
+                      onPointerUp: (details) {
+                        // Only end drawing if this is the active finger
+                        if (_activePointerId == details.pointer) {
+                          setState(() {
+                            drawingPoints.add(DrawingPoint(null, Paint()));
+                            _activePointerId = null;
+                          });
+                        }
                       },
                       child: CustomPaint(
                         painter: DrawingPainter(drawingPoints),
