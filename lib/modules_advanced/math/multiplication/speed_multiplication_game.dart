@@ -134,10 +134,20 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
       _speak(_isHebrew ? 'נכון!' : 'Correct!');
     } else {
       _speak(_isHebrew ? 'לא נכון' : 'Wrong');
+      // Reset after wrong answer to allow retry
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted && _isCorrect == false && _gameStarted) {
+          setState(() {
+            _selectedAnswer = null;
+            _isCorrect = null;
+          });
+        }
+      });
+      return;
     }
 
-    // Next question after 800ms
-    Future.delayed(const Duration(milliseconds: 800), () {
+    // Next question after 1500ms for correct answer
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted && _gameStarted) {
         setState(() {
           _currentQuestion++;
@@ -481,59 +491,72 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
         SizedBox(height: responsive.spacing(40)),
 
         // Answer options
-        Expanded(
+        Flexible(
+          flex: 2,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-            child: GridView.builder(
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.spacing(20),
+              vertical: responsive.spacing(8)
+            ),
+            child: GridView.count(
               shrinkWrap: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: responsive.spacing(12),
+              crossAxisSpacing: responsive.spacing(12),
+              childAspectRatio: responsive.quizButtonAspectRatio,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.5,
-              ),
-              itemCount: _answerOptions.length,
-              itemBuilder: (context, index) {
-                final option = _answerOptions[index];
+              children: _answerOptions.map((option) {
                 final isSelected = _selectedAnswer == option;
 
-                Color? bgColor;
-                if (isSelected) {
-                  bgColor = _isCorrect! ? Colors.green : Colors.red;
+                Color getButtonColor() {
+                  if (!isSelected) {
+                    return Colors.orange.shade400;
+                  }
+                  return _isCorrect! ? Colors.green.shade500 : Colors.red.shade500;
                 }
 
-                return InkWell(
+                return GestureDetector(
                   onTap: _isCorrect == null ? () => _checkAnswer(option) : null,
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(
-                      color: bgColor ?? Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: bgColor ?? Colors.orange.shade300,
-                        width: 4,
+                      gradient: LinearGradient(
+                        colors: [
+                          getButtonColor(),
+                          getButtonColor().withOpacity(0.8),
+                        ],
                       ),
+                      borderRadius: BorderRadius.circular(responsive.spacing(20)),
                       boxShadow: [
                         BoxShadow(
-                          color: (bgColor ?? Colors.orange).withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          color: getButtonColor().withOpacity(0.3),
+                          blurRadius: responsive.spacing(10),
+                          offset: Offset(0, responsive.spacing(6)),
                         ),
                       ],
                     ),
                     child: Center(
-                      child: Text(
-                        '$option',
-                        style: TextStyle(
-                          fontSize: responsive.fontSize(40),
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white : Colors.orange.shade700,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '$option',
+                            style: TextStyle(
+                              fontSize: responsive.largeNumberSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 );
-              },
+              }).toList(),
             ),
           ),
         ),

@@ -198,7 +198,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
 
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (context) => _buildQuestionDialog(row, col, correctAnswer, options),
     );
   }
@@ -235,85 +235,130 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
     return StatefulBuilder(
       builder: (context, setDialogState) {
         final screenSize = MediaQuery.of(context).size;
-        final dialogWidth = screenSize.width * 0.85;
-        final dialogHeight = screenSize.height * 0.6;
+
+        Color _getButtonColor(int option) {
+          if (selectedAnswer == null) {
+            return Colors.blue.shade400;
+          }
+
+          if (option == selectedAnswer) {
+            if (isCorrect == true) {
+              return Colors.green.shade500;
+            } else {
+              return Colors.red.shade500;
+            }
+          }
+
+          return Colors.blue.shade400;
+        }
 
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           child: Container(
-            width: dialogWidth,
-            height: dialogHeight,
-            padding: const EdgeInsets.all(20.0),
+            constraints: BoxConstraints(
+              maxWidth: screenSize.width * 0.9,
+              maxHeight: screenSize.height * 0.7,
+            ),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Question
-                Text(
-                  '$row ✖️ $col = ?',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
+                // Close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 40),
+                    Expanded(
+                      child: Text(
+                        '$row ✖️ $col = ?',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 28),
+                      onPressed: () => Navigator.pop(context),
+                      color: Colors.grey.shade700,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
 
-                // Answer options
-                Expanded(
+                const SizedBox(height: 20),
+
+                // Answer options in 2x2 grid
+                Flexible(
                   child: GridView.count(
                     shrinkWrap: true,
                     crossAxisCount: 2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 1.8,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 1.5,
                     children: options.map((option) {
-                      final isSelected = selectedAnswer == option;
-                      Color? bgColor;
+                      return GestureDetector(
+                        onTap: () {
+                          if (isCorrect == true) return;
 
-                      if (isSelected && isCorrect != null) {
-                        bgColor = isCorrect! ? Colors.green : Colors.red;
-                      }
+                          setDialogState(() {
+                            selectedAnswer = option;
+                            isCorrect = option == correctAnswer;
+                          });
 
-                      return ElevatedButton(
-                        onPressed: selectedAnswer == null
-                            ? () {
-                                setDialogState(() {
-                                  selectedAnswer = option;
-                                  isCorrect = option == correctAnswer;
-                                });
+                          if (isCorrect!) {
+                            setState(() {
+                              _completedCells.add('$row-$col');
+                            });
 
-                                if (isCorrect!) {
-                                  setState(() {
-                                    _completedCells.add('$row-$col');
-                                  });
-
-                                  Future.delayed(const Duration(milliseconds: 800), () {
-                                    if (mounted) {
-                                      Navigator.pop(context);
-                                    }
-                                  });
-                                }
+                            Future.delayed(const Duration(milliseconds: 1500), () {
+                              if (mounted) {
+                                Navigator.pop(context);
                               }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: bgColor ?? Colors.blue.shade50,
-                          foregroundColor: isSelected && isCorrect != null
-                              ? Colors.white
-                              : Colors.blue.shade700,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: bgColor ?? Colors.blue.shade300,
-                              width: 3,
+                            });
+                          } else {
+                            // Reset after wrong answer to allow retry
+                            Future.delayed(const Duration(milliseconds: 800), () {
+                              if (mounted && isCorrect == false) {
+                                setDialogState(() {
+                                  selectedAnswer = null;
+                                  isCorrect = null;
+                                });
+                              }
+                            });
+                          }
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                _getButtonColor(option),
+                                _getButtonColor(option).withOpacity(0.8),
+                              ],
                             ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _getButtonColor(option).withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: Text(
-                          '$option',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          child: Center(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                '$option',
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       );
