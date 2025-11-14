@@ -264,7 +264,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(40)),
+        SizedBox(height: responsive.spacing(12)),
 
         // Instructions
         Padding(
@@ -279,7 +279,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                     ? 'ענה על כמה שיותר שאלות נכונות'
                     : 'Answer as many correctly as you can',
               ),
-              SizedBox(height: responsive.spacing(16)),
+              SizedBox(height: responsive.spacing(8)),
               _buildInfoCard(
                 responsive,
                 icon: '⏱️',
@@ -288,7 +288,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                     ? 'כמה מהר אתה יכול לענות?'
                     : 'How fast can you answer?',
               ),
-              SizedBox(height: responsive.spacing(16)),
+              SizedBox(height: responsive.spacing(8)),
               _buildInfoCard(
                 responsive,
                 icon: '🏆',
@@ -301,7 +301,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        const Spacer(),
+        SizedBox(height: responsive.spacing(12)),
 
         // Difficulty selector
         Padding(
@@ -336,7 +336,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(32)),
+        SizedBox(height: responsive.spacing(16)),
 
         // Start button
         Padding(
@@ -350,7 +350,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
           ),
         ),
 
-        SizedBox(height: responsive.spacing(32)),
+        SizedBox(height: responsive.spacing(16)),
       ],
     );
   }
@@ -362,7 +362,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
     required String description,
   }) {
     return Container(
-      padding: EdgeInsets.all(responsive.spacing(16)),
+      padding: EdgeInsets.all(responsive.spacing(12)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -372,9 +372,9 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
         children: [
           Text(
             icon,
-            style: TextStyle(fontSize: responsive.iconSize(40)),
+            style: TextStyle(fontSize: responsive.iconSize(32)),
           ),
-          SizedBox(width: responsive.spacing(16)),
+          SizedBox(width: responsive.spacing(12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,7 +382,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: responsive.fontSize(16),
+                    fontSize: responsive.fontSize(15),
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade800,
                   ),
@@ -390,7 +390,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: responsive.fontSize(14),
+                    fontSize: responsive.fontSize(13),
                     color: Colors.grey.shade600,
                   ),
                 ),
@@ -619,21 +619,21 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
       children: [
         Text(
           emoji,
-          style: TextStyle(fontSize: responsive.iconSize(100)),
+          style: TextStyle(fontSize: responsive.iconSize(80)),
         ),
-        SizedBox(height: responsive.spacing(20)),
+        SizedBox(height: responsive.spacing(16)),
         Text(
           message,
           style: TextStyle(
-            fontSize: responsive.fontSize(32),
+            fontSize: responsive.fontSize(28),
             fontWeight: FontWeight.bold,
             color: Colors.orange.shade700,
           ),
         ),
-        SizedBox(height: responsive.spacing(40)),
+        SizedBox(height: responsive.spacing(24)),
         Container(
           margin: EdgeInsets.symmetric(horizontal: responsive.spacing(40)),
-          padding: EdgeInsets.all(responsive.spacing(24)),
+          padding: EdgeInsets.all(responsive.spacing(20)),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
@@ -650,24 +650,24 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
               Text(
                 _isHebrew ? 'הניקוד שלך' : 'Your Score',
                 style: TextStyle(
-                  fontSize: responsive.fontSize(20),
+                  fontSize: responsive.fontSize(18),
                   color: Colors.grey.shade600,
                 ),
               ),
-              SizedBox(height: responsive.spacing(12)),
+              SizedBox(height: responsive.spacing(10)),
               Text(
                 '$_score / $_totalQuestions',
                 style: TextStyle(
-                  fontSize: responsive.fontSize(48),
+                  fontSize: responsive.fontSize(42),
                   fontWeight: FontWeight.bold,
                   color: Colors.orange.shade700,
                 ),
               ),
-              SizedBox(height: responsive.spacing(8)),
+              SizedBox(height: responsive.spacing(6)),
               Text(
                 '$percentage%',
                 style: TextStyle(
-                  fontSize: responsive.fontSize(24),
+                  fontSize: responsive.fontSize(22),
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade600,
                 ),
@@ -675,7 +675,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
             ],
           ),
         ),
-        SizedBox(height: responsive.spacing(40)),
+        SizedBox(height: responsive.spacing(24)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
           child: KidButton(
