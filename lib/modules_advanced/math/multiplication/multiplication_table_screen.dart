@@ -234,90 +234,99 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
 
     return StatefulBuilder(
       builder: (context, setDialogState) {
+        final screenSize = MediaQuery.of(context).size;
+        final dialogWidth = screenSize.width * 0.85;
+        final dialogHeight = screenSize.height * 0.6;
+
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: Container(
+            width: dialogWidth,
+            height: dialogHeight,
+            padding: const EdgeInsets.all(20.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Question
                 Text(
                   '$row ✖️ $col = ?',
                   style: const TextStyle(
-                    fontSize: 36,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // Answer options
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.5,
-                  children: options.map((option) {
-                    final isSelected = selectedAnswer == option;
-                    Color? bgColor;
+                Expanded(
+                  child: GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 1.8,
+                    children: options.map((option) {
+                      final isSelected = selectedAnswer == option;
+                      Color? bgColor;
 
-                    if (isSelected && isCorrect != null) {
-                      bgColor = isCorrect! ? Colors.green : Colors.red;
-                    }
+                      if (isSelected && isCorrect != null) {
+                        bgColor = isCorrect! ? Colors.green : Colors.red;
+                      }
 
-                    return ElevatedButton(
-                      onPressed: selectedAnswer == null
-                          ? () {
-                              setDialogState(() {
-                                selectedAnswer = option;
-                                isCorrect = option == correctAnswer;
-                              });
-
-                              if (isCorrect!) {
-                                setState(() {
-                                  _completedCells.add('$row-$col');
+                      return ElevatedButton(
+                        onPressed: selectedAnswer == null
+                            ? () {
+                                setDialogState(() {
+                                  selectedAnswer = option;
+                                  isCorrect = option == correctAnswer;
                                 });
 
-                                Future.delayed(const Duration(milliseconds: 800), () {
-                                  if (mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                });
+                                if (isCorrect!) {
+                                  setState(() {
+                                    _completedCells.add('$row-$col');
+                                  });
+
+                                  Future.delayed(const Duration(milliseconds: 800), () {
+                                    if (mounted) {
+                                      Navigator.pop(context);
+                                    }
+                                  });
+                                }
                               }
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: bgColor ?? Colors.blue.shade50,
-                        foregroundColor: isSelected && isCorrect != null
-                            ? Colors.white
-                            : Colors.blue.shade700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: bgColor ?? Colors.blue.shade300,
-                            width: 3,
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: bgColor ?? Colors.blue.shade50,
+                          foregroundColor: isSelected && isCorrect != null
+                              ? Colors.white
+                              : Colors.blue.shade700,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: bgColor ?? Colors.blue.shade300,
+                              width: 3,
+                            ),
                           ),
                         ),
-                      ),
-                      child: Text(
-                        '$option',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                        child: Text(
+                          '$option',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
 
                 if (isCorrect != null) ...[
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   Text(
                     isCorrect! ? '🎉 מצוין!' : '❌ נסה שוב',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: isCorrect! ? Colors.green : Colors.red,
                     ),
