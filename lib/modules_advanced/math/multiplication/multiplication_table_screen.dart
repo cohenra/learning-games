@@ -117,34 +117,29 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
     // Adjust font size based on cell size
     double fontSize = (cellSize * 0.35).clamp(10.0, 16.0);
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header row
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header row
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildCell('✖️', cellSize, fontSize, isHeader: true),
+            for (int col = 1; col <= _maxNumber; col++)
+              _buildCell('$col', cellSize, fontSize, isHeader: true),
+          ],
+        ),
+        // Data rows
+        for (int row = 1; row <= _maxNumber; row++)
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildCell('✖️', cellSize, fontSize, isHeader: true),
+              _buildCell('$row', cellSize, fontSize, isHeader: true),
               for (int col = 1; col <= _maxNumber; col++)
-                _buildCell('$col', cellSize, fontSize, isHeader: true),
+                _buildCell('${row * col}', cellSize, fontSize),
             ],
           ),
-          // Data rows
-          for (int row = 1; row <= _maxNumber; row++)
-            Row(
-              children: [
-                _buildCell('$row', cellSize, fontSize, isHeader: true),
-                for (int col = 1; col <= _maxNumber; col++)
-                  _buildCell('${row * col}', cellSize, fontSize),
-              ],
-            ),
-        ],
-      ),
+      ],
     );
   }
 
