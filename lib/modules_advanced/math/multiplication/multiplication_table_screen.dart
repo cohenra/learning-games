@@ -12,6 +12,7 @@ class MultiplicationTableScreen extends StatefulWidget {
 
 class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
   int _maxNumber = 5;
+  Set<String> _completedCells = {}; // Track completed cells (e.g., "2-3")
 
   @override
   void initState() {
@@ -77,6 +78,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
         onPressed: () {
           setState(() {
             _maxNumber = maxNum;
+            _completedCells.clear(); // Reset progress when changing difficulty
           });
         },
         style: ElevatedButton.styleFrom(
@@ -85,7 +87,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.blue, width: 2),
+            side: const BorderSide(color: Colors.blue, width: 2),
           ),
         ),
         child: Text(
@@ -136,30 +138,196 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
             children: [
               _buildCell('$row', cellSize, fontSize, isHeader: true),
               for (int col = 1; col <= _maxNumber; col++)
-                _buildCell('${row * col}', cellSize, fontSize),
+                _buildCell('${row * col}', cellSize, fontSize, row: row, col: col),
             ],
           ),
       ],
     );
   }
 
-  Widget _buildCell(String text, double size, double fontSize, {bool isHeader = false}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: isHeader ? Colors.blue.shade100 : Colors.white,
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+  Widget _buildCell(String text, double size, double fontSize, {bool isHeader = false, int? row, int? col}) {
+    final cellKey = row != null && col != null ? '$row-$col' : null;
+    final isCompleted = cellKey != null && _completedCells.contains(cellKey);
+    final isClickable = !isHeader && row != null && col != null;
+
+    return GestureDetector(
+      onTap: isClickable ? () => _onCellTap(row!, col!) : null,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: isCompleted
+              ? Colors.green.shade100
+              : (isHeader ? Colors.blue.shade100 : Colors.white),
+          border: Border.all(
+            color: isCompleted ? Colors.green.shade300 : Colors.grey.shade300,
+            width: isCompleted ? 2 : 1,
           ),
         ),
+        child: Stack(
+          children: [
+            Center(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+                  color: isCompleted ? Colors.green.shade700 : Colors.black87,
+                ),
+              ),
+            ),
+            if (isCompleted)
+              Positioned(
+                top: 2,
+                right: 2,
+                child: Icon(
+                  Icons.check_circle,
+                  size: size * 0.25,
+                  color: Colors.green.shade700,
+                ),
+              ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _onCellTap(int row, int col) {
+    final correctAnswer = row * col;
+    final options = _generateOptions(correctAnswer);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _buildQuestionDialog(row, col, correctAnswer, options),
+    );
+  }
+
+  List<int> _generateOptions(int correctAnswer) {
+    final options = <int>{correctAnswer};
+
+    // Generate 3 wrong answers
+    while (options.length < 4) {
+      int wrongAnswer;
+      final random = (correctAnswer * 0.4).toInt() + 1;
+
+      if (options.length == 1) {
+        wrongAnswer = correctAnswer + random;
+      } else if (options.length == 2) {
+        wrongAnswer = correctAnswer - random;
+      } else {
+        wrongAnswer = correctAnswer + (random * 2);
+      }
+
+      if (wrongAnswer > 0 && wrongAnswer <= 144) {
+        options.add(wrongAnswer);
+      }
+    }
+
+    final list = options.toList()..shuffle();
+    return list;
+  }
+
+  Widget _buildQuestionDialog(int row, int col, int correctAnswer, List<int> options) {
+    int? selectedAnswer;
+    bool? isCorrect;
+
+    return StatefulBuilder(
+      builder: (context, setDialogState) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Question
+                Text(
+                  '$row ✖️ $col = ?',
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Answer options
+                GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.5,
+                  children: options.map((option) {
+                    final isSelected = selectedAnswer == option;
+                    Color? bgColor;
+
+                    if (isSelected && isCorrect != null) {
+                      bgColor = isCorrect! ? Colors.green : Colors.red;
+                    }
+
+                    return ElevatedButton(
+                      onPressed: selectedAnswer == null
+                          ? () {
+                              setDialogState(() {
+                                selectedAnswer = option;
+                                isCorrect = option == correctAnswer;
+                              });
+
+                              if (isCorrect!) {
+                                setState(() {
+                                  _completedCells.add('$row-$col');
+                                });
+
+                                Future.delayed(const Duration(milliseconds: 800), () {
+                                  if (mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                });
+                              }
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: bgColor ?? Colors.blue.shade50,
+                        foregroundColor: isSelected && isCorrect != null
+                            ? Colors.white
+                            : Colors.blue.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: bgColor ?? Colors.blue.shade300,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        '$option',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                if (isCorrect != null) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    isCorrect! ? '🎉 מצוין!' : '❌ נסה שוב',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isCorrect! ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
