@@ -3,7 +3,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../../utils/responsive_helper.dart';
 import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
-import '../../../widgets/reward_animation.dart';
 
 /// לוח כפל אינטראקטיבי - לחיצה על תא מציגה שאלה
 class MultiplicationTableScreen extends StatefulWidget {
@@ -14,8 +13,7 @@ class MultiplicationTableScreen extends StatefulWidget {
       _MultiplicationTableScreenState();
 }
 
-class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
-    with SingleTickerProviderStateMixin {
+class _MultiplicationTableScreenState extends State<MultiplicationTableScreen> {
   final FlutterTts _flutterTts = FlutterTts();
 
   bool _isHebrew = true;
@@ -28,27 +26,10 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
   bool? _isCorrect;
   Map<String, bool> _completedCells = {}; // Track completed cells
 
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
   @override
   void initState() {
     super.initState();
     _initTts();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _scaleAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isHebrew = Localizations.localeOf(context).languageCode == 'he';
-      });
-    });
   }
 
   Future<void> _initTts() async {
@@ -75,7 +56,6 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
     });
 
     _generateAnswerOptions(row, col);
-    _animationController.forward(from: 0);
 
     // Speak the question
     _speak(_isHebrew
@@ -143,7 +123,6 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
   @override
   void dispose() {
     _flutterTts.stop();
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -253,9 +232,6 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
               if (_showQuestion && _selectedRow != null && _selectedCol != null)
                 _buildQuestionOverlay(responsive),
 
-              // Reward animation
-              if (_isCorrect == true)
-                const RewardAnimation(),
             ],
           ),
         ),
@@ -411,9 +387,7 @@ class _MultiplicationTableScreenState extends State<MultiplicationTableScreen>
     return Container(
       color: Colors.black.withOpacity(0.7),
       child: Center(
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: Container(
+        child: Container(
             margin: EdgeInsets.all(responsive.spacing(20)),
             padding: EdgeInsets.all(responsive.spacing(24)),
             decoration: BoxDecoration(
