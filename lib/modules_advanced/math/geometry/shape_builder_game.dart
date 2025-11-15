@@ -352,76 +352,85 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
 
   Widget _buildShapeOptions(ResponsiveHelper responsive) {
     final options = _generateShapeOptions();
+    final correctShapes = _allShapes.where((s) => s['sides'] == _targetSides).map((s) => s['shape']).toSet();
 
     return GridView.count(
       shrinkWrap: true,
       padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
       crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.0,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.1,
       children: options.map((shapeData) {
         final shape = shapeData['shape'] as String;
         final isSelected = _selectedShape == shape;
-        final showResult = _isCorrect != null && isSelected;
+        final isCorrectOption = correctShapes.contains(shape);
+        final showResult = _isCorrect != null;
 
         return GestureDetector(
           onTap: _isCorrect == null ? () => _checkAnswer(shape) : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+          child: Container(
             decoration: BoxDecoration(
-              color: showResult
-                  ? (_isCorrect! ? Colors.green.shade100 : Colors.red.shade100)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: showResult
-                    ? (_isCorrect! ? Colors.green.shade600 : Colors.red.shade600)
+                color: showResult && isCorrectOption
+                    ? Colors.green.shade600
                     : Colors.green.shade300,
-                width: 3,
+                width: showResult && isCorrectOption ? 3 : 2,
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Stack(
               children: [
-                Expanded(
-                  flex: 3,
-                  child: Center(
-                    child: CustomPaint(
-                      size: const Size(100, 100),
-                      painter: ShapeOptionPainter(
-                        shape: shape,
-                        color: showResult
-                            ? (_isCorrect! ? Colors.green.shade400 : Colors.red.shade400)
-                            : Colors.green.shade400,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Center(
+                        child: CustomPaint(
+                          size: const Size(80, 80),
+                          painter: ShapeOptionPainter(
+                            shape: shape,
+                            color: Colors.green.shade400,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      shapeData[_isHebrew ? 'he' : 'en'] as String,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: showResult
-                            ? (_isCorrect! ? Colors.green.shade800 : Colors.red.shade800)
-                            : Colors.grey.shade800,
+                    Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          shapeData[_isHebrew ? 'he' : 'en'] as String,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                if (showResult && isSelected)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Icon(
+                      _isCorrect! ? Icons.check_circle : Icons.cancel,
+                      color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                      size: 28,
                     ),
                   ),
-                ),
               ],
             ),
           ),

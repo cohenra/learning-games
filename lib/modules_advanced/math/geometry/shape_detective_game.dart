@@ -330,16 +330,14 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
   }
 
   Widget _buildShape(ResponsiveHelper responsive) {
-    return Center(
-      child: CustomPaint(
-        size: const Size(250, 250),
-        painter: ShapePainter(
-          shape: _currentShape!,
-          color: _isCorrect == null
-              ? Colors.blue.shade400
-              : _isCorrect!
-                  ? Colors.green.shade400
-                  : Colors.red.shade400,
+    return Expanded(
+      child: Center(
+        child: CustomPaint(
+          size: const Size(180, 180),
+          painter: ShapePainter(
+            shape: _currentShape!,
+            color: Colors.blue.shade400,
+          ),
         ),
       ),
     );
@@ -354,52 +352,59 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 2.5,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 3.5,
         children: options.map((option) {
           final isSelected = _selectedAnswer == option;
-          final showResult = _isCorrect != null && isSelected;
+          final correctAnswer = _shapes[_currentShape]![_isHebrew ? 'he' : 'en']!;
+          final isCorrectOption = option == correctAnswer;
+          final showResult = _isCorrect != null;
 
           return GestureDetector(
             onTap: _isCorrect == null ? () => _checkAnswer(option) : null,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
+            child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: showResult
-                      ? (_isCorrect!
-                          ? [Colors.green.shade400, Colors.green.shade600]
-                          : [Colors.red.shade400, Colors.red.shade600])
-                      : [Colors.blue.shade300, Colors.blue.shade500],
+                  colors: [Colors.blue.shade300, Colors.blue.shade500],
                 ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(12),
+                border: showResult && isCorrectOption
+                    ? Border.all(color: Colors.green.shade700, width: 3)
+                    : null,
               ),
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      option,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+              child: Stack(
+                children: [
+                  Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Text(
+                          option,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
+                  if (showResult && isSelected)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Icon(
+                        _isCorrect! ? Icons.check_circle : Icons.cancel,
+                        color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                        size: 24,
+                      ),
+                    ),
+                ],
               ),
             ),
           );
