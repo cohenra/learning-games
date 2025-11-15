@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'dart:async';
 import 'dart:math';
 import '../../../utils/responsive_helper.dart';
 import '../../../widgets/kid_button.dart';
@@ -15,8 +14,7 @@ class GardenBuilderGame extends StatefulWidget {
   State<GardenBuilderGame> createState() => _GardenBuilderGameState();
 }
 
-class _GardenBuilderGameState extends State<GardenBuilderGame>
-    with TickerProviderStateMixin {
+class _GardenBuilderGameState extends State<GardenBuilderGame> {
   final FlutterTts _flutterTts = FlutterTts();
   final Random _random = Random();
 
@@ -31,17 +29,12 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   int? _cols;
   int _correctAnswer = 0;
 
-  // Animation state
-  bool _isPlanting = false;
+  // Planting state
   int _plantedFlowers = 0;
   bool _showQuestion = false;
   int? _selectedAnswer;
   bool? _isCorrect;
   List<int> _answerOptions = [];
-
-  // Bloom animation
-  late AnimationController _bloomController;
-  late Animation<double> _bloomAnimation;
 
   // Flower colors
   final List<Color> _flowerColors = [
@@ -58,14 +51,6 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _initTts();
-    _bloomController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _bloomAnimation = CurvedAnimation(
-      parent: _bloomController,
-      curve: Curves.elasticOut,
-    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
@@ -88,7 +73,6 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   @override
   void dispose() {
     _flutterTts.stop();
-    _bloomController.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
@@ -105,7 +89,6 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
 
   void _generateGarden() {
     setState(() {
-      _isPlanting = false;
       _plantedFlowers = 0;
       _showQuestion = false;
       _selectedAnswer = null;
@@ -130,43 +113,53 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
     _speak(_isHebrew
         ? 'שתול $_rows שורות עם $_cols פרחים בכל שורה'
         : 'Plant $_rows rows with $_cols flowers each');
-
-    // Start planting after 1.5 seconds
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        _plantFlowers();
-      }
-    });
   }
 
-  void _plantFlowers() {
-    setState(() {
-      _isPlanting = true;
-      _plantedFlowers = 0;
-    });
-
-    // Plant flowers one by one
-    Timer.periodic(const Duration(milliseconds: 150), (timer) {
-      if (!mounted || _plantedFlowers >= _correctAnswer) {
-        timer.cancel();
-        if (mounted) {
-          setState(() {
-            _isPlanting = false;
-          });
-          // Show question after planting is complete
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              _showQuestionDialog();
-            }
-          });
-        }
-        return;
-      }
-
+  void _plantFlower() {
+    if (_plantedFlowers < _rows! * _cols! * 2) {
       setState(() {
         _plantedFlowers++;
       });
-    });
+    }
+  }
+
+  void _checkPlanting() {
+    if (_plantedFlowers == _correctAnswer) {
+      // Correct! Show question
+      _showQuestionDialog();
+    } else if (_plantedFlowers < _correctAnswer) {
+      // Too few
+      _speak(_isHebrew ? 'חסרים פרחים!' : 'Too few flowers!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isHebrew
+                ? 'אופס! שתלת רק $_plantedFlowers פרחים. צריך $_correctAnswer!'
+                : 'Oops! You planted only $_plantedFlowers flowers. Need $_correctAnswer!',
+            style: const TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.orange.shade600,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Too many
+      _speak(_isHebrew ? 'יותר מידי פרחים!' : 'Too many flowers!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isHebrew
+                ? 'אופס! שתלת $_plantedFlowers פרחים. צריך רק $_correctAnswer!'
+                : 'Oops! You planted $_plantedFlowers flowers. Need only $_correctAnswer!',
+            style: const TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.red.shade600,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _showQuestionDialog() {
@@ -205,23 +198,20 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
     });
 
     if (isCorrect) {
-      _speak(_isHebrew ? 'נכון! הפרחים פורחים!' : 'Correct! The flowers bloom!');
+      _speak(_isHebrew ? 'נכון! מעולה!' : 'Correct! Excellent!');
       setState(() {
         _score++;
         _totalFlowers += _correctAnswer;
       });
 
-      // Bloom animation
-      _bloomController.forward().then((_) {
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          if (mounted) {
-            _bloomController.reverse();
-            setState(() {
-              _level++;
-            });
-            _generateGarden();
-          }
-        });
+      // Move to next garden
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          setState(() {
+            _level++;
+          });
+          _generateGarden();
+        }
       });
     } else {
       _speak(_isHebrew ? 'לא נכון, נסה שוב' : 'Wrong, try again');
@@ -260,6 +250,9 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
                 _buildStartScreen(responsive)
               else
                 _buildGameScreen(responsive),
+
+              // Question dialog overlay
+              if (_showQuestion) _buildQuestionOverlay(responsive),
             ],
           ),
         ),
@@ -280,13 +273,13 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
                   children: [
                     Text(
                       '🌻',
-                      style: TextStyle(fontSize: responsive.iconSize(80)),
+                      style: TextStyle(fontSize: responsive.iconSize(60)),
                     ),
-                    SizedBox(height: responsive.spacing(12)),
+                    SizedBox(height: responsive.spacing(8)),
                     Text(
                       _isHebrew ? 'בונה הגינה' : 'Garden Builder',
                       style: TextStyle(
-                        fontSize: responsive.titleSize,
+                        fontSize: responsive.fontSize(28),
                         fontWeight: FontWeight.bold,
                         color: Colors.green.shade700,
                       ),
@@ -309,59 +302,65 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
           ),
         ),
 
-        SizedBox(height: responsive.spacing(20)),
+        SizedBox(height: responsive.spacing(12)),
 
         // Instructions
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(32)),
-          child: Container(
-            padding: EdgeInsets.all(responsive.spacing(20)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.green.shade300, width: 3),
-            ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
             child: Column(
               children: [
-                Text(
-                  _isHebrew ? 'איך משחקים?' : 'How to Play?',
-                  style: TextStyle(
-                    fontSize: responsive.fontSize(22),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
+                Container(
+                  padding: EdgeInsets.all(responsive.spacing(16)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.green.shade300, width: 3),
                   ),
-                ),
-                SizedBox(height: responsive.spacing(12)),
-                _buildInstructionItem(
-                  responsive,
-                  '1️⃣',
-                  _isHebrew ? 'קבל משימת גינון' : 'Get a gardening task',
-                ),
-                _buildInstructionItem(
-                  responsive,
-                  '2️⃣',
-                  _isHebrew ? 'צפה בפרחים צומחים' : 'Watch flowers grow',
-                ),
-                _buildInstructionItem(
-                  responsive,
-                  '3️⃣',
-                  _isHebrew ? 'ספור כמה פרחים שתלת' : 'Count the flowers',
-                ),
-                _buildInstructionItem(
-                  responsive,
-                  '4️⃣',
-                  _isHebrew ? 'הפרחים יפרחו!' : 'Flowers bloom!',
+                  child: Column(
+                    children: [
+                      Text(
+                        _isHebrew ? 'איך משחקים?' : 'How to Play?',
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(20),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                      SizedBox(height: responsive.spacing(8)),
+                      _buildInstructionItem(
+                        responsive,
+                        '1️⃣',
+                        _isHebrew ? 'קבל משימת גינון' : 'Get a gardening task',
+                      ),
+                      _buildInstructionItem(
+                        responsive,
+                        '2️⃣',
+                        _isHebrew
+                            ? 'לחץ על הגינה כדי לשתול פרחים'
+                            : 'Tap the garden to plant flowers',
+                      ),
+                      _buildInstructionItem(
+                        responsive,
+                        '3️⃣',
+                        _isHebrew ? 'לחץ "בדוק" כשסיימת' : 'Click "Check" when done',
+                      ),
+                      _buildInstructionItem(
+                        responsive,
+                        '4️⃣',
+                        _isHebrew ? 'ענה על השאלה!' : 'Answer the question!',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
 
-        const Spacer(),
-
         // Start button
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+          padding: EdgeInsets.all(responsive.spacing(16)),
           child: KidButton(
             text: _isHebrew ? 'התחל לגנן! 🌱' : 'Start Gardening! 🌱',
             icon: Icons.play_arrow,
@@ -370,8 +369,6 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
             height: 70,
           ),
         ),
-
-        SizedBox(height: responsive.spacing(20)),
       ],
     );
   }
@@ -379,19 +376,19 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   Widget _buildInstructionItem(
       ResponsiveHelper responsive, String emoji, String text) {
     return Padding(
-      padding: EdgeInsets.only(bottom: responsive.spacing(8)),
+      padding: EdgeInsets.only(bottom: responsive.spacing(6)),
       child: Row(
         children: [
           Text(
             emoji,
-            style: TextStyle(fontSize: responsive.iconSize(28)),
+            style: TextStyle(fontSize: responsive.iconSize(24)),
           ),
-          SizedBox(width: responsive.spacing(12)),
+          SizedBox(width: responsive.spacing(8)),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
-                fontSize: responsive.fontSize(16),
+                fontSize: responsive.fontSize(15),
                 color: Colors.grey.shade700,
               ),
             ),
@@ -404,7 +401,7 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   Widget _buildGameScreen(ResponsiveHelper responsive) {
     return Column(
       children: [
-        // Header with score and flowers
+        // Header with score, back button and flowers
         Container(
           padding: EdgeInsets.all(responsive.spacing(12)),
           decoration: BoxDecoration(
@@ -418,64 +415,108 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatBadge(responsive, '📊', '$_level',
-                  _isHebrew ? 'רמה' : 'Level'),
-              _buildStatBadge(responsive, '✅', '$_score',
-                  _isHebrew ? 'גינות' : 'Gardens'),
-              _buildStatBadge(responsive, '🌸', '$_totalFlowers',
-                  _isHebrew ? 'פרחים' : 'Flowers'),
+              KidBackButton(
+                onPressed: () {
+                  setState(() {
+                    _gameStarted = false;
+                  });
+                },
+                color: Colors.white,
+                isHebrew: _isHebrew,
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatBadge(responsive, '📊', '$_level',
+                        _isHebrew ? 'רמה' : 'Level'),
+                    _buildStatBadge(responsive, '✅', '$_score',
+                        _isHebrew ? 'גינות' : 'Gardens'),
+                    _buildStatBadge(responsive, '🌸', '$_totalFlowers',
+                        _isHebrew ? 'פרחים' : 'Flowers'),
+                  ],
+                ),
+              ),
+              SizedBox(width: responsive.spacing(48)),
             ],
           ),
         ),
 
-        SizedBox(height: responsive.spacing(20)),
+        SizedBox(height: responsive.spacing(12)),
 
         // Task info
-        if (!_showQuestion)
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-            padding: EdgeInsets.all(responsive.spacing(16)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.green.shade300, width: 2),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '🌱 ',
-                  style: TextStyle(fontSize: responsive.iconSize(32)),
-                ),
-                Text(
-                  _isHebrew
-                      ? 'שתול: $_rows ✖️ $_cols פרחים'
-                      : 'Plant: $_rows ✖️ $_cols flowers',
-                  style: TextStyle(
-                    fontSize: responsive.fontSize(24),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
-                  ),
-                ),
-              ],
-            ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+          padding: EdgeInsets.all(responsive.spacing(12)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.green.shade300, width: 2),
           ),
-
-        SizedBox(height: responsive.spacing(20)),
-
-        // Garden
-        Expanded(
-          child: Center(
-            child: _buildGarden(responsive),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '🌱 ',
+                style: TextStyle(fontSize: responsive.iconSize(28)),
+              ),
+              Text(
+                _isHebrew
+                    ? 'שתול: $_rows ✖️ $_cols פרחים'
+                    : 'Plant: $_rows ✖️ $_cols flowers',
+                style: TextStyle(
+                  fontSize: responsive.fontSize(20),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade700,
+                ),
+              ),
+            ],
           ),
         ),
 
-        // Question dialog overlay
-        if (_showQuestion) _buildQuestionOverlay(responsive),
+        SizedBox(height: responsive.spacing(12)),
 
-        SizedBox(height: responsive.spacing(20)),
+        // Garden (clickable)
+        Expanded(
+          child: Center(
+            child: GestureDetector(
+              onTap: _plantFlower,
+              child: _buildGarden(responsive),
+            ),
+          ),
+        ),
+
+        // Planted counter
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+          child: Text(
+            _isHebrew
+                ? 'שתלת: $_plantedFlowers פרחים'
+                : 'Planted: $_plantedFlowers flowers',
+            style: TextStyle(
+              fontSize: responsive.fontSize(20),
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade700,
+            ),
+          ),
+        ),
+
+        SizedBox(height: responsive.spacing(12)),
+
+        // Check button
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+          child: KidButton(
+            text: _isHebrew ? 'בדוק! ✓' : 'Check! ✓',
+            icon: Icons.check_circle,
+            onPressed: _checkPlanting,
+            color: Colors.green.shade600,
+            height: 60,
+          ),
+        ),
+
+        SizedBox(height: responsive.spacing(12)),
       ],
     );
   }
@@ -483,16 +524,16 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   Widget _buildStatBadge(
       ResponsiveHelper responsive, String icon, String value, String label) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           icon,
-          style: TextStyle(fontSize: responsive.iconSize(28)),
+          style: TextStyle(fontSize: responsive.iconSize(24)),
         ),
-        SizedBox(height: responsive.spacing(4)),
         Text(
           value,
           style: TextStyle(
-            fontSize: responsive.fontSize(20),
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -500,7 +541,7 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
         Text(
           label,
           style: TextStyle(
-            fontSize: responsive.fontSize(12),
+            fontSize: responsive.fontSize(11),
             color: Colors.white70,
           ),
         ),
@@ -513,7 +554,7 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
 
     final size = MediaQuery.of(context).size;
     final availableWidth = size.width - 80;
-    final availableHeight = size.height - 400;
+    final availableHeight = size.height - 450;
 
     double flowerSize = min(
       availableWidth / _cols!,
@@ -549,80 +590,77 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
     final color = _flowerColors[index % _flowerColors.length];
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       width: size,
       height: size,
       margin: const EdgeInsets.all(3),
       child: isPlanted
-          ? ScaleTransition(
-              scale: _isCorrect == true ? _bloomAnimation : const AlwaysStoppedAnimation(1.0),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Stem
-                  Positioned(
-                    bottom: 0,
-                    child: Container(
-                      width: 3,
-                      height: size * 0.4,
-                      color: Colors.green.shade700,
-                    ),
+          ? Stack(
+              alignment: Alignment.center,
+              children: [
+                // Stem
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    width: 3,
+                    height: size * 0.4,
+                    color: Colors.green.shade700,
                   ),
-                  // Flower
-                  Positioned(
-                    top: 0,
-                    child: Container(
-                      width: size * 0.5,
-                      height: size * 0.5,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: color.withOpacity(0.5),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: size * 0.2,
-                          height: size * 0.2,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow.shade600,
-                            shape: BoxShape.circle,
-                          ),
+                ),
+                // Flower
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    width: size * 0.5,
+                    height: size * 0.5,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.5),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: size * 0.2,
+                        height: size * 0.2,
+                        decoration: BoxDecoration(
+                          color: Colors.yellow.shade600,
+                          shape: BoxShape.circle,
                         ),
                       ),
                     ),
                   ),
-                  // Leaves
-                  Positioned(
-                    left: 0,
-                    bottom: size * 0.3,
-                    child: Container(
-                      width: size * 0.25,
-                      height: size * 0.15,
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade600,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                ),
+                // Leaves
+                Positioned(
+                  left: 0,
+                  bottom: size * 0.3,
+                  child: Container(
+                    width: size * 0.25,
+                    height: size * 0.15,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: size * 0.25,
-                    child: Container(
-                      width: size * 0.25,
-                      height: size * 0.15,
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade600,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: size * 0.25,
+                  child: Container(
+                    width: size * 0.25,
+                    height: size * 0.15,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             )
           : Container(
               decoration: BoxDecoration(
@@ -638,94 +676,121 @@ class _GardenBuilderGameState extends State<GardenBuilderGame>
   }
 
   Widget _buildQuestionOverlay(ResponsiveHelper responsive) {
-    return Positioned.fill(
-      child: Container(
-        color: Colors.black.withOpacity(0.7),
-        child: Center(
-          child: Container(
-            margin: EdgeInsets.all(responsive.spacing(20)),
-            padding: EdgeInsets.all(responsive.spacing(24)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _isHebrew ? 'כמה פרחים שתלת?' : 'How many flowers?',
-                  style: TextStyle(
-                    fontSize: responsive.fontSize(26),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
+    return Container(
+      color: Colors.black.withOpacity(0.7),
+      child: Center(
+        child: Container(
+          margin: EdgeInsets.all(responsive.spacing(20)),
+          padding: EdgeInsets.all(responsive.spacing(20)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 40),
+                  Expanded(
+                    child: Text(
+                      _isHebrew ? 'כמה פרחים שתלת?' : 'How many flowers?',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(22),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: responsive.spacing(20)),
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2.5,
-                  children: _answerOptions.map((option) {
-                    final isSelected = _selectedAnswer == option;
-                    Color getButtonColor() {
-                      if (!isSelected) {
-                        return Colors.green.shade400;
-                      }
-                      return _isCorrect! ? Colors.green.shade500 : Colors.red.shade500;
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 28),
+                    onPressed: () {
+                      setState(() {
+                        _showQuestion = false;
+                        _selectedAnswer = null;
+                        _isCorrect = null;
+                      });
+                    },
+                    color: Colors.grey.shade700,
+                  ),
+                ],
+              ),
+              SizedBox(height: responsive.spacing(16)),
+              GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 3.0,
+                children: _answerOptions.map((option) {
+                  final isSelected = _selectedAnswer == option;
+                  Color getButtonColor() {
+                    if (!isSelected) {
+                      return Colors.green.shade400;
                     }
+                    return _isCorrect!
+                        ? Colors.green.shade500
+                        : Colors.red.shade500;
+                  }
 
-                    return GestureDetector(
-                      onTap: _isCorrect == null ? () => _checkAnswer(option) : null,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              getButtonColor(),
-                              getButtonColor().withOpacity(0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: getButtonColor().withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 6),
-                            ),
+                  return GestureDetector(
+                    onTap:
+                        _isCorrect == null ? () => _checkAnswer(option) : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            getButtonColor(),
+                            getButtonColor().withOpacity(0.8),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            '$option',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(28),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: getButtonColor().withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              '$option',
+                              style: TextStyle(
+                                fontSize: responsive.fontSize(24),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-                if (_isCorrect != null) ...[
-                  SizedBox(height: responsive.spacing(16)),
-                  Text(
-                    _isCorrect!
-                        ? '🎉 ${_isHebrew ? "מעולה! הפרחים פורחים!" : "Great! Blooming!"}'
-                        : '❌ ${_isHebrew ? "נסה שוב" : "Try again"}',
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(20),
-                      fontWeight: FontWeight.bold,
-                      color: _isCorrect! ? Colors.green : Colors.red,
                     ),
+                  );
+                }).toList(),
+              ),
+              if (_isCorrect != null) ...[
+                SizedBox(height: responsive.spacing(12)),
+                Text(
+                  _isCorrect!
+                      ? '🎉 ${_isHebrew ? "מעולה!" : "Great!"}'
+                      : '❌ ${_isHebrew ? "נסה שוב" : "Try again"}',
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(18),
+                    fontWeight: FontWeight.bold,
+                    color: _isCorrect! ? Colors.green : Colors.red,
                   ),
-                ],
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),
