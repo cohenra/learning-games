@@ -413,31 +413,31 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(6.0),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          shapeData[_isHebrew ? 'he' : 'en'] as String,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
-                          ),
-                          textAlign: TextAlign.center,
+                      child: Text(
+                        shapeData[_isHebrew ? 'he' : 'en'] as String,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade800,
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                if (showResult && isSelected)
-                  Positioned(
-                    top: 4,
-                    right: 4,
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Opacity(
+                    opacity: (showResult && isSelected) ? 1.0 : 0.0,
                     child: Icon(
-                      _isCorrect! ? Icons.check_circle : Icons.cancel,
-                      color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                      (showResult && isSelected && _isCorrect!) ? Icons.check_circle : Icons.cancel,
+                      color: (showResult && isSelected && _isCorrect!) ? Colors.green.shade700 : Colors.red.shade700,
                       size: 28,
                     ),
                   ),
+                ),
               ],
             ),
           ),

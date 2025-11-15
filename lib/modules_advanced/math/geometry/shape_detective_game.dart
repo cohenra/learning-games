@@ -378,32 +378,32 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
               child: Stack(
                 children: [
                   Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Text(
-                          option,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  if (showResult && isSelected)
-                    Positioned(
-                      top: 4,
-                      right: 4,
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Opacity(
+                      opacity: (showResult && isSelected) ? 1.0 : 0.0,
                       child: Icon(
-                        _isCorrect! ? Icons.check_circle : Icons.cancel,
-                        color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                        (showResult && isSelected && _isCorrect!) ? Icons.check_circle : Icons.cancel,
+                        color: (showResult && isSelected && _isCorrect!) ? Colors.green.shade700 : Colors.red.shade700,
                         size: 24,
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
