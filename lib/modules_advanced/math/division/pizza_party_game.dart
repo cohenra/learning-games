@@ -5,7 +5,6 @@ import 'dart:math';
 import '../../../utils/responsive_helper.dart';
 import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
-import '../../../widgets/reward_animation.dart';
 
 /// משחק מסיבת פיצה - למד חילוק באמצעות חיתוך פיצות
 class PizzaPartyGame extends StatefulWidget {
@@ -267,21 +266,74 @@ class _PizzaPartyGameState extends State<PizzaPartyGame> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => RewardAnimation(
-        score: _score,
-        totalQuestions: _totalRounds,
-        onPlayAgain: () {
-          Navigator.pop(context);
-          setState(() {
-            _score = 0;
-            _round = 1;
-            _startNewRound();
-          });
-        },
-        onExit: () {
-          Navigator.pop(context);
-          Navigator.pop(context);
-        },
+      builder: (context) => AlertDialog(
+        title: Text(
+          _isHebrew ? '🎉 כל הכבוד! 🎉' : '🎉 Well Done! 🎉',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 28),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _isHebrew ? 'סיימת את המשחק!' : 'You finished the game!',
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _isHebrew ? 'תשובות נכונות:' : 'Correct answers:',
+              style: const TextStyle(fontSize: 18),
+            ),
+            Text(
+              '$_score / $_totalRounds',
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _isHebrew
+                  ? 'ציון: ${((_score / _totalRounds) * 100).round()}%'
+                  : 'Score: ${((_score / _totalRounds) * 100).round()}%',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.red.shade700,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text(
+              _isHebrew ? 'יציאה' : 'Exit',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _score = 0;
+                _round = 1;
+                _startNewRound();
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+            ),
+            child: Text(
+              _isHebrew ? 'שחק שוב' : 'Play Again',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+        ],
       ),
     );
   }
