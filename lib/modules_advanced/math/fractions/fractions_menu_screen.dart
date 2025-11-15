@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../utils/responsive_helper.dart';
-import '../../widgets/kid_back_button.dart';
-import 'multiplication/multiplication_menu_screen.dart';
-import 'division/division_menu_screen.dart';
-import 'fractions/fractions_menu_screen.dart';
+import '../../../utils/responsive_helper.dart';
+import '../../../widgets/kid_button.dart';
+import '../../../widgets/kid_back_button.dart';
+import 'cake_cutter_game.dart';
+import 'chocolate_fractions_game.dart';
 
-/// מסך תפריט מתמטיקה - גילאי 7-12
-class MathMenuScreen extends StatefulWidget {
-  const MathMenuScreen({super.key});
+/// מסך תפריט שברים - גילאי 7-12
+class FractionsMenuScreen extends StatefulWidget {
+  const FractionsMenuScreen({super.key});
 
   @override
-  State<MathMenuScreen> createState() => _MathMenuScreenState();
+  State<FractionsMenuScreen> createState() => _FractionsMenuScreenState();
 }
 
-class _MathMenuScreenState extends State<MathMenuScreen>
+class _FractionsMenuScreenState extends State<FractionsMenuScreen>
     with SingleTickerProviderStateMixin {
   bool _isHebrew = true;
   late AnimationController _animationController;
@@ -59,8 +59,8 @@ class _MathMenuScreenState extends State<MathMenuScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade50,
-              Colors.indigo.shade50,
+              Colors.purple.shade50,
+              Colors.pink.shade50,
             ],
           ),
         ),
@@ -78,24 +78,24 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                         child: Column(
                           children: [
                             Text(
-                              '🔢',
+                              '½',
                               style: TextStyle(fontSize: responsive.iconSize(80)),
                             ),
                             SizedBox(height: responsive.spacing(12)),
                             Text(
-                              _isHebrew ? 'מתמטיקה' : 'Mathematics',
+                              _isHebrew ? 'שברים' : 'Fractions',
                               style: TextStyle(
                                 fontSize: responsive.titleSize,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.indigo.shade700,
+                                color: Colors.purple.shade700,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: responsive.spacing(8)),
                             Text(
                               _isHebrew
-                                  ? 'למד מתמטיקה בדרך מהנה!'
-                                  : 'Learn math the fun way!',
+                                  ? 'למד שברים בדרך חזותית!'
+                                  : 'Learn fractions visually!',
                               style: TextStyle(
                                 fontSize: responsive.fontSize(16),
                                 color: Colors.grey.shade700,
@@ -111,7 +111,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                         left: _isHebrew ? null : 0,
                         child: KidBackButton(
                           onPressed: () => Navigator.pop(context),
-                          color: Colors.indigo.shade600,
+                          color: Colors.purple.shade600,
                           isHebrew: _isHebrew,
                         ),
                       ),
@@ -119,87 +119,60 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(12)),
+                SizedBox(height: responsive.spacing(20)),
 
-                // Math topic cards
+                // Game Cards
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildTopicCard(
+                        _buildGameCard(
                           context,
                           responsive,
-                          icon: '✖️',
-                          title: _isHebrew ? 'לוח הכפל' : 'Multiplication',
+                          icon: '🎂',
+                          title: _isHebrew ? 'חותך עוגות' : 'Cake Cutter',
                           description: _isHebrew
-                              ? '4 משחקים אינטראקטיביים'
-                              : '4 Interactive Games',
-                          color: Colors.purple,
+                              ? 'למד שברים בסיסיים על ידי חיתוך עוגות'
+                              : 'Learn basic fractions by cutting cakes',
+                          color: Colors.pink,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const MultiplicationMenuScreen(),
+                                builder: (context) => const CakeCutterGame(),
                               ),
                             );
                           },
                         ),
-                        _buildTopicCard(
+                        SizedBox(height: responsive.spacing(20)),
+                        _buildGameCard(
                           context,
                           responsive,
-                          icon: '➗',
-                          title: _isHebrew ? 'חילוק' : 'Division',
+                          icon: '🍫',
+                          title: _isHebrew ? 'שברי שוקולד' : 'Chocolate Fractions',
                           description: _isHebrew
-                              ? 'למד לחלק במשחקים מהנים'
-                              : 'Learn division with fun games',
-                          color: Colors.teal,
+                              ? 'זהה ושרטט שברים עם לוח שוקולד'
+                              : 'Identify and draw fractions with chocolate bar',
+                          color: Colors.brown,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DivisionMenuScreen(),
+                                builder: (context) => const ChocolateFractionsGame(),
                               ),
                             );
                           },
-                        ),
-                        _buildTopicCard(
-                          context,
-                          responsive,
-                          icon: '½',
-                          title: _isHebrew ? 'שברים' : 'Fractions',
-                          description: _isHebrew
-                              ? 'הבן שברים בדרך חזותית'
-                              : 'Understand fractions visually',
-                          color: Colors.purple,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const FractionsMenuScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildComingSoonCard(
-                          context,
-                          responsive,
-                          icon: '📐',
-                          title: _isHebrew ? 'גיאומטריה' : 'Geometry',
-                          description: _isHebrew
-                              ? 'צורות, זוויות ושטחים'
-                              : 'Shapes, angles & areas',
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(8)),
+                SizedBox(height: responsive.spacing(12)),
               ],
             ),
           ),
@@ -208,7 +181,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
     );
   }
 
-  Widget _buildTopicCard(
+  Widget _buildGameCard(
     BuildContext context,
     ResponsiveHelper responsive, {
     required String icon,
@@ -221,7 +194,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(12)),
+        padding: EdgeInsets.all(responsive.spacing(20)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -237,8 +210,8 @@ class _MathMenuScreenState extends State<MathMenuScreen>
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 70,
+              height: 70,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
@@ -246,11 +219,11 @@ class _MathMenuScreenState extends State<MathMenuScreen>
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(28)),
+                  style: TextStyle(fontSize: responsive.iconSize(40)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(12)),
+            SizedBox(width: responsive.spacing(16)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,16 +231,16 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(15),
+                      fontSize: responsive.fontSize(18),
                       fontWeight: FontWeight.bold,
                       color: Colors.grey.shade800,
                     ),
                   ),
-                  SizedBox(height: responsive.spacing(2)),
+                  SizedBox(height: responsive.spacing(4)),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(12),
+                      fontSize: responsive.fontSize(14),
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -277,74 +250,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
             Icon(
               _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
               color: color,
-              size: 24,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildComingSoonCard(
-    BuildContext context,
-    ResponsiveHelper responsive, {
-    required String icon,
-    required String title,
-    required String description,
-  }) {
-    return Opacity(
-      opacity: 0.5,
-      child: Container(
-        padding: EdgeInsets.all(responsive.spacing(12)),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade400, width: 3),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Center(
-                child: Text(
-                  icon,
-                  style: TextStyle(fontSize: responsive.iconSize(28)),
-                ),
-              ),
-            ),
-            SizedBox(width: responsive.spacing(12)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(15),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  SizedBox(height: responsive.spacing(2)),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(12),
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.lock,
-              color: Colors.grey.shade500,
-              size: 24,
+              size: 30,
             ),
           ],
         ),
