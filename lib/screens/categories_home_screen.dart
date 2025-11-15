@@ -288,23 +288,26 @@ class CategoriesHomeScreen extends StatelessWidget {
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: responsive.fontSize(18),
-                          fontWeight: FontWeight.bold,
-                          color: color,
+                    Flexible(
+                      flex: 3,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: responsive.fontSize(18),
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(height: responsive.spacing(2)),
                     Flexible(
+                      flex: 2,
                       child: Text(
                         subtitle,
                         style: TextStyle(
