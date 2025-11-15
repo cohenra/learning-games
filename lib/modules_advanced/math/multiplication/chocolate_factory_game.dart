@@ -106,9 +106,15 @@ class _ChocolateFactoryGameState extends State<ChocolateFactoryGame> {
   }
 
   void _addSquare() {
-    if (_builtSquares < _rows! * _cols! * 2) {
+    setState(() {
+      _builtSquares++;
+    });
+  }
+
+  void _removeSquare() {
+    if (_builtSquares > 0) {
       setState(() {
-        _builtSquares++;
+        _builtSquares--;
       });
     }
   }
@@ -479,32 +485,46 @@ class _ChocolateFactoryGameState extends State<ChocolateFactoryGame> {
           ),
         ),
 
-        // Built counter
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-          child: Text(
-            _isHebrew
-                ? 'בנית: $_builtSquares משבצות'
-                : 'Built: $_builtSquares squares',
-            style: TextStyle(
-              fontSize: responsive.fontSize(20),
-              fontWeight: FontWeight.bold,
-              color: Colors.brown.shade700,
-            ),
-          ),
-        ),
-
         SizedBox(height: responsive.spacing(12)),
 
-        // Check button
+        // Add/Remove buttons and Check button
         Padding(
           padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-          child: KidButton(
-            text: _isHebrew ? 'בדוק! ✓' : 'Check! ✓',
-            icon: Icons.check_circle,
-            onPressed: _checkBuilding,
-            color: Colors.green.shade600,
-            height: 60,
+          child: Row(
+            children: [
+              // Remove button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'הסר 🗑️' : 'Remove 🗑️',
+                  icon: Icons.remove_circle,
+                  onPressed: _removeSquare,
+                  color: Colors.red.shade600,
+                  height: 60,
+                ),
+              ),
+              SizedBox(width: responsive.spacing(12)),
+              // Add button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'הוסף ➕' : 'Add ➕',
+                  icon: Icons.add_circle,
+                  onPressed: _addSquare,
+                  color: Colors.blue.shade600,
+                  height: 60,
+                ),
+              ),
+              SizedBox(width: responsive.spacing(12)),
+              // Check button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'בדוק ✓' : 'Check ✓',
+                  icon: Icons.check_circle,
+                  onPressed: _checkBuilding,
+                  color: Colors.green.shade600,
+                  height: 60,
+                ),
+              ),
+            ],
           ),
         ),
 

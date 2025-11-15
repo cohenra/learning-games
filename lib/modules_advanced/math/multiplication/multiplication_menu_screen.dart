@@ -122,15 +122,16 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(20)),
+                SizedBox(height: responsive.spacing(12)),
 
                 // Game Cards
                 Expanded(
-                  child: SingleChildScrollView(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _buildGameCard(
                           context,
@@ -153,7 +154,6 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.verticalSpacing),
                         _buildGameCard(
                           context,
                           responsive,
@@ -173,7 +173,6 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.verticalSpacing),
                         _buildGameCard(
                           context,
                           responsive,
@@ -193,7 +192,6 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.verticalSpacing),
                         _buildGameCard(
                           context,
                           responsive,
@@ -218,7 +216,7 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(20)),
+                SizedBox(height: responsive.spacing(12)),
               ],
             ),
           ),
@@ -238,57 +236,62 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(20)),
+        padding: EdgeInsets.all(responsive.spacing(12)),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color, width: 3),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color, width: 2),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: color.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 70,
-              height: 70,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(40)),
+                  style: TextStyle(fontSize: responsive.iconSize(28)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(16)),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(18),
+                      fontSize: responsive.fontSize(15),
                       fontWeight: FontWeight.bold,
                       color: Colors.grey.shade800,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: responsive.spacing(4)),
+                  SizedBox(height: responsive.spacing(2)),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(14),
+                      fontSize: responsive.fontSize(12),
                       color: Colors.grey.shade600,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -296,7 +299,7 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
             Icon(
               _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
               color: color,
-              size: 30,
+              size: 24,
             ),
           ],
         ),

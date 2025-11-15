@@ -116,9 +116,15 @@ class _GardenBuilderGameState extends State<GardenBuilderGame> {
   }
 
   void _plantFlower() {
-    if (_plantedFlowers < _rows! * _cols! * 2) {
+    setState(() {
+      _plantedFlowers++;
+    });
+  }
+
+  void _removeFlower() {
+    if (_plantedFlowers > 0) {
       setState(() {
-        _plantedFlowers++;
+        _plantedFlowers--;
       });
     }
   }
@@ -487,32 +493,46 @@ class _GardenBuilderGameState extends State<GardenBuilderGame> {
           ),
         ),
 
-        // Planted counter
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-          child: Text(
-            _isHebrew
-                ? 'שתלת: $_plantedFlowers פרחים'
-                : 'Planted: $_plantedFlowers flowers',
-            style: TextStyle(
-              fontSize: responsive.fontSize(20),
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade700,
-            ),
-          ),
-        ),
-
         SizedBox(height: responsive.spacing(12)),
 
-        // Check button
+        // Add/Remove buttons and Check button
         Padding(
           padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-          child: KidButton(
-            text: _isHebrew ? 'בדוק! ✓' : 'Check! ✓',
-            icon: Icons.check_circle,
-            onPressed: _checkPlanting,
-            color: Colors.green.shade600,
-            height: 60,
+          child: Row(
+            children: [
+              // Remove button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'הסר 🗑️' : 'Remove 🗑️',
+                  icon: Icons.remove_circle,
+                  onPressed: _removeFlower,
+                  color: Colors.red.shade600,
+                  height: 60,
+                ),
+              ),
+              SizedBox(width: responsive.spacing(12)),
+              // Add button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'הוסף ➕' : 'Add ➕',
+                  icon: Icons.add_circle,
+                  onPressed: _plantFlower,
+                  color: Colors.blue.shade600,
+                  height: 60,
+                ),
+              ),
+              SizedBox(width: responsive.spacing(12)),
+              // Check button
+              Expanded(
+                child: KidButton(
+                  text: _isHebrew ? 'בדוק ✓' : 'Check ✓',
+                  icon: Icons.check_circle,
+                  onPressed: _checkPlanting,
+                  color: Colors.green.shade600,
+                  height: 60,
+                ),
+              ),
+            ],
           ),
         ),
 
