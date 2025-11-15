@@ -25,6 +25,7 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
   int _score = 0;
   int _round = 1;
   final int _totalRounds = 8;
+  List<Map<String, dynamic>> _currentOptions = [];
 
   final Map<int, Map<String, String>> _shapesBySides = {
     3: {'shape': 'triangle', 'he': 'משולש', 'en': 'Triangle'},
@@ -72,6 +73,7 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
       _targetSides = sides;
       _selectedShape = null;
       _isCorrect = null;
+      _currentOptions = _generateShapeOptions();
     });
 
     // Speak the task
@@ -355,7 +357,7 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
   }
 
   Widget _buildShapeOptions(ResponsiveHelper responsive) {
-    final options = _generateShapeOptions();
+    final options = _currentOptions;
     final correctShapes = _allShapes.where((s) => s['sides'] == _targetSides).map((s) => s['shape']).toSet();
 
     return ConstrainedBox(

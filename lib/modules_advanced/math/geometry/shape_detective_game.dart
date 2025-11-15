@@ -25,6 +25,7 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
   int _score = 0;
   int _round = 1;
   final int _totalRounds = 10;
+  List<String> _currentOptions = [];
 
   final Map<String, Map<String, String>> _shapes = {
     'circle': {'he': 'עיגול', 'en': 'Circle'},
@@ -66,6 +67,7 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
       _currentShape = shape;
       _selectedAnswer = null;
       _isCorrect = null;
+      _currentOptions = _generateOptions();
     });
 
     // Speak the task
@@ -344,7 +346,7 @@ class _ShapeDetectiveGameState extends State<ShapeDetectiveGame> {
   }
 
   Widget _buildAnswers(ResponsiveHelper responsive) {
-    final options = _generateOptions();
+    final options = _currentOptions;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
