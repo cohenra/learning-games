@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/kid_back_button.dart';
-import '../modules_advanced/math/multiplication/multiplication_menu_screen.dart';
+import '../modules_advanced/math/math_menu_screen.dart';
 
 /// מסך למידה מתקדמת - גילאי 7-12
 class AdvancedLearningScreen extends StatelessWidget {
@@ -100,7 +100,7 @@ class AdvancedLearningScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MultiplicationMenuScreen(),
+                              builder: (context) => const MathMenuScreen(),
                             ),
                           );
                         },
