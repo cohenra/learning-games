@@ -415,7 +415,7 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
                       padding: const EdgeInsets.all(6.0),
                       child: Text(
                         shapeData[_isHebrew ? 'he' : 'en'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade800,
