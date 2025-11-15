@@ -118,7 +118,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(20)),
+                SizedBox(height: responsive.spacing(12)),
 
                 // Math topic cards
                 Expanded(
@@ -127,7 +127,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _buildTopicCard(
                           context,
@@ -148,7 +148,6 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
                         _buildTopicCard(
                           context,
                           responsive,
@@ -167,7 +166,6 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
                         _buildComingSoonCard(
                           context,
                           responsive,
@@ -177,7 +175,6 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                               ? 'הבן שברים בדרך חזותית'
                               : 'Understand fractions visually',
                         ),
-                        SizedBox(height: responsive.spacing(16)),
                         _buildComingSoonCard(
                           context,
                           responsive,
@@ -192,7 +189,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   ),
                 ),
 
-                SizedBox(height: responsive.spacing(12)),
+                SizedBox(height: responsive.spacing(8)),
               ],
             ),
           ),
@@ -214,7 +211,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(16)),
+        padding: EdgeInsets.all(responsive.spacing(12)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -230,8 +227,8 @@ class _MathMenuScreenState extends State<MathMenuScreen>
         child: Row(
           children: [
             Container(
-              width: 65,
-              height: 65,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
@@ -239,11 +236,11 @@ class _MathMenuScreenState extends State<MathMenuScreen>
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(35)),
+                  style: TextStyle(fontSize: responsive.iconSize(28)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(16)),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,16 +248,16 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(18),
+                      fontSize: responsive.fontSize(15),
                       fontWeight: FontWeight.bold,
                       color: Colors.grey.shade800,
                     ),
                   ),
-                  SizedBox(height: responsive.spacing(4)),
+                  SizedBox(height: responsive.spacing(2)),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(14),
+                      fontSize: responsive.fontSize(12),
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -270,7 +267,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
             Icon(
               _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
               color: color,
-              size: 28,
+              size: 24,
             ),
           ],
         ),
@@ -288,7 +285,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
     return Opacity(
       opacity: 0.5,
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(16)),
+        padding: EdgeInsets.all(responsive.spacing(12)),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(20),
@@ -297,8 +294,8 @@ class _MathMenuScreenState extends State<MathMenuScreen>
         child: Row(
           children: [
             Container(
-              width: 65,
-              height: 65,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(15),
@@ -306,11 +303,11 @@ class _MathMenuScreenState extends State<MathMenuScreen>
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(35)),
+                  style: TextStyle(fontSize: responsive.iconSize(28)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(16)),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,16 +315,16 @@ class _MathMenuScreenState extends State<MathMenuScreen>
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(18),
+                      fontSize: responsive.fontSize(15),
                       fontWeight: FontWeight.bold,
                       color: Colors.grey.shade700,
                     ),
                   ),
-                  SizedBox(height: responsive.spacing(4)),
+                  SizedBox(height: responsive.spacing(2)),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: responsive.fontSize(14),
+                      fontSize: responsive.fontSize(12),
                       color: Colors.grey.shade600,
                     ),
                   ),
@@ -337,7 +334,7 @@ class _MathMenuScreenState extends State<MathMenuScreen>
             Icon(
               Icons.lock,
               color: Colors.grey.shade500,
-              size: 28,
+              size: 24,
             ),
           ],
         ),

@@ -477,28 +477,16 @@ class _PizzaPartyGameState extends State<PizzaPartyGame> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.red.shade300, width: 2),
       ),
-      child: Column(
-        children: [
-          Text(
-            _isHebrew
-                ? 'חתוך את הפיצה ל-$_targetSlices פלחים שווים'
-                : 'Cut the pizza into $_targetSlices equal slices',
-            style: TextStyle(
-              fontSize: responsive.fontSize(18),
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: responsive.spacing(4)),
-          Text(
-            _isHebrew ? 'פלחים נוכחיים: $_currentSlices' : 'Current slices: $_currentSlices',
-            style: TextStyle(
-              fontSize: responsive.fontSize(16),
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ],
+      child: Text(
+        _isHebrew
+            ? 'חתוך את הפיצה ל-$_targetSlices פלחים שווים'
+            : 'Cut the pizza into $_targetSlices equal slices',
+        style: TextStyle(
+          fontSize: responsive.fontSize(18),
+          fontWeight: FontWeight.bold,
+          color: Colors.grey.shade800,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
