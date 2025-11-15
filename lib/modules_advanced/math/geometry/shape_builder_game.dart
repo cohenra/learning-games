@@ -216,11 +216,15 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
               : Column(
                   children: [
                     _buildHeader(responsive),
-                    SizedBox(height: responsive.spacing(12)),
+                    SizedBox(height: responsive.spacing(10)),
                     _buildTask(responsive),
-                    SizedBox(height: responsive.spacing(12)),
-                    Expanded(child: _buildShapeOptions(responsive)),
-                    SizedBox(height: responsive.spacing(12)),
+                    SizedBox(height: responsive.spacing(16)),
+                    Expanded(
+                      child: Center(
+                        child: _buildShapeOptions(responsive),
+                      ),
+                    ),
+                    SizedBox(height: responsive.spacing(8)),
                   ],
                 ),
         ),
@@ -354,14 +358,17 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
     final options = _generateShapeOptions();
     final correctShapes = _allShapes.where((s) => s['sides'] == _targetSides).map((s) => s['shape']).toSet();
 
-    return GridView.count(
-      shrinkWrap: true,
-      padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.1,
-      children: options.map((shapeData) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 500, maxHeight: 400),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(20)),
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 1.4,
+        children: options.map((shapeData) {
         final shape = shapeData['shape'] as String;
         final isSelected = _selectedShape == shape;
         final isCorrectOption = correctShapes.contains(shape);
@@ -392,11 +399,11 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
+                    Flexible(
                       flex: 3,
                       child: Center(
                         child: CustomPaint(
-                          size: const Size(80, 80),
+                          size: const Size(65, 65),
                           painter: ShapeOptionPainter(
                             shape: shape,
                             color: Colors.green.shade400,
@@ -436,6 +443,7 @@ class _ShapeBuilderGameState extends State<ShapeBuilderGame> {
           ),
         );
       }).toList(),
+      ),
     );
   }
 
