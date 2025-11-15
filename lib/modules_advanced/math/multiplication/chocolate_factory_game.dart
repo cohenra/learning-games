@@ -568,9 +568,18 @@ class _ChocolateFactoryGameState extends State<ChocolateFactoryGame> {
     final availableWidth = size.width - 100;
     final availableHeight = size.height - 450;
 
+    // Calculate how many rows we need to display based on built squares
+    int displayRows = _rows!;
+    if (_builtSquares > _correctAnswer) {
+      // Add extra rows if built more than needed
+      int extraSquares = _builtSquares - _correctAnswer;
+      int extraRows = (extraSquares / _cols!).ceil();
+      displayRows = _rows! + extraRows;
+    }
+
     double squareSize = min(
       availableWidth / _cols!,
-      availableHeight / _rows!,
+      availableHeight / displayRows,
     ).clamp(20.0, 60.0);
 
     return Container(
@@ -589,7 +598,7 @@ class _ChocolateFactoryGameState extends State<ChocolateFactoryGame> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (int row = 0; row < _rows!; row++)
+          for (int row = 0; row < displayRows; row++)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [

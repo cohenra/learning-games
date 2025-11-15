@@ -440,7 +440,7 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
   Widget _buildGameScreen(ResponsiveHelper responsive) {
     return Column(
       children: [
-        // Header with timer and score
+        // Header with timer, score and back button
         Container(
           padding: EdgeInsets.all(responsive.spacing(12)),
           decoration: BoxDecoration(
@@ -454,29 +454,41 @@ class _SpeedMultiplicationGameState extends State<SpeedMultiplicationGame> {
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatCard(
-                responsive,
-                icon: '⏱️',
-                value: '$_timeLeft',
-                label: _isHebrew ? 'שניות' : 'sec',
-                color: _timeLeft <= 10 ? Colors.red : Colors.blue,
+              KidBackButton(
+                onPressed: () => Navigator.pop(context),
+                color: Colors.orange.shade600,
+                isHebrew: _isHebrew,
               ),
-              _buildStatCard(
-                responsive,
-                icon: '❓',
-                value: '${_currentQuestion + 1}/$_totalQuestions',
-                label: _isHebrew ? 'שאלה' : 'Q',
-                color: Colors.purple,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatCard(
+                      responsive,
+                      icon: '⏱️',
+                      value: '$_timeLeft',
+                      label: _isHebrew ? 'שניות' : 'sec',
+                      color: _timeLeft <= 10 ? Colors.red : Colors.blue,
+                    ),
+                    _buildStatCard(
+                      responsive,
+                      icon: '❓',
+                      value: '${_currentQuestion + 1}/$_totalQuestions',
+                      label: _isHebrew ? 'שאלה' : 'Q',
+                      color: Colors.purple,
+                    ),
+                    _buildStatCard(
+                      responsive,
+                      icon: '✅',
+                      value: '$_score',
+                      label: _isHebrew ? 'נכונות' : 'correct',
+                      color: Colors.green,
+                    ),
+                  ],
+                ),
               ),
-              _buildStatCard(
-                responsive,
-                icon: '✅',
-                value: '$_score',
-                label: _isHebrew ? 'נכונות' : 'correct',
-                color: Colors.green,
-              ),
+              SizedBox(width: responsive.spacing(48)),
             ],
           ),
         ),

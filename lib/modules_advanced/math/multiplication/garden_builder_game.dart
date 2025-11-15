@@ -576,9 +576,18 @@ class _GardenBuilderGameState extends State<GardenBuilderGame> {
     final availableWidth = size.width - 80;
     final availableHeight = size.height - 450;
 
+    // Calculate how many rows we need to display based on planted flowers
+    int displayRows = _rows!;
+    if (_plantedFlowers > _correctAnswer) {
+      // Add extra rows if planted more than needed
+      int extraFlowers = _plantedFlowers - _correctAnswer;
+      int extraRows = (extraFlowers / _cols!).ceil();
+      displayRows = _rows! + extraRows;
+    }
+
     double flowerSize = min(
       availableWidth / _cols!,
-      availableHeight / _rows!,
+      availableHeight / displayRows,
     ).clamp(25.0, 70.0);
 
     return Container(
@@ -591,7 +600,7 @@ class _GardenBuilderGameState extends State<GardenBuilderGame> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (int row = 0; row < _rows!; row++)
+          for (int row = 0; row < displayRows; row++)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
