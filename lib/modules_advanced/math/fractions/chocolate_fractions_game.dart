@@ -538,15 +538,12 @@ class _ChocolateFractionsGameState extends State<ChocolateFractionsGame> {
   }
 
   Widget _buildChocolateBar(ResponsiveHelper responsive) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.all(responsive.spacing(16)),
-        child: _buildGrid(responsive),
-      ),
-    );
-  }
+    if (_denominator == null) return const SizedBox();
 
-  Widget _buildGrid(ResponsiveHelper responsive) {
+    final size = MediaQuery.of(context).size;
+    final availableWidth = size.width - 80;
+    final availableHeight = size.height - 500;
+
     // Determine grid layout based on denominator
     int cols, rows;
     if (_denominator == 2) {
@@ -566,46 +563,71 @@ class _ChocolateFractionsGameState extends State<ChocolateFractionsGame> {
       rows = 2;
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: cols,
-        mainAxisSpacing: 4,
-        crossAxisSpacing: 4,
-        childAspectRatio: 1.0,
+    double squareSize = min(
+      availableWidth / cols,
+      availableHeight / rows,
+    ).clamp(40.0, 80.0);
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.brown.shade800,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int row = 0; row < rows; row++)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int col = 0; col < cols; col++)
+                    _buildChocolateSquare(row * cols + col, squareSize),
+                ],
+              ),
+          ],
+        ),
       ),
-      itemCount: _denominator,
-      itemBuilder: (context, index) {
-        final isSelected = index < _selectedSquares;
-        return GestureDetector(
-          onTap: () => _toggleSquare(index),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.brown.shade400 : Colors.brown.shade100,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Colors.brown.shade600,
-                width: 3,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 3,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                isSelected ? '🍫' : '',
-                style: TextStyle(fontSize: responsive.iconSize(32)),
-              ),
-            ),
+    );
+  }
+
+  Widget _buildChocolateSquare(int index, double size) {
+    final isSelected = index < _selectedSquares;
+
+    return GestureDetector(
+      onTap: () => _toggleSquare(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: size,
+        height: size,
+        margin: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.brown.shade400,
+                    Colors.brown.shade600,
+                  ],
+                )
+              : null,
+          color: isSelected ? null : Colors.brown.shade200.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: Colors.brown.shade900,
+            width: 2,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
