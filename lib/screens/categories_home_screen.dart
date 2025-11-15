@@ -291,7 +291,9 @@ class CategoriesHomeScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
                       child: Text(
                         title,
                         style: TextStyle(
@@ -299,8 +301,6 @@ class CategoriesHomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     SizedBox(height: responsive.spacing(2)),
