@@ -6,6 +6,7 @@ import 'multiplication_table_screen.dart';
 import 'speed_multiplication_game.dart';
 import 'chocolate_factory_game.dart';
 import 'garden_builder_game.dart';
+import 'multiplication_racing_game.dart';
 
 /// מסך תפריט לוח הכפל - גילאי 7-12
 class MultiplicationMenuScreen extends StatefulWidget {
@@ -207,6 +208,25 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const GardenBuilderGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildGameCard(
+                          context,
+                          responsive,
+                          icon: '🏎️',
+                          title: _isHebrew ? 'מרוץ כפל' : 'Multiplication Racing',
+                          description: _isHebrew
+                              ? 'מרוץ מהיר נגד הזמן!'
+                              : 'Fast racing against time!',
+                          color: Colors.red,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const MultiplicationRacingGame(),
                               ),
                             );
                           },
