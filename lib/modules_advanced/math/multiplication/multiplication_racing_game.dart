@@ -571,7 +571,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                         style: TextStyle(
                           fontSize: responsive.fontSize(20),
                           fontWeight: FontWeight.bold,
-                          color: color.shade800,
+                          color: color,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -602,7 +602,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                       '🏆 ${_isHebrew ? 'שיא:' : 'Best:'}',
                       style: TextStyle(
                         fontSize: responsive.fontSize(14),
-                        color: color.shade700,
+                        color: color,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -611,7 +611,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                       '$bestScore ${_isHebrew ? 'ב-' : 'in'} ${bestTime}s',
                       style: TextStyle(
                         fontSize: responsive.fontSize(14),
-                        color: color.shade800,
+                        color: color,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
