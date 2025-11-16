@@ -294,6 +294,7 @@ class _DivisionRacingGameState extends State<DivisionRacingGame>
       _options = options.toList()..shuffle();
       _selectedAnswer = null;
       _isCorrect = null;
+      _particles.clear();  // Clear particles from previous question
     });
 
     _speak(_isHebrew ? 'כמה זה $_dividend חלקי $_divisor?' : 'What is $_dividend divided by $_divisor?');
@@ -315,6 +316,7 @@ class _DivisionRacingGameState extends State<DivisionRacingGame>
 
       Future.delayed(const Duration(milliseconds: 800), () {
         if (!mounted) return;
+        _particleController.stop();  // Stop particle animation to prevent race condition
         _currentQuestion++;
         if (_currentQuestion >= _totalQuestions) {
           _finishRace();

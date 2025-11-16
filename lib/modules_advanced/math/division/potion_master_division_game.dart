@@ -601,9 +601,9 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
                 children: [
                   Text(
                     potion.emoji,
-                    style: TextStyle(fontSize: responsive.iconSize(40)),
+                    style: TextStyle(fontSize: responsive.iconSize(38)),
                   ),
-                  SizedBox(height: responsive.spacing(8)),
+                  SizedBox(height: responsive.spacing(6)),
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.spacing(8),
