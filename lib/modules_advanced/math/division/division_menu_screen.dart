@@ -4,6 +4,9 @@ import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
 import 'share_treats_game.dart';
 import 'pizza_party_game.dart';
+import 'division_racing_game.dart';
+import 'pirate_treasure_division_game.dart';
+import 'potion_master_division_game.dart';
 
 /// מסך תפריט חילוק - גילאי 7-12
 class DivisionMenuScreen extends StatefulWidget {
@@ -123,13 +126,70 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
 
                 // Game Cards
                 Expanded(
-                  child: Padding(
+                  child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(height: responsive.spacing(12)),
+                        _buildGameCard(
+                          context,
+                          responsive,
+                          icon: '🏎️',
+                          title: _isHebrew ? 'מרוץ החילוק' : 'Division Racing',
+                          description: _isHebrew
+                              ? 'מרוץ מרגש נגד יריבים!'
+                              : 'Exciting race against opponents!',
+                          color: Colors.blue,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DivisionRacingGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        _buildGameCard(
+                          context,
+                          responsive,
+                          icon: '🏴‍☠️',
+                          title: _isHebrew ? 'אוצר הפיראטים' : 'Pirate\'s Treasure',
+                          description: _isHebrew
+                              ? 'הרפתקה באיים מסתוריים'
+                              : 'Adventure on mysterious islands',
+                          color: Colors.amber.shade700,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PirateTreasureDivisionGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
+                        _buildGameCard(
+                          context,
+                          responsive,
+                          icon: '🧙‍♂️',
+                          title: _isHebrew ? 'קוסם השיקויים' : 'Potion Master',
+                          description: _isHebrew
+                              ? 'בשל שיקויים קסומים!'
+                              : 'Brew magical potions!',
+                          color: Colors.purple,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PotionMasterDivisionGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: responsive.spacing(16)),
                         _buildGameCard(
                           context,
                           responsive,
@@ -148,7 +208,7 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(20)),
+                        SizedBox(height: responsive.spacing(16)),
                         _buildGameCard(
                           context,
                           responsive,
@@ -167,6 +227,7 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
+                        SizedBox(height: responsive.spacing(16)),
                       ],
                     ),
                   ),
