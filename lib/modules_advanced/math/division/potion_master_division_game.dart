@@ -7,7 +7,7 @@ import '../../../utils/responsive_helper.dart';
 import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
 
-/// משחק קוסם השיקויים - מעבדה קסומה ללימוד חילוק
+/// משחק קוסם השיקויים (גרסה 2) - בחר את השיקוי הנכון ושפוך לקדרה!
 class PotionMasterDivisionGame extends StatefulWidget {
   const PotionMasterDivisionGame({super.key});
 
@@ -23,72 +23,45 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
   bool _isHebrew = true;
 
   // Game state
-  String _currentScreen = 'menu'; // 'menu', 'lab', 'book', 'success'
-  int _currentPotionIndex = 0;
-  final int _totalPotions = 15;
+  int _currentQuestion = 0;
+  final int _totalQuestions = 10;
+  int _score = 0;
 
-  // Potion collection
-  Map<int, bool> _collectedPotions = {};
-
-  // Current potion state
-  int? _totalIngredients;
-  int? _vials;
+  // Current question
+  int? _dividend;
+  int? _divisor;
   int? _correctAnswer;
-  List<int> _vialDistribution = [];
-  int? _selectedAnswer;
+  List<PotionOption> _potions = [];
+  int? _selectedPotion;
   bool? _isCorrect;
 
-  // Potion definitions
-  late List<PotionRecipe> _potionRecipes;
-
   // Animations
-  late AnimationController _bubbleController;
+  late AnimationController _cauldronBubbleController;
   late AnimationController _sparkleController;
-  late AnimationController _stirController;
-  late AnimationController _successController;
+  late AnimationController _pourController;
+  late AnimationController _explosionController;
   late Animation<double> _bubbleAnimation;
   late Animation<double> _sparkleAnimation;
-  late Animation<double> _stirAnimation;
-  late Animation<double> _successAnimation;
+  late Animation<double> _pourAnimation;
+  late Animation<double> _explosionAnimation;
 
-  // Particles
-  List<MagicParticle> _magicParticles = [];
-  Timer? _particleTimer;
+  // Particles for magic effects
+  List<MagicParticle> _particles = [];
+  bool _showExplosion = false;
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    _initPotionRecipes();
     _initTts();
     _initAnimations();
-    _startParticleGeneration();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isHebrew = Localizations.localeOf(context).languageCode == 'he';
       });
+      _generateQuestion();
     });
-  }
-
-  void _initPotionRecipes() {
-    _potionRecipes = [
-      PotionRecipe('שיקוי הכוכבים', 'Starlight Potion', Colors.purple, '✨', '⭐'),
-      PotionRecipe('שיקוי הקפיצה', 'Bounce Potion', Colors.green, '🍀', '🌿'),
-      PotionRecipe('שיקוי האש', 'Fire Potion', Colors.red, '🔥', '🌶️'),
-      PotionRecipe('שיקוי הקרח', 'Ice Potion', Colors.blue, '❄️', '💎'),
-      PotionRecipe('שיקוי החכמה', 'Wisdom Potion', Colors.indigo, '📚', '🔮'),
-      PotionRecipe('שיקוי המהירות', 'Speed Potion', Colors.yellow, '⚡', '🏃'),
-      PotionRecipe('שיקוי הכוח', 'Strength Potion', Colors.orange, '💪', '🦁'),
-      PotionRecipe('שיקוי הריפוי', 'Healing Potion', Colors.pink, '💖', '🌸'),
-      PotionRecipe('שיקוי הזהב', 'Gold Potion', Colors.amber, '💰', '🪙'),
-      PotionRecipe('שיקוי השינה', 'Sleep Potion', Colors.deepPurple, '😴', '🌙'),
-      PotionRecipe('שיקוי הפרחים', 'Flower Potion', Colors.lightGreen, '🌺', '🌻'),
-      PotionRecipe('שיקוי הקשת', 'Rainbow Potion', Colors.teal, '🌈', '🦄'),
-      PotionRecipe('שיקוי התעופה', 'Flight Potion', Colors.cyan, '🪶', '🕊️'),
-      PotionRecipe('שיקוי האור', 'Light Potion', Colors.lime, '💡', '🌟'),
-      PotionRecipe('שיקוי הקסם', 'Magic Potion', Colors.deepOrange, '🎭', '✨'),
-    ];
   }
 
   Future<void> _initTts() async {
@@ -98,293 +71,196 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
   }
 
   void _initAnimations() {
-    _bubbleController = AnimationController(
+    _cauldronBubbleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     )..repeat();
-    _bubbleAnimation = Tween<double>(begin: 0, end: 1).animate(_bubbleController);
+    _bubbleAnimation =
+        Tween<double>(begin: 0, end: 1).animate(_cauldronBubbleController);
 
     _sparkleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
-    _sparkleAnimation = Tween<double>(begin: 0, end: 1).animate(_sparkleController);
+    _sparkleAnimation =
+        Tween<double>(begin: 0, end: 1).animate(_sparkleController);
 
-    _stirController = AnimationController(
+    _pourController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
-    _stirAnimation = Tween<double>(begin: -0.1, end: 0.1).animate(
-      CurvedAnimation(parent: _stirController, curve: Curves.easeInOut),
+      duration: const Duration(milliseconds: 800),
+    );
+    _pourAnimation = CurvedAnimation(
+      parent: _pourController,
+      curve: Curves.easeInOut,
     );
 
-    _successController = AnimationController(
+    _explosionController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1000),
     );
-    _successAnimation = CurvedAnimation(
-      parent: _successController,
-      curve: Curves.elasticOut,
+    _explosionAnimation = CurvedAnimation(
+      parent: _explosionController,
+      curve: Curves.easeOut,
     );
-  }
-
-  void _startParticleGeneration() {
-    _particleTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
-      if (!mounted || _currentScreen != 'lab') return;
-
-      setState(() {
-        _magicParticles.add(MagicParticle(
-          x: _random.nextDouble(),
-          y: _random.nextDouble() * 0.6 + 0.2,
-          vx: (_random.nextDouble() - 0.5) * 0.003,
-          vy: -_random.nextDouble() * 0.005,
-          color: _currentPotion.color,
-          size: _random.nextDouble() * 4 + 2,
-        ));
-
-        _magicParticles = _magicParticles.map((p) => p.update()).toList();
-        _magicParticles.removeWhere((p) => p.life <= 0);
-      });
-    });
   }
 
   Future<void> _speak(String text) async {
     await _flutterTts.speak(text);
   }
 
-  PotionRecipe get _currentPotion => _potionRecipes[_currentPotionIndex];
-
-  void _startPotionBrewing() {
+  void _generateQuestion() {
     // Generate division problem
-    final divisors = [2, 3, 4, 5, 6];
-    final vials = divisors[_random.nextInt(divisors.length)];
-    final perVial = _random.nextInt(6) + 2;
-    final total = vials * perVial;
+    final divisors = [2, 3, 4, 5, 6, 7, 8];
+    final divisor = divisors[_random.nextInt(divisors.length)];
+    final answer = _random.nextInt(8) + 2; // 2-9
+    final dividend = divisor * answer;
+
+    // Generate 4 answer options (potions)
+    final options = <int>{answer};
+    while (options.length < 4) {
+      final offset = _random.nextInt(7) - 3;
+      final option = (answer + offset).clamp(1, 50);
+      options.add(option);
+    }
+
+    final optionsList = options.toList()..shuffle();
+
+    // Create potion options with colors
+    final colors = [
+      Colors.purple,
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+    ];
+
+    final potionEmojis = ['🔮', '⚗️', '🧪', '🍶'];
 
     setState(() {
-      _currentScreen = 'lab';
-      _totalIngredients = total;
-      _vials = vials;
-      _correctAnswer = perVial;
-      _vialDistribution = List.filled(vials, 0);
-      _selectedAnswer = null;
+      _dividend = dividend;
+      _divisor = divisor;
+      _correctAnswer = answer;
+      _potions = List.generate(
+        4,
+        (i) => PotionOption(
+          value: optionsList[i],
+          color: colors[i],
+          emoji: potionEmojis[i],
+        ),
+      );
+      _selectedPotion = null;
       _isCorrect = null;
+      _particles.clear();
+      _showExplosion = false;
     });
 
     _speak(_isHebrew
-        ? 'חלק $_totalIngredients מרכיבים קסומים ל-$_vials מבחנות'
-        : 'Divide $_totalIngredients magic ingredients into $_vials vials');
+        ? 'כמה זה $_dividend חלקי $_divisor?'
+        : 'What is $_dividend divided by $_divisor?');
   }
 
-  void _addIngredientToVial(int vialIndex) {
-    final totalDistributed = _vialDistribution.reduce((a, b) => a + b);
-    if (totalDistributed < _totalIngredients!) {
-      setState(() => _vialDistribution[vialIndex]++);
-    }
-  }
+  void _selectPotion(int index) {
+    if (_selectedPotion != null) return; // Already selected
 
-  void _removeIngredientFromVial(int vialIndex) {
-    if (_vialDistribution[vialIndex] > 0) {
-      setState(() => _vialDistribution[vialIndex]--);
-    }
-  }
+    setState(() => _selectedPotion = index);
 
-  void _brewPotion() {
-    final totalDistributed = _vialDistribution.reduce((a, b) => a + b);
+    final selectedValue = _potions[index].value;
+    final isCorrect = selectedValue == _correctAnswer;
 
-    if (totalDistributed < _totalIngredients!) {
-      _showSnackBar(
-        _isHebrew
-            ? 'חסרים מרכיבים! נשארו ${_totalIngredients! - totalDistributed}'
-            : 'Missing ingredients! ${_totalIngredients! - totalDistributed} left',
-        Colors.orange,
-      );
-      return;
-    }
+    setState(() => _isCorrect = isCorrect);
 
-    if (totalDistributed > _totalIngredients!) {
-      _showSnackBar(
-        _isHebrew ? 'יותר מדי! יש רק $_totalIngredients מרכיבים' : 'Too many! Only $_totalIngredients ingredients',
-        Colors.red,
-      );
-      return;
-    }
+    _pourController.forward(from: 0);
 
-    final allEqual =
-        _vialDistribution.every((count) => count == _vialDistribution[0]);
-    if (!allEqual) {
-      _showSnackBar(
-        _isHebrew ? 'לא שווה! כל מבחנה צריכה אותו מספר' : 'Not equal! Each vial needs the same amount',
-        Colors.red,
-      );
-      return;
-    }
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
 
-    // Success!
-    _showQuestionDialog();
-  }
+      setState(() => _showExplosion = true);
 
-  void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: color,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+      if (isCorrect) {
+        _speak(_isHebrew ? 'מעולה! קסם מושלם!' : 'Excellent! Perfect magic!');
+        _createSuccessParticles();
+        setState(() => _score++);
+      } else {
+        _speak(_isHebrew ? 'אופס! נסה שוב' : 'Oops! Try again');
+        _createFailureParticles();
+      }
 
-  void _showQuestionDialog() {
-    final options = _generateOptions(_correctAnswer!);
+      _explosionController.forward(from: 0);
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    _currentPotion.color.shade100,
-                    _currentPotion.color.shade200,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _isHebrew
-                        ? 'כמה מרכיבים בכל מבחנה?'
-                        : 'How many ingredients per vial?',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 2.5,
-                    children: options.map((option) {
-                      final isSelected = _selectedAnswer == option;
-                      final showResult = _isCorrect != null && isSelected;
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        if (!mounted) return;
 
-                      return GestureDetector(
-                        onTap: _isCorrect == null
-                            ? () {
-                                setDialogState(() {
-                                  _selectedAnswer = option;
-                                  _isCorrect = option == _correctAnswer;
-                                });
-
-                                if (_isCorrect!) {
-                                  _speak(_isHebrew ? 'קסם מושלם!' : 'Perfect magic!');
-                                } else {
-                                  _speak(_isHebrew ? 'לא נכון, נסה שוב' : 'Wrong, try again');
-                                }
-
-                                Future.delayed(const Duration(milliseconds: 800), () {
-                                  if (_isCorrect!) {
-                                    Navigator.pop(context);
-                                    _showSuccess();
-                                  } else {
-                                    setDialogState(() {
-                                      _selectedAnswer = null;
-                                      _isCorrect = null;
-                                    });
-                                  }
-                                });
-                              }
-                            : null,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: showResult
-                                  ? (_isCorrect!
-                                      ? [Colors.green.shade400, Colors.green.shade600]
-                                      : [Colors.red.shade400, Colors.red.shade600])
-                                  : [_currentPotion.color.shade300, _currentPotion.color.shade500],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              option.toString(),
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  List<int> _generateOptions(int correct) {
-    final options = <int>{correct};
-    while (options.length < 4) {
-      final offset = _random.nextInt(5) - 2;
-      final option = (correct + offset).clamp(1, 20);
-      options.add(option);
-    }
-    return options.toList()..shuffle();
-  }
-
-  void _showSuccess() {
-    setState(() {
-      _currentScreen = 'success';
-      _collectedPotions[_currentPotionIndex] = true;
-    });
-    _successController.forward(from: 0);
-    _speak(_isHebrew ? 'הכנת שיקוי קסום!' : 'You brewed a magic potion!');
-  }
-
-  void _nextPotion() {
-    if (_currentPotionIndex < _totalPotions - 1) {
-      setState(() {
-        _currentPotionIndex++;
-        _currentScreen = 'menu';
+        if (isCorrect) {
+          _currentQuestion++;
+          if (_currentQuestion >= _totalQuestions) {
+            _showFinalScore();
+          } else {
+            _generateQuestion();
+          }
+        } else {
+          setState(() {
+            _selectedPotion = null;
+            _isCorrect = null;
+            _showExplosion = false;
+            _particles.clear();
+          });
+        }
       });
-    } else {
-      _showGameComplete();
-    }
+    });
   }
 
-  void _showGameComplete() {
+  void _createSuccessParticles() {
+    final newParticles = List.generate(30, (i) {
+      final angle = (i / 30) * 2 * pi;
+      return MagicParticle(
+        x: 0.5,
+        y: 0.5,
+        vx: cos(angle) * 0.015,
+        vy: sin(angle) * 0.015,
+        color: [Colors.yellow, Colors.orange, Colors.pink, Colors.purple]
+            [_random.nextInt(4)],
+        size: _random.nextDouble() * 8 + 4,
+      );
+    });
+    setState(() => _particles.addAll(newParticles));
+
+    Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (!mounted || _particles.isEmpty) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _particles = _particles.map((p) => p.update()).toList();
+        _particles.removeWhere((p) => p.life <= 0);
+      });
+    });
+  }
+
+  void _createFailureParticles() {
+    final newParticles = List.generate(15, (i) {
+      return MagicParticle(
+        x: 0.5 + (_random.nextDouble() - 0.5) * 0.2,
+        y: 0.45 + (_random.nextDouble() - 0.5) * 0.2,
+        vx: (_random.nextDouble() - 0.5) * 0.01,
+        vy: -_random.nextDouble() * 0.02,
+        color: Colors.grey.shade700,
+        size: _random.nextDouble() * 12 + 6,
+      );
+    });
+    setState(() => _particles.addAll(newParticles));
+
+    Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (!mounted || _particles.isEmpty) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _particles = _particles.map((p) => p.update()).toList();
+        _particles.removeWhere((p) => p.life <= 0);
+      });
+    });
+  }
+
+  void _showFinalScore() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -407,14 +283,21 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
               const SizedBox(height: 16),
               Text(
                 _isHebrew ? 'מאסטר קוסם!' : 'Master Wizard!',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               Text(
-                _isHebrew
-                    ? 'אספת ${_collectedPotions.length} שיקויים!'
-                    : 'Collected ${_collectedPotions.length} potions!',
+                _isHebrew ? 'תשובות נכונות:' : 'Correct answers:',
                 style: const TextStyle(fontSize: 18),
+              ),
+              Text(
+                '$_score / $_totalQuestions',
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -431,15 +314,15 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
                     onPressed: () {
                       Navigator.pop(context);
                       setState(() {
-                        _currentPotionIndex = 0;
-                        _collectedPotions.clear();
-                        _currentScreen = 'menu';
+                        _score = 0;
+                        _currentQuestion = 0;
                       });
+                      _generateQuestion();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple.shade600,
                     ),
-                    child: Text(_isHebrew ? 'התחל מחדש' : 'Start Over'),
+                    child: Text(_isHebrew ? 'שחק שוב' : 'Play Again'),
                   ),
                 ],
               ),
@@ -452,12 +335,11 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
 
   @override
   void dispose() {
-    _particleTimer?.cancel();
     _flutterTts.stop();
-    _bubbleController.dispose();
+    _cauldronBubbleController.dispose();
     _sparkleController.dispose();
-    _stirController.dispose();
-    _successController.dispose();
+    _pourController.dispose();
+    _explosionController.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
@@ -483,105 +365,43 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
           ),
         ),
         child: SafeArea(
-          child: _buildCurrentScreen(responsive),
+          child: _dividend == null
+              ? const Center(child: CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    Column(
+                      children: [
+                        _buildHeader(responsive),
+                        SizedBox(height: responsive.spacing(16)),
+                        _buildQuestion(responsive),
+                        SizedBox(height: responsive.spacing(24)),
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              _buildCauldron(responsive),
+                              if (_selectedPotion != null)
+                                _buildPouringPotion(responsive),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: responsive.spacing(24)),
+                        _buildPotionOptions(responsive),
+                        SizedBox(height: responsive.spacing(16)),
+                      ],
+                    ),
+                    if (_particles.isNotEmpty)
+                      CustomPaint(
+                        painter: ParticlePainter(_particles),
+                        size: Size.infinite,
+                      ),
+                  ],
+                ),
         ),
       ),
     );
   }
 
-  Widget _buildCurrentScreen(ResponsiveHelper responsive) {
-    switch (_currentScreen) {
-      case 'menu':
-        return _buildMenuScreen(responsive);
-      case 'lab':
-        return _buildLabScreen(responsive);
-      case 'book':
-        return _buildPotionBookScreen(responsive);
-      case 'success':
-        return _buildSuccessScreen(responsive);
-      default:
-        return const Center(child: CircularProgressIndicator());
-    }
-  }
-
-  Widget _buildMenuScreen(ResponsiveHelper responsive) {
-    return Column(
-      children: [
-        _buildMenuHeader(responsive),
-        Expanded(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(responsive.spacing(16)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(responsive.spacing(24)),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          _currentPotion.color.shade300.withOpacity(0.3),
-                          _currentPotion.color.shade600.withOpacity(0.3),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.purple.shade300, width: 3),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          _isHebrew ? _currentPotion.nameHe : _currentPotion.nameEn,
-                          style: TextStyle(
-                            fontSize: responsive.fontSize(28),
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: responsive.spacing(16)),
-                        Text(
-                          '${_currentPotion.emoji} ${_currentPotion.ingredient}',
-                          style: TextStyle(fontSize: responsive.iconSize(60)),
-                        ),
-                        SizedBox(height: responsive.spacing(16)),
-                        Text(
-                          _isHebrew
-                              ? 'שיקוי ${_currentPotionIndex + 1} מתוך $_totalPotions'
-                              : 'Potion ${_currentPotionIndex + 1} of $_totalPotions',
-                          style: TextStyle(
-                            fontSize: responsive.fontSize(16),
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: responsive.spacing(32)),
-                  KidButton(
-                    text: _isHebrew ? 'התחל לבשל! 🧪' : 'Start Brewing! 🧪',
-                    icon: Icons.science,
-                    onPressed: _startPotionBrewing,
-                    color: _currentPotion.color,
-                    height: 60,
-                  ),
-                  SizedBox(height: responsive.spacing(16)),
-                  KidButton(
-                    text: _isHebrew ? 'ספר השיקויים 📖' : 'Potion Book 📖',
-                    icon: Icons.menu_book,
-                    onPressed: () => setState(() => _currentScreen = 'book'),
-                    color: Colors.amber.shade700,
-                    height: 60,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMenuHeader(ResponsiveHelper responsive) {
+  Widget _buildHeader(ResponsiveHelper responsive) {
     return Container(
       padding: EdgeInsets.all(responsive.spacing(12)),
       decoration: BoxDecoration(
@@ -595,14 +415,22 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
             isHebrew: _isHebrew,
           ),
           Expanded(
-            child: Text(
-              _isHebrew ? '🧙‍♂️ קוסם השיקויים 🧙‍♀️' : '🧙‍♂️ Potion Master 🧙‍♀️',
-              style: TextStyle(
-                fontSize: responsive.fontSize(20),
-                fontWeight: FontWeight.bold,
-                color: Colors.purple.shade100,
-              ),
-              textAlign: TextAlign.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatBadge(
+                  responsive,
+                  '🎯',
+                  '${_currentQuestion + 1}/$_totalQuestions',
+                  _isHebrew ? 'שאלה' : 'Question',
+                ),
+                _buildStatBadge(
+                  responsive,
+                  '⭐',
+                  '$_score',
+                  _isHebrew ? 'נכונות' : 'Score',
+                ),
+              ],
             ),
           ),
           SizedBox(width: responsive.spacing(48)),
@@ -611,168 +439,42 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
     );
   }
 
-  Widget _buildLabScreen(ResponsiveHelper responsive) {
-    return Stack(
-      children: [
-        if (_magicParticles.isNotEmpty)
-          CustomPaint(
-            painter: MagicParticlePainter(_magicParticles),
-            size: Size.infinite,
-          ),
-        Column(
-          children: [
-            _buildLabHeader(responsive),
-            SizedBox(height: responsive.spacing(16)),
-            _buildIngredientDisplay(responsive),
-            SizedBox(height: responsive.spacing(16)),
-            Expanded(child: _buildVialsArea(responsive)),
-            _buildBrewButton(responsive),
-            SizedBox(height: responsive.spacing(16)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLabHeader(ResponsiveHelper responsive) {
+  Widget _buildStatBadge(
+      ResponsiveHelper responsive, String emoji, String value, String label) {
     return Container(
-      padding: EdgeInsets.all(responsive.spacing(12)),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple.shade800.withOpacity(0.9),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.spacing(12),
+        vertical: responsive.spacing(8),
       ),
-      child: Row(
-        children: [
-          KidBackButton(
-            onPressed: () => setState(() => _currentScreen = 'menu'),
-            color: Colors.purple.shade300,
-            isHebrew: _isHebrew,
-          ),
-          Expanded(
-            child: Text(
-              _isHebrew ? _currentPotion.nameHe : _currentPotion.nameEn,
-              style: TextStyle(
-                fontSize: responsive.fontSize(18),
-                fontWeight: FontWeight.bold,
-                color: Colors.purple.shade100,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(width: responsive.spacing(48)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIngredientDisplay(ResponsiveHelper responsive) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-      padding: EdgeInsets.all(responsive.spacing(16)),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.purple.shade800.withOpacity(0.7),
-            Colors.indigo.shade800.withOpacity(0.7),
-          ],
+          colors: [Colors.purple.shade100, Colors.pink.shade100],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.purple.shade300, width: 2),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: [
-          Text(
-            _isHebrew ? 'מרכיבים קסומים:' : 'Magic Ingredients:',
-            style: TextStyle(
-              fontSize: responsive.fontSize(18),
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: responsive.spacing(12)),
-          AnimatedBuilder(
-            animation: _sparkleAnimation,
-            builder: (context, child) {
-              return Opacity(
-                opacity: 0.7 + 0.3 * sin(_sparkleAnimation.value * 2 * pi),
-                child: child,
-              );
-            },
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              alignment: WrapAlignment.center,
-              children: List.generate(
-                _totalIngredients!,
-                (index) => Text(
-                  _currentPotion.ingredient,
-                  style: TextStyle(fontSize: responsive.iconSize(24)),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVialsArea(ResponsiveHelper responsive) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(
-          _vials!,
-          (index) => Expanded(child: _buildVial(responsive, index)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVial(ResponsiveHelper responsive, int vialIndex) {
-    final ingredients = _vialDistribution[vialIndex];
-
-    return Container(
-      margin: EdgeInsets.all(responsive.spacing(4)),
-      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedBuilder(
-            animation: _bubbleAnimation,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: VialPainter(
-                  fillLevel: ingredients / 10,
-                  color: _currentPotion.color,
-                  bubbleValue: _bubbleAnimation.value,
-                ),
-                size: const Size(60, 120),
-              );
-            },
-          ),
-          SizedBox(height: responsive.spacing(8)),
-          Text(
-            ingredients.toString(),
-            style: TextStyle(
-              fontSize: responsive.fontSize(20),
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: responsive.spacing(8)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Text(emoji, style: TextStyle(fontSize: responsive.iconSize(20))),
+          SizedBox(width: responsive.spacing(6)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: () => _removeIngredientFromVial(vialIndex),
-                icon: const Icon(Icons.remove_circle),
-                color: Colors.red.shade300,
-                iconSize: 28,
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(16),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple.shade800,
+                ),
               ),
-              IconButton(
-                onPressed: () => _addIngredientToVial(vialIndex),
-                icon: const Icon(Icons.add_circle),
-                color: Colors.green.shade300,
-                iconSize: 28,
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(10),
+                  color: Colors.purple.shade600,
+                ),
               ),
             ],
           ),
@@ -781,191 +483,168 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
     );
   }
 
-  Widget _buildBrewButton(ResponsiveHelper responsive) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
-      child: KidButton(
-        text: _isHebrew ? 'בשל שיקוי! ✨' : 'Brew Potion! ✨',
-        icon: Icons.auto_fix_high,
-        onPressed: _brewPotion,
-        color: _currentPotion.color,
-        height: 60,
-      ),
-    );
-  }
-
-  Widget _buildSuccessScreen(ResponsiveHelper responsive) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        AnimatedBuilder(
-          animation: _successAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _successAnimation.value,
-              child: child,
-            );
-          },
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  _currentPotion.color.shade300,
-                  _currentPotion.color.shade600,
-                  _currentPotion.color.shade900,
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: _currentPotion.color.withOpacity(0.6),
-                  blurRadius: 30,
-                  spreadRadius: 10,
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                _currentPotion.emoji,
-                style: TextStyle(fontSize: responsive.iconSize(80)),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: responsive.spacing(32)),
-        Text(
-          _isHebrew ? '✨ קסם מושלם! ✨' : '✨ Perfect Magic! ✨',
-          style: TextStyle(
-            fontSize: responsive.fontSize(32),
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        SizedBox(height: responsive.spacing(16)),
-        Text(
-          _isHebrew ? _currentPotion.nameHe : _currentPotion.nameEn,
-          style: TextStyle(
-            fontSize: responsive.fontSize(24),
-            color: _currentPotion.color.shade200,
-          ),
-        ),
-        SizedBox(height: responsive.spacing(48)),
-        KidButton(
-          text: _isHebrew ? 'שיקוי הבא! →' : 'Next Potion! →',
-          icon: Icons.arrow_forward,
-          onPressed: _nextPotion,
-          color: _currentPotion.color,
-          height: 60,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPotionBookScreen(ResponsiveHelper responsive) {
-    return Column(
-      children: [
-        _buildBookHeader(responsive),
-        Expanded(
-          child: GridView.builder(
-            padding: EdgeInsets.all(responsive.spacing(16)),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: responsive.isTablet ? 4 : 3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.8,
-            ),
-            itemCount: _totalPotions,
-            itemBuilder: (context, index) {
-              final potion = _potionRecipes[index];
-              final collected = _collectedPotions[index] ?? false;
-
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: collected
-                        ? [potion.color.shade300, potion.color.shade600]
-                        : [Colors.grey.shade600, Colors.grey.shade800],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: collected ? potion.color.shade200 : Colors.grey,
-                    width: 2,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      collected ? potion.emoji : '❓',
-                      style: TextStyle(fontSize: responsive.iconSize(40)),
-                    ),
-                    SizedBox(height: responsive.spacing(8)),
-                    Text(
-                      collected
-                          ? (_isHebrew ? potion.nameHe : potion.nameEn)
-                          : '???',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBookHeader(ResponsiveHelper responsive) {
+  Widget _buildQuestion(ResponsiveHelper responsive) {
     return Container(
-      padding: EdgeInsets.all(responsive.spacing(12)),
+      margin: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+      padding: EdgeInsets.all(responsive.spacing(16)),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.shade800.withOpacity(0.9),
-      ),
-      child: Row(
-        children: [
-          KidBackButton(
-            onPressed: () => setState(() => _currentScreen = 'menu'),
-            color: Colors.purple.shade300,
-            isHebrew: _isHebrew,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.purple.shade400, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          Expanded(
-            child: Text(
-              _isHebrew ? '📖 ספר השיקויים 📖' : '📖 Potion Book 📖',
-              style: TextStyle(
-                fontSize: responsive.fontSize(20),
-                fontWeight: FontWeight.bold,
-                color: Colors.purple.shade100,
-              ),
-              textAlign: TextAlign.center,
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            _isHebrew ? 'בחר את השיקוי הנכון:' : 'Choose the correct potion:',
+            style: TextStyle(
+              fontSize: responsive.fontSize(16),
+              color: Colors.purple.shade700,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(width: responsive.spacing(48)),
+          SizedBox(height: responsive.spacing(8)),
+          Text(
+            '$_dividend ÷ $_divisor = ?',
+            style: TextStyle(
+              fontSize: responsive.fontSize(32),
+              fontWeight: FontWeight.bold,
+              color: Colors.purple.shade900,
+            ),
+          ),
         ],
       ),
     );
   }
+
+  Widget _buildCauldron(ResponsiveHelper responsive) {
+    return Center(
+      child: AnimatedBuilder(
+        animation: _bubbleAnimation,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: CauldronPainter(
+              bubbleValue: _bubbleAnimation.value,
+              showExplosion: _showExplosion,
+              explosionValue: _explosionAnimation.value,
+              isCorrect: _isCorrect ?? true,
+            ),
+            size: Size(
+              responsive.width * 0.5,
+              responsive.height * 0.25,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPouringPotion(ResponsiveHelper responsive) {
+    if (_selectedPotion == null) return const SizedBox();
+
+    final potion = _potions[_selectedPotion!];
+
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: AnimatedBuilder(
+        animation: _pourAnimation,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: PouringPotionPainter(
+              pourValue: _pourAnimation.value,
+              potionColor: potion.color,
+            ),
+            size: Size.infinite,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPotionOptions(ResponsiveHelper responsive) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: responsive.spacing(16)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(4, (index) {
+          final potion = _potions[index];
+          final isSelected = _selectedPotion == index;
+
+          return GestureDetector(
+            onTap:
+                _selectedPotion == null ? () => _selectPotion(index) : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: responsive.width * 0.2,
+              height: responsive.height * 0.15,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected
+                      ? (_isCorrect == true ? Colors.green : Colors.red)
+                      : potion.color,
+                  width: isSelected ? 4 : 2,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    potion.emoji,
+                    style: TextStyle(fontSize: responsive.iconSize(40)),
+                  ),
+                  SizedBox(height: responsive.spacing(8)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.spacing(8),
+                      vertical: responsive.spacing(4),
+                    ),
+                    decoration: BoxDecoration(
+                      color: potion.color,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      potion.value.toString(),
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(20),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
 }
 
-// Potion recipe data class
-class PotionRecipe {
-  final String nameHe;
-  final String nameEn;
+// Data classes
+class PotionOption {
+  final int value;
   final MaterialColor color;
   final String emoji;
-  final String ingredient;
 
-  PotionRecipe(this.nameHe, this.nameEn, this.color, this.emoji, this.ingredient);
+  PotionOption({
+    required this.value,
+    required this.color,
+    required this.emoji,
+  });
 }
 
-// Magic particle class
 class MagicParticle {
   double x, y, vx, vy;
   Color color;
@@ -987,26 +666,26 @@ class MagicParticle {
       x: x + vx,
       y: y + vy,
       vx: vx,
-      vy: vy,
+      vy: vy + 0.001, // Gravity
       color: color,
       size: size * 0.97,
-      life: life - 0.015,
+      life: life - 0.02,
     );
   }
 }
 
-// Magic particle painter
-class MagicParticlePainter extends CustomPainter {
+// Painters
+class ParticlePainter extends CustomPainter {
   final List<MagicParticle> particles;
 
-  MagicParticlePainter(this.particles);
+  ParticlePainter(this.particles);
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final particle in particles) {
       final paint = Paint()
-        ..color = particle.color.withOpacity(particle.life * 0.6)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+        ..color = particle.color.withOpacity(particle.life * 0.8)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
 
       canvas.drawCircle(
         Offset(particle.x * size.width, particle.y * size.height),
@@ -1017,94 +696,145 @@ class MagicParticlePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(MagicParticlePainter oldDelegate) => true;
+  bool shouldRepaint(ParticlePainter oldDelegate) => true;
 }
 
-// Vial painter with bubbles
-class VialPainter extends CustomPainter {
-  final double fillLevel;
-  final MaterialColor color;
+class CauldronPainter extends CustomPainter {
   final double bubbleValue;
+  final bool showExplosion;
+  final double explosionValue;
+  final bool isCorrect;
 
-  VialPainter({
-    required this.fillLevel,
-    required this.color,
+  CauldronPainter({
     required this.bubbleValue,
+    required this.showExplosion,
+    required this.explosionValue,
+    required this.isCorrect,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final vialRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(size.width * 0.2, 20, size.width * 0.6, size.height - 40),
-      const Radius.circular(8),
+    final center = Offset(size.width / 2, size.height * 0.7);
+
+    // Draw cauldron body
+    final cauldronPath = Path();
+    cauldronPath.moveTo(size.width * 0.2, size.height * 0.5);
+    cauldronPath.quadraticBezierTo(
+      size.width * 0.15,
+      size.height * 0.7,
+      size.width * 0.2,
+      size.height * 0.9,
+    );
+    cauldronPath.lineTo(size.width * 0.8, size.height * 0.9);
+    cauldronPath.quadraticBezierTo(
+      size.width * 0.85,
+      size.height * 0.7,
+      size.width * 0.8,
+      size.height * 0.5,
+    );
+    cauldronPath.close();
+
+    final cauldronPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.grey.shade800, Colors.grey.shade900],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    canvas.drawPath(cauldronPath, cauldronPaint);
+
+    // Draw potion inside
+    final potionRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(center.dx, size.height * 0.7),
+        width: size.width * 0.5,
+        height: size.height * 0.3,
+      ),
+      const Radius.circular(20),
     );
 
-    // Vial outline
-    final outlinePaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-    canvas.drawRRect(vialRect, outlinePaint);
+    final potionColor =
+        showExplosion ? (isCorrect ? Colors.gold : Colors.grey) : Colors.green;
 
-    // Potion fill
-    if (fillLevel > 0) {
-      final fillHeight = (size.height - 60) * fillLevel;
-      final fillRect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.2 + 3,
-          size.height - 40 - fillHeight,
-          size.width * 0.6 - 6,
-          fillHeight,
-        ),
-        const Radius.circular(6),
-      );
+    final potionPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          potionColor.shade400,
+          potionColor.shade700,
+        ],
+      ).createShader(potionRect.outerRect);
 
-      final fillPaint = Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            color.shade300.withOpacity(0.7),
-            color.shade600,
-          ],
-        ).createShader(fillRect.outerRect);
+    canvas.drawRRect(potionRect, potionPaint);
 
-      canvas.drawRRect(fillRect, fillPaint);
-
-      // Bubbles
+    // Draw bubbles
+    if (!showExplosion) {
       final bubblePaint = Paint()
-        ..color = Colors.white.withOpacity(0.4)
+        ..color = Colors.white.withOpacity(0.5)
         ..style = PaintingStyle.fill;
 
-      for (int i = 0; i < 3; i++) {
-        final bubbleY = size.height -
-            40 -
-            (fillHeight * 0.3) -
-            (sin(bubbleValue * 2 * pi + i) * 10);
+      for (int i = 0; i < 5; i++) {
+        final bubbleY = size.height * 0.65 +
+            (sin(bubbleValue * 2 * pi + i) * size.height * 0.1);
         canvas.drawCircle(
-          Offset(size.width * 0.5 + (i - 1) * 10, bubbleY),
-          3,
+          Offset(size.width * (0.3 + i * 0.1), bubbleY),
+          size.width * 0.02,
           bubblePaint,
         );
       }
     }
 
-    // Cork/cap
-    final capPaint = Paint()
-      ..color = Colors.brown.shade700
-      ..style = PaintingStyle.fill;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(size.width * 0.3, 10, size.width * 0.4, 15),
-        const Radius.circular(4),
-      ),
-      capPaint,
-    );
+    // Draw explosion effect
+    if (showExplosion && explosionValue > 0) {
+      final explosionPaint = Paint()
+        ..color = (isCorrect ? Colors.yellow : Colors.grey.shade600)
+            .withOpacity((1 - explosionValue) * 0.6)
+        ..style = PaintingStyle.fill;
+
+      canvas.drawCircle(
+        Offset(center.dx, size.height * 0.5),
+        size.width * 0.3 * explosionValue,
+        explosionPaint,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(VialPainter oldDelegate) {
-    return oldDelegate.fillLevel != fillLevel ||
-        oldDelegate.bubbleValue != bubbleValue;
+  bool shouldRepaint(CauldronPainter oldDelegate) =>
+      oldDelegate.bubbleValue != bubbleValue ||
+      oldDelegate.showExplosion != showExplosion ||
+      oldDelegate.explosionValue != explosionValue;
+}
+
+class PouringPotionPainter extends CustomPainter {
+  final double pourValue;
+  final MaterialColor potionColor;
+
+  PouringPotionPainter({
+    required this.pourValue,
+    required this.potionColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (pourValue == 0) return;
+
+    // Draw pouring stream
+    final streamPath = Path();
+    final startY = size.height * 0.1;
+    final endY = size.height * 0.4 * pourValue;
+
+    streamPath.moveTo(size.width * 0.5 - 5, startY);
+    streamPath.lineTo(size.width * 0.5 - 5, endY);
+    streamPath.lineTo(size.width * 0.5 + 5, endY);
+    streamPath.lineTo(size.width * 0.5 + 5, startY);
+    streamPath.close();
+
+    final streamPaint = Paint()
+      ..color = potionColor.withOpacity(0.7)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(streamPath, streamPaint);
   }
+
+  @override
+  bool shouldRepaint(PouringPotionPainter oldDelegate) =>
+      oldDelegate.pourValue != pourValue;
 }

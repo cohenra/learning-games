@@ -313,21 +313,19 @@ class _DivisionRacingGameState extends State<DivisionRacingGame>
       _createParticles();
       setState(() => _score++);
 
-      Future.delayed(const Duration(milliseconds: 600), () {
+      Future.delayed(const Duration(milliseconds: 800), () {
         if (!mounted) return;
-        setState(() {
-          _currentQuestion++;
-          if (_currentQuestion >= _totalQuestions) {
-            _finishRace();
-          } else {
-            _generateQuestion();
-          }
-        });
+        _currentQuestion++;
+        if (_currentQuestion >= _totalQuestions) {
+          _finishRace();
+        } else {
+          _generateQuestion();
+        }
       });
     } else {
       _speak(_isHebrew ? 'לא נכון, נסה שוב' : 'Wrong, try again');
       _wrongShakeController.forward(from: 0);
-      Future.delayed(const Duration(milliseconds: 600), () {
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (!mounted) return;
         setState(() {
           _selectedAnswer = null;

@@ -126,21 +126,18 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
 
                 // Game Cards
                 Expanded(
-                  child: SingleChildScrollView(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        SizedBox(height: responsive.spacing(12)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🏎️',
                           title: _isHebrew ? 'מרוץ החילוק' : 'Division Racing',
-                          description: _isHebrew
-                              ? 'מרוץ מרגש נגד יריבים!'
-                              : 'Exciting race against opponents!',
                           color: Colors.blue,
                           onTap: () {
                             Navigator.push(
@@ -151,15 +148,11 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🏴‍☠️',
                           title: _isHebrew ? 'אוצר הפיראטים' : 'Pirate\'s Treasure',
-                          description: _isHebrew
-                              ? 'הרפתקה באיים מסתוריים'
-                              : 'Adventure on mysterious islands',
                           color: Colors.amber.shade700,
                           onTap: () {
                             Navigator.push(
@@ -170,15 +163,11 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🧙‍♂️',
                           title: _isHebrew ? 'קוסם השיקויים' : 'Potion Master',
-                          description: _isHebrew
-                              ? 'בשל שיקויים קסומים!'
-                              : 'Brew magical potions!',
                           color: Colors.purple,
                           onTap: () {
                             Navigator.push(
@@ -189,15 +178,11 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🍪',
                           title: _isHebrew ? 'חלק את הממתקים' : 'Share the Treats',
-                          description: _isHebrew
-                              ? 'חלק ממתקים באופן שווה בין חברים'
-                              : 'Share treats equally among friends',
                           color: Colors.orange,
                           onTap: () {
                             Navigator.push(
@@ -208,15 +193,11 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🍕',
                           title: _isHebrew ? 'מסיבת פיצה' : 'Pizza Party',
-                          description: _isHebrew
-                              ? 'חלק פיצות לפלחים שווים'
-                              : 'Divide pizzas into equal slices',
                           color: Colors.red,
                           onTap: () {
                             Navigator.push(
@@ -227,7 +208,6 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(16)),
                       ],
                     ),
                   ),
@@ -242,76 +222,65 @@ class _DivisionMenuScreenState extends State<DivisionMenuScreen>
     );
   }
 
-  Widget _buildGameCard(
+  Widget _buildCompactGameCard(
     BuildContext context,
     ResponsiveHelper responsive, {
     required String icon,
     required String title,
-    required String description,
     required Color color,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(20)),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(12),
+          vertical: responsive.spacing(8),
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color, width: 3),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color, width: 2),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: color.withOpacity(0.25),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 70,
-              height: 70,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(40)),
+                  style: TextStyle(fontSize: responsive.iconSize(28)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(16)),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(18),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                  SizedBox(height: responsive.spacing(4)),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(14),
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(16),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
               ),
             ),
             Icon(
               _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
               color: color,
-              size: 30,
+              size: 24,
             ),
           ],
         ),
