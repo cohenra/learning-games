@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:learning_fun/generated/app_localizations.dart';
@@ -7,6 +8,13 @@ import 'screens/categories_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // הסרת שורת התפריט של אנדרואיד בכל האפליקציה
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+    overlays: [],
+  );
+
   runApp(const LearningFunApp());
 }
 
