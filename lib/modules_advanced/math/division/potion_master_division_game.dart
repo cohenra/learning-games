@@ -172,8 +172,8 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
     });
 
     _speak(_isHebrew
-        ? 'חלק $_total מרכיבים קסומים ל-$_vials מבחנות'
-        : 'Divide $_total magic ingredients into $_vials vials');
+        ? 'חלק $_totalIngredients מרכיבים קסומים ל-$_vials מבחנות'
+        : 'Divide $_totalIngredients magic ingredients into $_vials vials');
   }
 
   void _addIngredientToVial(int vialIndex) {
@@ -1023,7 +1023,7 @@ class MagicParticlePainter extends CustomPainter {
 // Vial painter with bubbles
 class VialPainter extends CustomPainter {
   final double fillLevel;
-  final Color color;
+  final MaterialColor color;
   final double bubbleValue;
 
   VialPainter({

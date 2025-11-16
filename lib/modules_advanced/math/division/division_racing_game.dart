@@ -168,7 +168,7 @@ class _DivisionRacingGameState extends State<DivisionRacingGame>
   }
 
   Widget _buildDifficultyButton(
-      int level, String title, String subtitle, Color color, String emoji) {
+      int level, String title, String subtitle, MaterialColor color, String emoji) {
     return InkWell(
       onTap: () {
         setState(() => _difficulty = level);
@@ -842,7 +842,7 @@ class RaceTrackPainter extends CustomPainter {
   }
 
   void _drawRacer(Canvas canvas, Size size, int lane, double position,
-      Color color, String emoji, bool hasTurbo, double turboValue) {
+      MaterialColor color, String emoji, bool hasTurbo, double turboValue) {
     final trackHeight = size.height / 4;
     final centerY = lane * trackHeight + trackHeight / 2;
     final maxX = size.width - 80; // Account for finish line

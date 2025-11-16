@@ -147,8 +147,8 @@ class _PirateTreasureDivisionGameState
     });
 
     _speak(_isHebrew
-        ? 'חלק $_total אוצרות באופן שווה בין $_pirates פיראטים'
-        : 'Share $_total treasures equally among $_pirates pirates');
+        ? 'חלק $_totalTreasure אוצרות באופן שווה בין $_pirates פיראטים'
+        : 'Share $_totalTreasure treasures equally among $_pirates pirates');
   }
 
   void _addTreasureToPirate(int pirateIndex) {
