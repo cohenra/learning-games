@@ -216,10 +216,10 @@ class _MultiplicationMenuScreenState extends State<MultiplicationMenuScreen>
                           context,
                           responsive,
                           icon: '🏎️',
-                          title: _isHebrew ? 'מרוץ כפל' : 'Multiplication Racing',
+                          title: _isHebrew ? 'מרוץ מתמטיקה' : 'Math Racing',
                           description: _isHebrew
-                              ? 'מרוץ מהיר נגד הזמן!'
-                              : 'Fast racing against time!',
+                              ? 'כפל, חיבור וחיסור במרוץ!'
+                              : 'Multiply, add, subtract while racing!',
                           color: Colors.red,
                           onTap: () {
                             Navigator.push(

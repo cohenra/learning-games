@@ -7,7 +7,7 @@ import 'dart:async';
 import '../../../utils/responsive_helper.dart';
 import '../../../widgets/kid_back_button.dart';
 
-/// משחק מרוץ כפל - ענה על שאלות כפל תוך כדי נהיגה
+/// משחק מרוץ מתמטיקה - ענה על שאלות מתמטיקה תוך כדי נהיגה
 class MultiplicationRacingGame extends StatefulWidget {
   const MultiplicationRacingGame({super.key});
 
@@ -15,11 +15,16 @@ class MultiplicationRacingGame extends StatefulWidget {
   State<MultiplicationRacingGame> createState() => _MultiplicationRacingGameState();
 }
 
+enum GameMode { multiplication, additionSubtraction }
+
 class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
     with TickerProviderStateMixin {
   final FlutterTts _flutterTts = FlutterTts();
   final Random _random = Random();
   bool _isHebrew = true;
+
+  // Game mode
+  GameMode? _selectedMode;
 
   // Game state
   int _currentLane = 1; // 0-3 lanes
@@ -29,13 +34,16 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
   bool _gameStarted = false;
   bool _gameOver = false;
 
-  // Best scores
-  int _bestScore = 0;
-  int _bestCorrectAnswers = 0;
+  // Best scores (separate for each mode)
+  int _bestScoreMultiplication = 0;
+  int _bestCorrectMultiplication = 0;
+  int _bestScoreAddSub = 0;
+  int _bestCorrectAddSub = 0;
 
   // Current question
   int? _num1;
   int? _num2;
+  String? _operation; // '+', '-', or '×'
   int? _correctAnswer;
   List<int> _answers = [];
 
@@ -109,21 +117,36 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
   Future<void> _loadBestScores() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _bestScore = prefs.getInt('racing_best_score') ?? 0;
-      _bestCorrectAnswers = prefs.getInt('racing_best_correct') ?? 0;
+      _bestScoreMultiplication = prefs.getInt('racing_mult_best_score') ?? 0;
+      _bestCorrectMultiplication = prefs.getInt('racing_mult_best_correct') ?? 0;
+      _bestScoreAddSub = prefs.getInt('racing_addsub_best_score') ?? 0;
+      _bestCorrectAddSub = prefs.getInt('racing_addsub_best_correct') ?? 0;
     });
   }
 
   Future<void> _saveBestScores() async {
-    if (_correctAnswers > _bestCorrectAnswers ||
-        (_correctAnswers == _bestCorrectAnswers && _elapsedSeconds < _bestScore && _bestScore > 0)) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('racing_best_score', _elapsedSeconds);
-      await prefs.setInt('racing_best_correct', _correctAnswers);
-      setState(() {
-        _bestScore = _elapsedSeconds;
-        _bestCorrectAnswers = _correctAnswers;
-      });
+    final prefs = await SharedPreferences.getInstance();
+
+    if (_selectedMode == GameMode.multiplication) {
+      if (_correctAnswers > _bestCorrectMultiplication ||
+          (_correctAnswers == _bestCorrectMultiplication && _elapsedSeconds < _bestScoreMultiplication && _bestScoreMultiplication > 0)) {
+        await prefs.setInt('racing_mult_best_score', _elapsedSeconds);
+        await prefs.setInt('racing_mult_best_correct', _correctAnswers);
+        setState(() {
+          _bestScoreMultiplication = _elapsedSeconds;
+          _bestCorrectMultiplication = _correctAnswers;
+        });
+      }
+    } else {
+      if (_correctAnswers > _bestCorrectAddSub ||
+          (_correctAnswers == _bestCorrectAddSub && _elapsedSeconds < _bestScoreAddSub && _bestScoreAddSub > 0)) {
+        await prefs.setInt('racing_addsub_best_score', _elapsedSeconds);
+        await prefs.setInt('racing_addsub_best_correct', _correctAnswers);
+        setState(() {
+          _bestScoreAddSub = _elapsedSeconds;
+          _bestCorrectAddSub = _correctAnswers;
+        });
+      }
     }
   }
 
@@ -154,21 +177,48 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
   }
 
   void _generateQuestion() {
-    // Difficulty scaling based on level
-    int maxNum1 = min(9, 3 + (_level ~/ 3)); // Start with 3-6, increase gradually
-    int maxNum2 = min(9, 3 + (_level ~/ 3));
+    if (_selectedMode == GameMode.multiplication) {
+      // Multiplication mode
+      int maxNum1 = min(9, 3 + (_level ~/ 3));
+      int maxNum2 = min(9, 3 + (_level ~/ 3));
 
-    // After level 10, start using two-digit numbers
-    if (_level > 10) {
-      maxNum1 = min(15, 8 + (_level ~/ 5));
-      maxNum2 = min(12, 6 + (_level ~/ 5));
+      if (_level > 10) {
+        maxNum1 = min(15, 8 + (_level ~/ 5));
+        maxNum2 = min(12, 6 + (_level ~/ 5));
+      }
+
+      setState(() {
+        _num1 = _random.nextInt(maxNum1) + 2;
+        _num2 = _random.nextInt(maxNum2) + 2;
+        _operation = '×';
+        _correctAnswer = _num1! * _num2!;
+      });
+    } else {
+      // Addition/Subtraction mode
+      final useAddition = _random.nextBool();
+      int maxNum = min(20, 10 + (_level ~/ 2));
+
+      if (_level > 10) {
+        maxNum = min(50, 15 + (_level));
+      }
+
+      setState(() {
+        if (useAddition) {
+          _num1 = _random.nextInt(maxNum) + 1;
+          _num2 = _random.nextInt(maxNum) + 1;
+          _operation = '+';
+          _correctAnswer = _num1! + _num2!;
+        } else {
+          // For subtraction, ensure num1 > num2 for positive results
+          _num1 = _random.nextInt(maxNum) + 5;
+          _num2 = _random.nextInt(_num1! - 1) + 1;
+          _operation = '-';
+          _correctAnswer = _num1! - _num2!;
+        }
+      });
     }
 
     setState(() {
-      _num1 = _random.nextInt(maxNum1) + 2;
-      _num2 = _random.nextInt(maxNum2) + 2;
-      _correctAnswer = _num1! * _num2!;
-
       // Generate wrong answers
       _answers = [_correctAnswer!];
       while (_answers.length < 4) {
@@ -224,8 +274,15 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
   }
 
   void _showGameOverDialog() {
-    final isNewRecord = _correctAnswers > _bestCorrectAnswers ||
-        (_correctAnswers == _bestCorrectAnswers && _elapsedSeconds < _bestScore);
+    final currentBest = _selectedMode == GameMode.multiplication
+        ? _bestCorrectMultiplication
+        : _bestCorrectAddSub;
+    final currentBestTime = _selectedMode == GameMode.multiplication
+        ? _bestScoreMultiplication
+        : _bestScoreAddSub;
+
+    final isNewRecord = _correctAnswers > currentBest ||
+        (_correctAnswers == currentBest && _elapsedSeconds < currentBestTime);
 
     showDialog(
       context: context,
@@ -257,7 +314,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
             ),
             const SizedBox(height: 10),
             Text(
-              '$_bestCorrectAnswers ${_isHebrew ? 'תשובות ב-' : 'answers in '} ${_bestScore}s',
+              '$currentBest ${_isHebrew ? 'תשובות ב-' : 'answers in '} ${currentBestTime}s',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -270,11 +327,13 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context);
+              setState(() {
+                _selectedMode = null;
+              });
             },
             child: Text(
-              _isHebrew ? 'יציאה' : 'Exit',
-              style: const TextStyle(fontSize: 18),
+              _isHebrew ? 'חזור לתפריט' : 'Back to Menu',
+              style: const TextStyle(fontSize: 16),
             ),
           ),
           ElevatedButton(
@@ -325,10 +384,11 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
     if (!_gameStarted || _gameOver) return;
 
     setState(() {
-      if (delta < 0 && _currentLane < 3) {
-        _currentLane++;
-      } else if (delta > 0 && _currentLane > 0) {
+      // Fixed: swipe left = go left (decrease lane), swipe right = go right (increase lane)
+      if (delta < 0 && _currentLane > 0) {
         _currentLane--;
+      } else if (delta > 0 && _currentLane < 3) {
+        _currentLane++;
       }
     });
   }
@@ -363,7 +423,9 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
           child: Stack(
             children: [
               // Game area
-              if (_gameStarted && !_gameOver) ...[
+              if (_selectedMode == null) ...[
+                _buildModeSelectionScreen(responsive),
+              ] else if (_gameStarted && !_gameOver) ...[
                 _buildGameScreen(responsive),
               ] else ...[
                 _buildStartScreen(responsive),
@@ -375,7 +437,15 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                 left: _isHebrew ? null : 10,
                 right: _isHebrew ? 10 : null,
                 child: KidBackButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    if (_selectedMode != null && !_gameStarted) {
+                      setState(() {
+                        _selectedMode = null;
+                      });
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
                   color: Colors.orange.shade600,
                   isHebrew: _isHebrew,
                 ),
@@ -387,7 +457,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
     );
   }
 
-  Widget _buildStartScreen(ResponsiveHelper responsive) {
+  Widget _buildModeSelectionScreen(ResponsiveHelper responsive) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -398,12 +468,197 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
           ),
           SizedBox(height: responsive.spacing(20)),
           Text(
-            _isHebrew ? 'מרוץ כפל' : 'Multiplication Racing',
+            _isHebrew ? 'מרוץ מתמטיקה' : 'Math Racing',
             style: TextStyle(
               fontSize: responsive.fontSize(36),
               fontWeight: FontWeight.bold,
               color: Colors.orange.shade800,
             ),
+          ),
+          SizedBox(height: responsive.spacing(10)),
+          Text(
+            _isHebrew ? 'בחר מצב משחק:' : 'Choose game mode:',
+            style: TextStyle(
+              fontSize: responsive.fontSize(20),
+              color: Colors.grey.shade700,
+            ),
+          ),
+          SizedBox(height: responsive.spacing(30)),
+          _buildModeButton(
+            responsive,
+            icon: '✖️',
+            title: _isHebrew ? 'כפל' : 'Multiplication',
+            description: _isHebrew ? 'תרגול לוח הכפל' : 'Practice multiplication',
+            color: Colors.purple,
+            bestScore: _bestCorrectMultiplication,
+            bestTime: _bestScoreMultiplication,
+            onTap: () {
+              setState(() {
+                _selectedMode = GameMode.multiplication;
+              });
+            },
+          ),
+          SizedBox(height: responsive.spacing(20)),
+          _buildModeButton(
+            responsive,
+            icon: '➕➖',
+            title: _isHebrew ? 'חיבור וחיסור' : 'Addition & Subtraction',
+            description: _isHebrew ? 'תרגול חיבור וחיסור' : 'Practice addition and subtraction',
+            color: Colors.teal,
+            bestScore: _bestCorrectAddSub,
+            bestTime: _bestScoreAddSub,
+            onTap: () {
+              setState(() {
+                _selectedMode = GameMode.additionSubtraction;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeButton(
+    ResponsiveHelper responsive, {
+    required String icon,
+    required String title,
+    required String description,
+    required Color color,
+    required int bestScore,
+    required int bestTime,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: responsive.spacing(30)),
+        padding: EdgeInsets.all(responsive.spacing(20)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Center(
+                    child: Text(icon, style: const TextStyle(fontSize: 32)),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(20),
+                          fontWeight: FontWeight.bold,
+                          color: color.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: responsive.fontSize(14),
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (bestScore > 0) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '🏆 ${_isHebrew ? 'שיא:' : 'Best:'}',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(14),
+                        color: color.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '$bestScore ${_isHebrew ? 'ב-' : 'in'} ${bestTime}s',
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(14),
+                        color: color.shade800,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStartScreen(ResponsiveHelper responsive) {
+    final currentBest = _selectedMode == GameMode.multiplication
+        ? _bestCorrectMultiplication
+        : _bestCorrectAddSub;
+    final currentBestTime = _selectedMode == GameMode.multiplication
+        ? _bestScoreMultiplication
+        : _bestScoreAddSub;
+
+    final modeTitle = _selectedMode == GameMode.multiplication
+        ? (_isHebrew ? 'מרוץ כפל' : 'Multiplication Racing')
+        : (_isHebrew ? 'מרוץ חיבור וחיסור' : 'Addition & Subtraction Racing');
+
+    final modeIcon = _selectedMode == GameMode.multiplication ? '✖️' : '➕➖';
+    final modeInstruction = _selectedMode == GameMode.multiplication
+        ? (_isHebrew ? 'ענה על שאלות כפל' : 'Answer multiplication questions')
+        : (_isHebrew ? 'ענה על שאלות חיבור וחיסור' : 'Answer addition and subtraction questions');
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '🏎️',
+            style: TextStyle(fontSize: responsive.iconSize(80)),
+          ),
+          SizedBox(height: responsive.spacing(20)),
+          Text(
+            modeTitle,
+            style: TextStyle(
+              fontSize: responsive.fontSize(32),
+              fontWeight: FontWeight.bold,
+              color: Colors.orange.shade800,
+            ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: responsive.spacing(20)),
           Container(
@@ -431,11 +686,11 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                 ),
                 SizedBox(height: responsive.spacing(12)),
                 _buildInstruction('🚗', _isHebrew ? 'הזז את המכונית בין הנתיבים' : 'Move the car between lanes'),
-                _buildInstruction('✖️', _isHebrew ? 'ענה על שאלות כפל' : 'Answer multiplication questions'),
+                _buildInstruction(modeIcon, modeInstruction),
                 _buildInstruction('⚡', _isHebrew ? 'ככל שעולים ברמה המהירות עולה' : 'Speed increases with levels'),
                 _buildInstruction('🏆', _isHebrew ? 'נסה להשיג את השיא!' : 'Try to beat the record!'),
                 const SizedBox(height: 20),
-                if (_bestCorrectAnswers > 0) ...[
+                if (currentBest > 0) ...[
                   Text(
                     _isHebrew ? 'השיא שלך:' : 'Your Best:',
                     style: TextStyle(
@@ -444,7 +699,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                     ),
                   ),
                   Text(
-                    '$_bestCorrectAnswers ${_isHebrew ? 'תשובות ב-' : 'answers in '} ${_bestScore}s',
+                    '$currentBest ${_isHebrew ? 'תשובות ב-' : 'answers in '} ${currentBestTime}s',
                     style: TextStyle(
                       fontSize: responsive.fontSize(20),
                       fontWeight: FontWeight.bold,
@@ -537,7 +792,7 @@ class _MultiplicationRacingGameState extends State<MultiplicationRacingGame>
                   border: Border.all(color: Colors.orange.shade300, width: 2),
                 ),
                 child: Text(
-                  '$_num1 × $_num2 = ?',
+                  '$_num1 $_operation $_num2 = ?',
                   style: TextStyle(
                     fontSize: responsive.fontSize(32),
                     fontWeight: FontWeight.bold,
@@ -641,15 +896,14 @@ class RoadPainter extends CustomPainter {
       }
     }
 
-    // Draw answer blocks
+    // Draw answer blocks (all same color - don't reveal the answer!)
     if (answerPosition > -100 && answerPosition < size.height) {
       for (int i = 0; i < 4; i++) {
         final laneX = size.width * 0.1 + (laneWidth * i) + (laneWidth / 2);
         final answer = answers[i];
-        final isCorrect = answer == correctAnswer;
 
         final blockPaint = Paint()
-          ..color = isCorrect ? Colors.green.shade400 : Colors.red.shade400;
+          ..color = Colors.blue.shade400;
 
         final blockRect = Rect.fromCenter(
           center: Offset(laneX, answerPosition),
@@ -685,34 +939,89 @@ class RoadPainter extends CustomPainter {
       }
     }
 
-    // Draw car
+    // Draw car with better graphics
     final carLaneX = size.width * 0.1 + (laneWidth * currentLane) + (laneWidth / 2);
     final carY = size.height * 0.75;
+    final carWidth = laneWidth * 0.7;
+    final carHeight = 80.0;
 
-    final carPaint = Paint()..color = Colors.blue.shade600;
-    final carRect = Rect.fromCenter(
+    // Car body (main)
+    final carBodyPaint = Paint()..color = Colors.red.shade600;
+    final carBodyRect = Rect.fromCenter(
       center: Offset(carLaneX, carY),
-      width: laneWidth * 0.7,
-      height: 80,
+      width: carWidth,
+      height: carHeight * 0.6,
     );
-
     canvas.drawRRect(
-      RRect.fromRectAndRadius(carRect, const Radius.circular(8)),
-      carPaint,
+      RRect.fromRectAndRadius(carBodyRect, const Radius.circular(8)),
+      carBodyPaint,
     );
 
-    // Draw car windows
-    final windowPaint = Paint()..color = Colors.lightBlue.shade200;
+    // Car roof
+    final roofPaint = Paint()..color = Colors.red.shade700;
+    final roofRect = Rect.fromCenter(
+      center: Offset(carLaneX, carY - carHeight * 0.25),
+      width: carWidth * 0.7,
+      height: carHeight * 0.35,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(roofRect, const Radius.circular(6)),
+      roofPaint,
+    );
+
+    // Windows
+    final windowPaint = Paint()..color = Colors.lightBlue.shade100;
+
+    // Front window
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromCenter(
-          center: Offset(carLaneX, carY - 10),
-          width: laneWidth * 0.5,
-          height: 30,
+          center: Offset(carLaneX, carY - carHeight * 0.25),
+          width: carWidth * 0.5,
+          height: carHeight * 0.25,
         ),
-        const Radius.circular(6),
+        const Radius.circular(4),
       ),
       windowPaint,
+    );
+
+    // Wheels
+    final wheelPaint = Paint()..color = Colors.grey.shade900;
+    final wheelRadius = carWidth * 0.15;
+
+    // Left wheel
+    canvas.drawCircle(
+      Offset(carLaneX - carWidth * 0.25, carY + carHeight * 0.35),
+      wheelRadius,
+      wheelPaint,
+    );
+
+    // Right wheel
+    canvas.drawCircle(
+      Offset(carLaneX + carWidth * 0.25, carY + carHeight * 0.35),
+      wheelRadius,
+      wheelPaint,
+    );
+
+    // Wheel rims
+    final rimPaint = Paint()..color = Colors.grey.shade400;
+    canvas.drawCircle(
+      Offset(carLaneX - carWidth * 0.25, carY + carHeight * 0.35),
+      wheelRadius * 0.5,
+      rimPaint,
+    );
+    canvas.drawCircle(
+      Offset(carLaneX + carWidth * 0.25, carY + carHeight * 0.35),
+      wheelRadius * 0.5,
+      rimPaint,
+    );
+
+    // Headlights
+    final headlightPaint = Paint()..color = Colors.yellow.shade300;
+    canvas.drawCircle(
+      Offset(carLaneX + carWidth * 0.3, carY + carHeight * 0.1),
+      4,
+      headlightPaint,
     );
   }
 
