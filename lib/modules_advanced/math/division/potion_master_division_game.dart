@@ -536,8 +536,8 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
               isCorrect: _isCorrect ?? true,
             ),
             size: Size(
-              responsive.width * 0.5,
-              responsive.height * 0.25,
+              responsive.screenWidth * 0.5,
+              responsive.screenHeight * 0.25,
             ),
           );
         },
@@ -584,8 +584,8 @@ class _PotionMasterDivisionGameState extends State<PotionMasterDivisionGame>
                 _selectedPotion == null ? () => _selectPotion(index) : null,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              width: responsive.width * 0.2,
-              height: responsive.height * 0.15,
+              width: responsive.screenWidth * 0.2,
+              height: responsive.screenHeight * 0.15,
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -752,7 +752,7 @@ class CauldronPainter extends CustomPainter {
     );
 
     final potionColor =
-        showExplosion ? (isCorrect ? Colors.gold : Colors.grey) : Colors.green;
+        showExplosion ? (isCorrect ? Colors.amber : Colors.grey) : Colors.green;
 
     final potionPaint = Paint()
       ..shader = LinearGradient(
