@@ -25,7 +25,7 @@ class _FractionPlatformRunnerGameState
   // Game state
   int _score = 0;
   int _distance = 0;
-  double _gameSpeed = 0.005;
+  double _gameSpeed = 0.003; // Reduced from 0.005 for slower gameplay
   bool _gameOver = false;
   bool _hasShield = false;
   bool _hasMagnet = false;
@@ -110,7 +110,7 @@ class _FractionPlatformRunnerGameState
     setState(() {
       _score = 0;
       _distance = 0;
-      _gameSpeed = 0.005;
+      _gameSpeed = 0.003; // Slower start speed
       _gameOver = false;
       _currentLane = 1;
       _isJumping = false;
@@ -191,10 +191,10 @@ class _FractionPlatformRunnerGameState
 
   void _updateGame() {
     setState(() {
-      // Increase speed over time
+      // Increase speed over time (slower acceleration)
       _distance++;
-      if (_distance % 500 == 0) {
-        _gameSpeed = (_gameSpeed * 1.1).clamp(0.005, 0.015);
+      if (_distance % 1000 == 0) {
+        _gameSpeed = (_gameSpeed * 1.05).clamp(0.003, 0.012);
       }
 
       // Update jump
@@ -819,6 +819,18 @@ class _FractionPlatformRunnerGameState
             ),
             textAlign: TextAlign.center,
           ),
+          SizedBox(height: responsive.spacing(4)),
+          Text(
+            _isHebrew
+                ? '(פלטפורמות נעות מימין לשמאל, תקפוץ כשהן מגיעות אליך)'
+                : '(Platforms move right to left, jump when they reach you)',
+            style: TextStyle(
+              fontSize: responsive.fontSize(11),
+              color: Colors.orange.shade700,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
           SizedBox(height: responsive.spacing(6)),
           Container(
             padding: EdgeInsets.symmetric(
@@ -833,7 +845,7 @@ class _FractionPlatformRunnerGameState
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _isHebrew ? 'בקרים:' : 'Controls:',
+                  _isHebrew ? 'איך לשחק:' : 'How to play:',
                   style: TextStyle(
                     fontSize: responsive.fontSize(11),
                     fontWeight: FontWeight.bold,
@@ -843,8 +855,8 @@ class _FractionPlatformRunnerGameState
                 SizedBox(height: responsive.spacing(2)),
                 Text(
                   _isHebrew
-                      ? '👆 לחיצה = קפיצה\n⬆️ החלק למעלה/למטה = שנה מסלול'
-                      : '👆 Tap = Jump\n⬆️ Swipe up/down = Change lane',
+                      ? '⬆️⬇️ החלק למעלה/למטה = שנה מסלול (3 מסלולים)\n👆 לחיצה = קפיצה למעלה באוויר\n🎯 תהיה באותו מסלול של הפלטפורמה וקפוץ כשהיא מגיעה'
+                      : '⬆️⬇️ Swipe up/down = Change lane (3 lanes)\n👆 Tap = Jump up in the air\n🎯 Be in same lane as platform and jump when it arrives',
                   style: TextStyle(
                     fontSize: responsive.fontSize(9),
                     color: Colors.orange.shade700,
