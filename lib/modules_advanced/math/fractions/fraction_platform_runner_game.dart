@@ -634,19 +634,14 @@ class _FractionPlatformRunnerGameState
         behavior: HitTestBehavior.translucent,
         onVerticalDragUpdate: (details) {
           if (_gameOver) return;
+          // Swipe up = move up (decrease lane: 2→1→0)
+          // Swipe down = move down (increase lane: 0→1→2)
           if (details.delta.dy < -10) {
-            _jump();
-          }
-        },
-        onHorizontalDragUpdate: (details) {
-          if (_gameOver) return;
-          // Swipe left/right to change lanes
-          if (details.delta.dx > 10) {
-            // Swipe right
-            if (_currentLane < 2) _changeLane(_currentLane + 1);
-          } else if (details.delta.dx < -10) {
-            // Swipe left
+            // Swipe up - go to upper lane
             if (_currentLane > 0) _changeLane(_currentLane - 1);
+          } else if (details.delta.dy > 10) {
+            // Swipe down - go to lower lane
+            if (_currentLane < 2) _changeLane(_currentLane + 1);
           }
         },
         onTap: () {
@@ -815,25 +810,49 @@ class _FractionPlatformRunnerGameState
         children: [
           Text(
             _isHebrew
-                ? 'קפוץ על: $_targetNumerator/$_targetDenominator'
-                : 'Jump on: $_targetNumerator/$_targetDenominator',
+                ? '🎯 קפוץ על פלטפורמה עם: $_targetNumerator/$_targetDenominator'
+                : '🎯 Jump on platform with: $_targetNumerator/$_targetDenominator',
             style: TextStyle(
-              fontSize: responsive.fontSize(20),
+              fontSize: responsive.fontSize(18),
               fontWeight: FontWeight.bold,
               color: Colors.orange.shade900,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: responsive.spacing(4)),
-          Text(
-            _isHebrew
-                ? '⬆️ החלק למעלה לקפוץ | ⬅️➡️ החלק לשנות מסלול'
-                : '⬆️ Swipe up to jump | ⬅️➡️ Swipe to change lane',
-            style: TextStyle(
-              fontSize: responsive.fontSize(10),
-              color: Colors.orange.shade700,
+          SizedBox(height: responsive.spacing(6)),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.spacing(8),
+              vertical: responsive.spacing(4),
             ),
-            textAlign: TextAlign.center,
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _isHebrew ? 'בקרים:' : 'Controls:',
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(11),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+                SizedBox(height: responsive.spacing(2)),
+                Text(
+                  _isHebrew
+                      ? '👆 לחיצה = קפיצה\n⬆️ החלק למעלה/למטה = שנה מסלול'
+                      : '👆 Tap = Jump\n⬆️ Swipe up/down = Change lane',
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(9),
+                    color: Colors.orange.shade700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ],
       ),

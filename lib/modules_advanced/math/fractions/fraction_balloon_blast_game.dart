@@ -352,9 +352,11 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
       _speak(_isHebrew ? 'קומבו מדהים!' : 'Amazing combo!');
     }
 
-    // Generate new question every 5 correct answers (if not bonus round)
-    if (!_isBonusRound && _combo % 5 == 0) {
-      _generateQuestion();
+    // Generate new question after each correct answer (if not bonus round)
+    if (!_isBonusRound) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) _generateQuestion();
+      });
     }
   }
 
@@ -714,21 +716,32 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
 
   Widget _buildQuestion(ResponsiveHelper responsive) {
     String questionText = '';
+    String explanation = '';
+
     switch (_questionType) {
       case 'match':
         questionText = _isHebrew
-            ? 'פוצץ: $_targetNumerator/$_targetDenominator'
-            : 'Pop: $_targetNumerator/$_targetDenominator';
+            ? 'פוצץ בלונים עם: $_targetNumerator/$_targetDenominator'
+            : 'Pop balloons with: $_targetNumerator/$_targetDenominator';
+        explanation = _isHebrew
+            ? '(חפש בלונים עם השבר $_targetNumerator/$_targetDenominator)'
+            : '(Find balloons with the fraction $_targetNumerator/$_targetDenominator)';
         break;
       case 'bigger':
         questionText = _isHebrew
-            ? 'פוצץ שברים > $_targetNumerator/$_targetDenominator'
-            : 'Pop fractions > $_targetNumerator/$_targetDenominator';
+            ? 'פוצץ שברים גדולים מ-$_targetNumerator/$_targetDenominator'
+            : 'Pop fractions bigger than $_targetNumerator/$_targetDenominator';
+        explanation = _isHebrew
+            ? '(שברים שגדולים מ-${(_targetValue! * 100).toInt()}%)'
+            : '(Fractions bigger than ${(_targetValue! * 100).toInt()}%)';
         break;
       case 'smaller':
         questionText = _isHebrew
-            ? 'פוצץ שברים < $_targetNumerator/$_targetDenominator'
-            : 'Pop fractions < $_targetNumerator/$_targetDenominator';
+            ? 'פוצץ שברים קטנים מ-$_targetNumerator/$_targetDenominator'
+            : 'Pop fractions smaller than $_targetNumerator/$_targetDenominator';
+        explanation = _isHebrew
+            ? '(שברים שקטנים מ-${(_targetValue! * 100).toInt()}%)'
+            : '(Fractions smaller than ${(_targetValue! * 100).toInt()}%)';
         break;
     }
 
@@ -756,7 +769,7 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
           Text(
             questionText,
             style: TextStyle(
-              fontSize: responsive.fontSize(24),
+              fontSize: responsive.fontSize(20),
               fontWeight: FontWeight.bold,
               color: Colors.purple.shade900,
             ),
@@ -764,10 +777,20 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
           ),
           SizedBox(height: responsive.spacing(4)),
           Text(
-            _isHebrew ? '👆 גע על הבלונים הנכונים!' : '👆 Tap the correct balloons!',
+            explanation,
             style: TextStyle(
               fontSize: responsive.fontSize(12),
               color: Colors.purple.shade700,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: responsive.spacing(4)),
+          Text(
+            _isHebrew ? '👆 גע על הבלונים!' : '👆 Tap the balloons!',
+            style: TextStyle(
+              fontSize: responsive.fontSize(11),
+              color: Colors.purple.shade600,
             ),
             textAlign: TextAlign.center,
           ),
