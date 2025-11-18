@@ -181,6 +181,8 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
       _targetNumerator = target[0];
       _targetDenominator = target[1];
       _targetValue = target[0] / target[1];
+      // Clear existing balloons so they don't have the old question's fractions
+      _balloons.clear();
     });
 
     _speakQuestion();
