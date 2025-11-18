@@ -573,12 +573,19 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
                   final x = details.localPosition.dx / responsive.screenWidth;
                   final y = details.localPosition.dy / responsive.screenHeight;
 
+                  // Find the balloon to pop
+                  Balloon? balloonToPop;
                   for (final balloon in _balloons) {
                     final distance = sqrt(pow(balloon.x - x, 2) + pow(balloon.y - y, 2));
                     if (distance < 0.08) {
-                      _popBalloon(balloon);
+                      balloonToPop = balloon;
                       break;
                     }
+                  }
+
+                  // Pop balloon after gesture completes to avoid blocking
+                  if (balloonToPop != null) {
+                    Future.microtask(() => _popBalloon(balloonToPop!));
                   }
                 },
                 child: SizedBox.expand(
