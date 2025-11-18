@@ -4,6 +4,9 @@ import '../../../widgets/kid_button.dart';
 import '../../../widgets/kid_back_button.dart';
 import 'cake_cutter_game.dart';
 import 'chocolate_fractions_game.dart';
+import 'fraction_rocket_collector_game.dart';
+import 'fraction_balloon_blast_game.dart';
+import 'fraction_platform_runner_game.dart';
 
 /// מסך תפריט שברים - גילאי 7-12
 class FractionsMenuScreen extends StatefulWidget {
@@ -128,16 +131,13 @@ class _FractionsMenuScreenState extends State<FractionsMenuScreen>
                       horizontal: responsive.spacing(20),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🎂',
                           title: _isHebrew ? 'חותך עוגות' : 'Cake Cutter',
-                          description: _isHebrew
-                              ? 'למד שברים בסיסיים על ידי חיתוך עוגות'
-                              : 'Learn basic fractions by cutting cakes',
                           color: Colors.pink,
                           onTap: () {
                             Navigator.push(
@@ -148,21 +148,62 @@ class _FractionsMenuScreenState extends State<FractionsMenuScreen>
                             );
                           },
                         ),
-                        SizedBox(height: responsive.spacing(20)),
-                        _buildGameCard(
+                        _buildCompactGameCard(
                           context,
                           responsive,
                           icon: '🍫',
                           title: _isHebrew ? 'שברי שוקולד' : 'Chocolate Fractions',
-                          description: _isHebrew
-                              ? 'זהה ושרטט שברים עם לוח שוקולד'
-                              : 'Identify and draw fractions with chocolate bar',
                           color: Colors.brown,
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const ChocolateFractionsGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildCompactGameCard(
+                          context,
+                          responsive,
+                          icon: '🚀',
+                          title: _isHebrew ? 'רקטת שברים' : 'Fraction Rocket',
+                          color: Colors.blue,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FractionRocketCollectorGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildCompactGameCard(
+                          context,
+                          responsive,
+                          icon: '🎈',
+                          title: _isHebrew ? 'פיצוץ בלונים' : 'Balloon Blast',
+                          color: Colors.purple,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FractionBalloonBlastGame(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildCompactGameCard(
+                          context,
+                          responsive,
+                          icon: '🏃‍♂️',
+                          title: _isHebrew ? 'מרוץ פלטפורמות' : 'Platform Runner',
+                          color: Colors.orange,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FractionPlatformRunnerGame(),
                               ),
                             );
                           },
@@ -181,76 +222,65 @@ class _FractionsMenuScreenState extends State<FractionsMenuScreen>
     );
   }
 
-  Widget _buildGameCard(
+  Widget _buildCompactGameCard(
     BuildContext context,
     ResponsiveHelper responsive, {
     required String icon,
     required String title,
-    required String description,
     required Color color,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: EdgeInsets.all(responsive.spacing(20)),
+        padding: EdgeInsets.symmetric(
+          horizontal: responsive.spacing(12),
+          vertical: responsive.spacing(8),
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color, width: 3),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 70,
-              height: 70,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
                   icon,
-                  style: TextStyle(fontSize: responsive.iconSize(40)),
+                  style: TextStyle(fontSize: responsive.iconSize(28)),
                 ),
               ),
             ),
-            SizedBox(width: responsive.spacing(16)),
+            SizedBox(width: responsive.spacing(12)),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(18),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                  SizedBox(height: responsive.spacing(4)),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: responsive.fontSize(14),
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(16),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
               ),
             ),
             Icon(
               _isHebrew ? Icons.arrow_back : Icons.arrow_forward,
               color: color,
-              size: 30,
+              size: 24,
             ),
           ],
         ),
