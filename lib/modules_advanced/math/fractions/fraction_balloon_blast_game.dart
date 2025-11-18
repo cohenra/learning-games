@@ -181,8 +181,7 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
       _targetNumerator = target[0];
       _targetDenominator = target[1];
       _targetValue = target[0] / target[1];
-      // Clear existing balloons so they don't have the old question's fractions
-      _balloons.clear();
+      // Don't clear balloons - let the spawn system create appropriate ones
     });
 
     _speakQuestion();
@@ -252,7 +251,42 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
       [7, 8]
     ];
 
-    final fraction = fractions[_random.nextInt(fractions.length)];
+    List<int> fraction;
+
+    // 50% chance to spawn a balloon that matches the current question
+    // This ensures there are always correct answers available
+    if (_targetValue != null && _random.nextDouble() < 0.5) {
+      switch (_questionType) {
+        case 'match':
+          // Spawn the exact fraction
+          fraction = [_targetNumerator!, _targetDenominator!];
+          break;
+        case 'bigger':
+          // Spawn a fraction bigger than target
+          final validFractions = fractions.where((f) =>
+            (f[0] / f[1]) > _targetValue!
+          ).toList();
+          fraction = validFractions.isNotEmpty
+            ? validFractions[_random.nextInt(validFractions.length)]
+            : fractions[_random.nextInt(fractions.length)];
+          break;
+        case 'smaller':
+          // Spawn a fraction smaller than target
+          final validFractions = fractions.where((f) =>
+            (f[0] / f[1]) < _targetValue!
+          ).toList();
+          fraction = validFractions.isNotEmpty
+            ? validFractions[_random.nextInt(validFractions.length)]
+            : fractions[_random.nextInt(fractions.length)];
+          break;
+        default:
+          fraction = fractions[_random.nextInt(fractions.length)];
+      }
+    } else {
+      // 50% chance to spawn a random (possibly wrong) balloon
+      fraction = fractions[_random.nextInt(fractions.length)];
+    }
+
     final balloon = Balloon(
       numerator: fraction[0],
       denominator: fraction[1],
