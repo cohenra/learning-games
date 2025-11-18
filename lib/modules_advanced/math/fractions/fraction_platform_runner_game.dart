@@ -36,6 +36,7 @@ class _FractionPlatformRunnerGameState
   double _jumpHeight = 0.0;
   bool _canDoubleJump = false;
   bool _hasUsedDoubleJump = false;
+  bool _hasChangedLaneThisGesture = false; // Prevent multiple lane changes per swipe
 
   // Current question
   int? _targetNumerator;
@@ -119,6 +120,7 @@ class _FractionPlatformRunnerGameState
       _hasMagnet = false;
       _canDoubleJump = false;
       _hasUsedDoubleJump = false;
+      _hasChangedLaneThisGesture = false;
       _platforms.clear();
       _obstacles.clear();
       _coins.clear();
@@ -633,16 +635,31 @@ class _FractionPlatformRunnerGameState
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onVerticalDragUpdate: (details) {
-          if (_gameOver) return;
+          if (_gameOver || _hasChangedLaneThisGesture) return;
           // Swipe up = move up (decrease lane: 2→1→0)
           // Swipe down = move down (increase lane: 0→1→2)
           if (details.delta.dy < -10) {
             // Swipe up - go to upper lane
-            if (_currentLane > 0) _changeLane(_currentLane - 1);
+            if (_currentLane > 0) {
+              _changeLane(_currentLane - 1);
+              setState(() {
+                _hasChangedLaneThisGesture = true;
+              });
+            }
           } else if (details.delta.dy > 10) {
             // Swipe down - go to lower lane
-            if (_currentLane < 2) _changeLane(_currentLane + 1);
+            if (_currentLane < 2) {
+              _changeLane(_currentLane + 1);
+              setState(() {
+                _hasChangedLaneThisGesture = true;
+              });
+            }
           }
+        },
+        onVerticalDragEnd: (details) {
+          setState(() {
+            _hasChangedLaneThisGesture = false;
+          });
         },
         onTap: () {
           if (_gameOver) return;

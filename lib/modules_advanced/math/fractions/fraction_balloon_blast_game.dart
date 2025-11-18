@@ -29,7 +29,6 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
   bool _gameOver = false;
   int _timeLeft = 60; // 60 seconds per game
   bool _isBonusRound = false;
-  bool _isProcessingPop = false; // Prevent multiple pops at once
 
   // Question
   String _questionType = 'match'; // 'match', 'bigger', 'smaller', 'sum'
@@ -295,10 +294,9 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
   }
 
   void _popBalloon(Balloon balloon) {
-    if (_isProcessingPop) return; // Prevent multiple pops at once
-
+    // Remove balloon immediately to prevent double-tap
     setState(() {
-      _isProcessingPop = true;
+      _balloons.remove(balloon);
     });
 
     final isCorrect = _checkAnswer(balloon);
@@ -316,25 +314,11 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
 
     _popController.forward(from: 0);
 
-    // Remove balloon
-    setState(() {
-      _balloons.remove(balloon);
-    });
-
     if (isCorrect) {
       _handleCorrectPop();
     } else {
       _handleWrongPop();
     }
-
-    // Re-enable popping after animation
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) {
-        setState(() {
-          _isProcessingPop = false;
-        });
-      }
-    });
   }
 
   bool _checkAnswer(Balloon balloon) {
