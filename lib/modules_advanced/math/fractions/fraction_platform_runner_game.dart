@@ -631,22 +631,27 @@ class _FractionPlatformRunnerGameState
 
     return Scaffold(
       body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onVerticalDragUpdate: (details) {
           if (_gameOver) return;
           if (details.delta.dy < -10) {
             _jump();
           }
         },
-        onTapDown: (details) {
+        onHorizontalDragUpdate: (details) {
           if (_gameOver) return;
-          final y = details.localPosition.dy / responsive.screenHeight;
-          if (y < 0.4) {
-            _changeLane(0);
-          } else if (y < 0.6) {
-            _changeLane(1);
-          } else {
-            _changeLane(2);
+          // Swipe left/right to change lanes
+          if (details.delta.dx > 10) {
+            // Swipe right
+            if (_currentLane < 2) _changeLane(_currentLane + 1);
+          } else if (details.delta.dx < -10) {
+            // Swipe left
+            if (_currentLane > 0) _changeLane(_currentLane - 1);
           }
+        },
+        onTap: () {
+          if (_gameOver) return;
+          _jump();
         },
         child: Container(
           width: double.infinity,
@@ -805,16 +810,32 @@ class _FractionPlatformRunnerGameState
           ),
         ],
       ),
-      child: Text(
-        _isHebrew
-            ? 'קפוץ על: $_targetNumerator/$_targetDenominator'
-            : 'Jump on: $_targetNumerator/$_targetDenominator',
-        style: TextStyle(
-          fontSize: responsive.fontSize(20),
-          fontWeight: FontWeight.bold,
-          color: Colors.orange.shade900,
-        ),
-        textAlign: TextAlign.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _isHebrew
+                ? 'קפוץ על: $_targetNumerator/$_targetDenominator'
+                : 'Jump on: $_targetNumerator/$_targetDenominator',
+            style: TextStyle(
+              fontSize: responsive.fontSize(20),
+              fontWeight: FontWeight.bold,
+              color: Colors.orange.shade900,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: responsive.spacing(4)),
+          Text(
+            _isHebrew
+                ? '⬆️ החלק למעלה לקפוץ | ⬅️➡️ החלק לשנות מסלול'
+                : '⬆️ Swipe up to jump | ⬅️➡️ Swipe to change lane',
+            style: TextStyle(
+              fontSize: responsive.fontSize(10),
+              color: Colors.orange.shade700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

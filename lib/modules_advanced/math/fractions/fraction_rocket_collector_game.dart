@@ -437,6 +437,8 @@ class _FractionRocketCollectorGameState
                       setState(() {
                         _score = 0;
                         _currentLevel = 1;
+                        _showExplosion = false;
+                        _explosionPosition = null;
                       });
                       _startLevel();
                     },
@@ -518,6 +520,8 @@ class _FractionRocketCollectorGameState
                       setState(() {
                         _score = 0;
                         _currentLevel = 1;
+                        _showExplosion = false;
+                        _explosionPosition = null;
                       });
                       _startLevel();
                     },

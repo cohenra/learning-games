@@ -545,18 +545,20 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
                     }
                   }
                 },
-                child: AnimatedBuilder(
-                  animation: _floatController,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      painter: BalloonsPainter(
-                        balloons: _balloons,
-                        floatValue: _floatController.value,
-                        popAnimations: _popAnimations,
-                      ),
-                      size: Size.infinite,
-                    );
-                  },
+                child: SizedBox.expand(
+                  child: AnimatedBuilder(
+                    animation: _floatController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: BalloonsPainter(
+                          balloons: _balloons,
+                          floatValue: _floatController.value,
+                          popAnimations: _popAnimations,
+                        ),
+                        size: Size.infinite,
+                      );
+                    },
+                  ),
                 ),
               ),
 
@@ -748,14 +750,28 @@ class _FractionBalloonBlastGameState extends State<FractionBalloonBlastGame>
           ),
         ],
       ),
-      child: Text(
-        questionText,
-        style: TextStyle(
-          fontSize: responsive.fontSize(24),
-          fontWeight: FontWeight.bold,
-          color: Colors.purple.shade900,
-        ),
-        textAlign: TextAlign.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            questionText,
+            style: TextStyle(
+              fontSize: responsive.fontSize(24),
+              fontWeight: FontWeight.bold,
+              color: Colors.purple.shade900,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: responsive.spacing(4)),
+          Text(
+            _isHebrew ? '👆 גע על הבלונים הנכונים!' : '👆 Tap the correct balloons!',
+            style: TextStyle(
+              fontSize: responsive.fontSize(12),
+              color: Colors.purple.shade700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
