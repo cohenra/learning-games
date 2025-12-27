@@ -1,11 +1,16 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../games/tap_colors_game.dart';
+import '../games/floating_balloons_game.dart';
 
 class GameScreen extends StatefulWidget {
-  final TapColorsGame game;
-  const GameScreen({super.key, required this.game});
+  // We can switch this to FloatingBalloonsGame
+  final FloatingBalloonsGame? game;
+
+  // Or we can just create it inside if not passed, but usually it is passed or created here.
+  // The original code passed TapColorsGame. We will adapt.
+
+  const GameScreen({super.key, this.game});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -13,22 +18,27 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   bool _muted = false;
+  late FloatingBalloonsGame _gameInstance;
+
+  @override
+  void initState() {
+    super.initState();
+    _gameInstance = widget.game ?? FloatingBalloonsGame();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final game = widget.game;
-
     return Scaffold(
-      backgroundColor: const Color(0xFF0FA3B1),
+      backgroundColor: const Color(0xFF87CEEB), // Sky blue background
       body: SafeArea(
         child: Stack(
           children: [
-            // המשחק עצמו
+            // The Game
             Positioned.fill(
-              child: GameWidget(game: game),
+              child: GameWidget(game: _gameInstance),
             ),
 
-            // כפתור השמעת ההנחיה (ימין-עליון)
+            // Replay Instruction Button (Top Right)
             Positioned(
               top: 10,
               right: 10,
@@ -36,10 +46,11 @@ class _GameScreenState extends State<GameScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white.withOpacity(0.85),
                   foregroundColor: Colors.black87,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 onPressed: () async {
                   HapticFeedback.selectionClick();
-                  await game.replayInstruction();
+                  await _gameInstance.replayInstruction();
                 },
                 icon: const Icon(Icons.record_voice_over),
                 label: const Text(
@@ -49,7 +60,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
 
-            // כפתור השתקה (שמאל-עליון)
+            // Mute Button (Top Left)
             Positioned(
               top: 10,
               left: 10,
@@ -57,12 +68,13 @@ class _GameScreenState extends State<GameScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white.withOpacity(0.85),
                   foregroundColor: Colors.black87,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 onPressed: () {
                   HapticFeedback.selectionClick();
                   setState(() {
                     _muted = !_muted;
-                    game.toggleSound();
+                    _gameInstance.toggleSound();
                   });
                 },
                 icon: Icon(_muted ? Icons.volume_off : Icons.volume_up),
